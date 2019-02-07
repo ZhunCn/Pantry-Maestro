@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 var InventorySchema = new Schema({
   items: [{
     type: Schema.Types.ObjectId,
-    ref: 'Item'
+    ref: 'Item',
+    required: true
   }]
 }, {collection: 'inventories'});
 

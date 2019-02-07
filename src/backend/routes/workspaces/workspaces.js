@@ -1,7 +1,7 @@
 const express = require('express');
-
-const {complete} = require('../../utils');
-const {Workspace} = require('../../models');
+const {complete} = require('utils');
+const {Workspace, Inventory} = require('models');
+const c = require('const');
 
 module.exports = function(router) {
   /*
@@ -16,21 +16,21 @@ module.exports = function(router) {
 
     // Check if request contains necessary fields
     if (fields && !complete(req.query, fields)) {
-      res.status(400).json({'error': 'Missing fields'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
     Workspace.findOne({'name': req.query.name, 'deleted': false}).exec((err, workspace) => {
       if (err) {
-        res.json({'error': 'Error querying for workspace: ' + err});
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;
       }
       else if (!workspace) {
-        res.json({'error': 'No workspace exists with that id'});
+        res.status(c.status.BAD_REQUEST).json({'error': 'No workspace exists with that id'});
         return;
       }
 
-      res.json({'_id': workspace._id});
+      res.status(c.status.OK).json({'_id': workspace._id});
     });
   });
 
@@ -38,7 +38,7 @@ module.exports = function(router) {
    * Creates a new workspace
    */
   router.post('/api/workspaces/', (req, res) => {
-    // Authorize
+    // Add authorization and add user to workspace
 
     let fields = [
       'name'
@@ -46,18 +46,48 @@ module.exports = function(router) {
 
     // Check if request contains necessary fields
     if (fields && !complete(req.query, fields)) {
-      res.status(400).json({'error': 'Missing fields'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
     Workspace.findOne({'name': req.query.name}).exec((err, workspace) => {
-      if (err || !workspace) {
-        res.json({'error': 'Error querying for workspace: ' + err});
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
+        return;
+      }
+      else if (workspace) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that name already exists'});
         return;
       }
 
-      res.json({'_id': workspace._id});
+      let inventory = new Inventory({
+        'items': []
+      });
+
+      inventory.save((err, inventory) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
+          return;
+        }
+
+        let workspace = new Workspace({
+          'name': req.query.name,
+          'inventory': inventory['_id'],
+          'users': []
+        });
+
+        workspace.save(err => {
+          if (err) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
+            return;
+          }
+
+          res.status(c.status.OK).json({'message': 'Successfully created the workspace'});
+        });
+      });
     });
+
+    // res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not finished'});
   });
 
   /*
@@ -67,8 +97,12 @@ module.exports = function(router) {
     // Authorize
 
     Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -inventory -users -deleted').exec((err, workspace) => {
-      if (err || !workspace) {
-        res.json({'error': 'Error querying for workspace: ' + err});
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+        return;
+      }
+      else if (!workspace) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
         return;
       }
 
@@ -85,11 +119,11 @@ module.exports = function(router) {
 
     // Check if request contains necessary fields
     if (fields && !complete(req.query, fields)) {
-      res.status(400).json({'error': 'Missing fields'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
-    res.json({'error': 'Functionality not finished'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not finished'});
   });
 
   /*
@@ -103,28 +137,28 @@ module.exports = function(router) {
 
     // Check if request contains necessary fields
     if (fields && !complete(req.query, fields)) {
-      res.status(400).json({'error': 'Missing fields'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
-    Workspace.findById(req.params.workspace_id).exec((err, workspace) => {
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
       if (err) {
-        res.json({'error': 'Error deleting workspace: ' + err});
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
         return;
       }
       else if (!workspace) {
-        res.json({'error': 'A workspace with that id doesn\'t exist'});
+        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
         return;
       }
 
-      workspace.deleted = true;
+      workspace.set({deleted: true});
       workspace.save((err) => {
         if (err) {
-          res.json({'error': 'Error deleting workspace: ' + err});
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
           return;
         }
 
-        res.json({'message': 'Successfully deleted database'});
+        res.status(c.status.OK).json({'message': 'Successfully deleted database'});
       });
     });
   });

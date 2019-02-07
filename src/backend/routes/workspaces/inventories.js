@@ -1,6 +1,7 @@
 const express = require('express');
-const {complete, sanitize, isJSON} = require('../../utils');
-const {Inventory, Item, Workspace} = require('../../models');
+const {complete, sanitize, isJSON} = require('utils');
+const {Inventory, Item, Workspace} = require('models');
+const c = require('const');
 
 module.exports = function(router) {
   /*
@@ -16,11 +17,11 @@ module.exports = function(router) {
       }
     }).exec((err, inventory) => {
       if (err || !inventory) {
-        res.json({'error': 'Error querying for inventory: ' + err});
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for inventory: ' + err});
         return;
       }
 
-      res.json(inventory);
+      res.status(c.status.OK).json(inventory);
     });
   });
 
@@ -35,11 +36,11 @@ module.exports = function(router) {
 
     // Check if request contains necessary fields
     if (fields && !complete(req.query, fields)) {
-      res.status(400).json({'error': 'Missing fields'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
     else if (!isJSON(req.query.quantities)) {
-      res.status(400).json({'error': 'Invalid JSON syntax'});
+      res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON syntax'});
       return;
     }
 
@@ -48,13 +49,13 @@ module.exports = function(router) {
     // Check if item exists
     Item.findOne({name: req.query.name}).exec((err, item) => {
       if (err) {
-        res.status(500).json({'error': 'Error querying for item: ' + err});
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
         return;
       }
 
       // If it already exists, send back an error
       if (item) {
-        res.status(400).json({'error': 'Item with this name already exists'});
+        res.status(c.status.BAD_REQUEST).json({'error': 'Item with this name already exists'});
         return;
       }
       else {
@@ -66,21 +67,21 @@ module.exports = function(router) {
 
         item.save((err, item) => {
           if (err) {
-            res.status(500).json({'error': 'Error saving item to database: ' + err});
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item to database: ' + err});
             return;
           }
 
           // Find workspace by workspace_id in endpoint
           Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
             if (err) {
-              res.status(500).json({'error': 'Error adding item to inventory: ' + err});
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding item to inventory: ' + err});
               return;
             }
 
             // Find inventory by inventory_id
             Inventory.findOneAndUpdate({'_id': workspace.inventory}).exec((err, inventory) => {
               if (err) {
-                res.status(500).json({'error': 'Error adding item to inventory: ' + err});
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding item to inventory: ' + err});
                 return;
               }
 
@@ -88,11 +89,11 @@ module.exports = function(router) {
               inventory['items'].push(item._id);
               inventory.save((err) => {
                 if (err) {
-                  res.status(500).json({'error': 'Error saving item to inventory: ' + err});
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item to inventory: ' + err});
                   return;
                 }
 
-                res.json({'message': 'Successfully added item to inventory'});
+                res.status(c.status.OK).json({'message': 'Successfully added item to inventory'});
               });
             });
           });
@@ -105,17 +106,21 @@ module.exports = function(router) {
    * Sends information on a specific item
    */
   router.get('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    Item.findById(req.params.item_id).exec((err, item) => {
-      if (err || !item) {
-        res.status(500).json({'error': 'Error querying for item: ' + err});
+    Item.findById(req.params.item_id).select('-_id').exec((err, item) => {
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
+        return;
+      }
+      else if (!item) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'No item exists with that id'});
         return;
       }
 
-      res.json(item);
+      res.status(c.status.OK).json(item);
     });
   });
 
   router.put('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    res.json({'error': 'Functionality not added'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 }

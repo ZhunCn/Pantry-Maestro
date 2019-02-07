@@ -1,5 +1,6 @@
 const express = require('express');
-const {Workspace} = require('../../models');
+const {Workspace} = require('models');
+const c = require('const');
 
 module.exports = function(router) {
   /*
@@ -8,7 +9,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id/invites', (req, res) => {
     // Authorize
 
-    res.json({'error': 'Functionality not added'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 
   /*
@@ -17,7 +18,7 @@ module.exports = function(router) {
   router.post('/api/workspaces/:workspace_id/invites', (req, res) => {
     // Authorize
 
-    res.json({'error': 'Functionality not added'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 
   /*
@@ -26,7 +27,7 @@ module.exports = function(router) {
   router.put('/api/workspaces/:workspace_id/invites/:invite_id', (req, res) => {
     // Authorize
 
-    res.json({'error': 'Functionality not added'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 
   /*
@@ -35,6 +36,6 @@ module.exports = function(router) {
   router.delete('/api/workspaces/:workspace_id/invites/:invite_id', (req, res) => {
     // Authorize
 
-    res.json({'error': 'Functionality not added'});
+    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 }

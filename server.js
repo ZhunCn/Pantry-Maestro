@@ -1,5 +1,7 @@
-var express = require('express');
 var path = require('path');
+// Adds relative paths for backend
+require('app-module-path').addPath(path.join(__dirname, 'src', 'backend'));
+var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
@@ -30,7 +32,7 @@ app.get('/index.html', (req, res) => {
 
 
 // Frontend endpoints
-app.use('/public', express.static(__dirname + "/dist"));
+app.use('/public', express.static(path.join(__dirname, '/dist')));
 
 // Catch all for frontend routes
 app.all('/*', function(req, res) {
