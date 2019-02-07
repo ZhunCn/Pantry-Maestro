@@ -7,7 +7,10 @@ module.exports = function() {
     res.json({message: 'Backend API'});
   });
 
-  require('./error.js')(router);
+  require('./auth')(router);
+  require('./account')(router);
+  require('./workspaces')(router);
+  require('./error')(router);
 
   return router;
 }
