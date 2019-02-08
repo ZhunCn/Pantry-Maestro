@@ -9,7 +9,9 @@ export default class About extends React.Component {
     return (
       <div>
         <GenericNavigationBar/>
+        <div class="Content">
         <p>About component!</p>
+        </div>
       </div>
     );
   }

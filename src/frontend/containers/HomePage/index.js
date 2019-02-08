@@ -10,8 +10,10 @@ export default class Home extends React.Component {
     return (
       <div>
         <GenericNavigationBar/>
+        <div class="Content">
         <p>Home component</p>
         <Link to="/login">Login</Link>
+        </div>
       </div>
     );
   }
