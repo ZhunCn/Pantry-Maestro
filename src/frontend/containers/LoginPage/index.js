@@ -9,7 +9,9 @@ export default class Login extends React.Component {
     return (
       <div>
         <GenericNavigationBar/>
+        <div class="Content">
         <p>Login component</p>
+        </div>
       </div>
     );
   }
