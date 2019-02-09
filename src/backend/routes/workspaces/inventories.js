@@ -120,7 +120,69 @@ module.exports = function(router) {
     });
   });
 
+  /*
+   * Updating quantities for some specified item
+   */
   router.put('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
+    if (!req.query) {
+      res.status(c.status.BAD_REQUEST).json({'message': 'No fields to update'});
+      return;
+    }
+    else if (req.query && !isJSON(req.query.quantities)) {
+      res.status(c.status.BAD_REQUEST).json({'message': 'Invalid JSON for field `quantities`'});
+      return;
+    }
+
+    // In the future, add functionality to change item's name
+    let fields = [
+      'quantities'
+    ];
+    let toUpdate = {};
+
+    fields.forEach(field => {
+      if (req.query.hasOwnProperty(field)) {
+        if (field === 'quantities') {
+          toUpdate[field] = JSON.parse(req.query[field]);
+        }
+        else {
+          toUpdate[field] = req.query[field];
+        }
+      }
+    });
+
+    Item.findById(req.params.item_id).exec((err, item) => {
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error updating item(s): ' + err});
+        return;
+      }
+      else if (!item) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'No item with this id exists'});
+        return;
+      }
+
+      Object.keys(toUpdate['quantities']).forEach(quantity => {
+        if (item.quantities.hasOwnProperty(quantity)) {
+          item.quantities[quantity] += toUpdate['quantities'][quantity];
+        }
+        else {
+          item.quantities[quantity] = toUpdate['quantities'][quantity];
+        }
+
+        if (item.quantities[quantity] <= 0) {
+          delete item.quantities[quantity];
+        }
+      });
+
+      item.markModified('quantities');
+
+      item.save((err, item) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+          return;
+        }
+
+        res.status(c.status.OK).json({'message': 'Successfully updated item(s)'});
+      });
+    });
   });
 }
