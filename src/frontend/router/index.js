@@ -5,6 +5,7 @@ import { Switch, Route, BrowserRouter, Redirect} from 'react-router-dom'
 import Home from '@/containers/HomePage'
 import About from '@/containers/AboutPage'
 import Login from '@/containers/LoginPage'
+import Inventory from '@/containers/InventoryPage'
 
 const Router = () => {
   return (
@@ -13,6 +14,7 @@ const Router = () => {
         <Route exact path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
+        <Route path="/inventory" component={Inventory} />
         <Route path="*" render={() => (<Redirect to="/"/>)} />
       </Switch>
     </BrowserRouter>
