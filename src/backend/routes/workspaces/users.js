@@ -102,28 +102,58 @@ module.exports = function(router) {
   router.delete('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     // Authorize
 
-    Workspace.findById(req.query.workspace_id).exec((err, workspace) => {
+    console.log(req.params);
+
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
         return;
       }
 
-      for (let i = 0; i < workspace.users.length; i++) {
-        if (workspace.users[i].account == req.query.user_id) {
-          workspace.splice(i, 1);
+      console.log(workspace);
 
-          workspace.save(err => {
-            if (err) {
-              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
-              return;
-            }
-
-            res.status(c.status.OK).json({'message': 'Successfully removed user from the workspace'});
-          });
+      User.findById(req.params.user_id).exec((err, user) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
+          return;
         }
-      }
-    });
+        else if (!user) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'Specified user is not a member of that workspace'});
+          return;
+        }
+        else if (user.workspaces.indexOf(req.params.workspace_id) == -1) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'Specified user is not a member of that workspace'});
+          return;
+        }
 
-    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
+        user.workspaces.splice(user.workspaces.indexOf(req.params.user_id), 1);
+
+        for (let i = 0; i < workspace.users.length; i++) {
+          if (workspace.users[i].account == req.params.user_id) {
+            // TODO: Add extra checking to stop owner or last user from deleting  themself
+
+            workspace.users.splice(i, 1);
+
+            workspace.save(err => {
+              if (err) {
+                // TODO: Add user back into workspace if there's an error?
+                
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
+                return;
+              }
+
+              user.save(err => {
+                if (err) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
+                  return;
+                }
+
+                res.status(c.status.OK).json({'message': 'Successfully deleted user from workspace'});
+              });
+            });
+          }
+        }
+      });
+    });
   });
 }
