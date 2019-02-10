@@ -6,6 +6,7 @@ import Home from '@/containers/HomePage'
 import About from '@/containers/AboutPage'
 import Login from '@/containers/LoginPage'
 import Inventory from '@/containers/InventoryPage'
+import Settings from "@/containers/SettingsPage";
 
 const Router = () => {
   return (

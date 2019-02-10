@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import GenericNavigationBar from '@/settings/GenericNavigationBar';
+import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
 //add input checking on Settings similar to Login/Register

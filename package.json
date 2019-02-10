@@ -34,6 +34,12 @@
     "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.14",
+    "@fortawesome/free-solid-svg-icons": "^5.7.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "@trendmicro/react-sidenav": "^0.4.5",
+    "file-loader": "^3.0.1",
+    "font-awesome": "^4.7.0",
     "app-module-path": "^2.2.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
@@ -41,17 +47,6 @@
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
-<<<<<<< HEAD
-    "mongoose": "^5.3.12",
-    "path": "^0.12.7",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "react-router-dom": "^4.3.1"
-  },
-  "jest": {
-  "snapshotSerializers": ["enzyme-to-json/serializer"]
-}
-=======
     "i": "^0.3.6",
     "lodash": "^4.17.11",
     "mongoose": "^5.4.10",
@@ -66,6 +61,10 @@
     "react-router-dom": "^4.3.1",
     "react-table": "^6.9.0",
     "url-loader": "^1.1.2"
+  },
+  "jest": {
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ]
   }
->>>>>>> 0bffeb7592208abe7ad9498c976bdb4ed870d43d
 }
