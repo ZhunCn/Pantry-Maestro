@@ -15,6 +15,7 @@ const Router = () => {
         <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
         <Route path="/inventory" component={Inventory} />
+        <Route path="/settings" component={Settings} />
         <Route path="*" render={() => (<Redirect to="/"/>)} />
       </Switch>
     </BrowserRouter>
