@@ -41,6 +41,7 @@
     "font-awesome": "^4.7.0",
     "fs": "0.0.1-security",
     "i": "^0.3.6",
+    "lodash": "^4.17.11",
     "mongoose": "^5.4.10",
     "npm": "^6.7.0",
     "path": "^0.12.7",
@@ -51,6 +52,7 @@
     "react-fontawesome": "^1.6.1",
     "react-native-vector-icons": "^6.2.0",
     "react-router-dom": "^4.3.1",
+    "react-table": "^6.9.0",
     "url-loader": "^1.1.2"
   }
 }

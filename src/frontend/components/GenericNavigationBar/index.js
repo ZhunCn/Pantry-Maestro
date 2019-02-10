@@ -8,12 +8,13 @@ export default class GenericNavigationBar extends React.Component {
   render() {
     return (
       <Menu>
-          <a className="menu-item" href="/"><img src={prof} alt = "Profile" /></a>
-          <a className="menu-item" href="/">Home</a>
-          <a className="menu-item" href="/about">About</a>
-          <a className="menu-item" href="/login">Login</a>
-          <a className="menu-item" href="#">Blank</a>
-        </Menu>
-      );
+        <a className="menu-item" href="/"><img src={prof} alt="Profile"/></a>
+        <a className="menu-item" href="/">Home</a>
+        <a className="menu-item" href="/about">About</a>
+        <a className="menu-item" href="/login">Login</a>
+        <a className="menu-item" href="/inventory">Inventory</a>
+        <a className="menu-item" href="#">Blank</a>
+      </Menu>
+    );
   }
 };
