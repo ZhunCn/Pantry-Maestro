@@ -41,6 +41,7 @@
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
+<<<<<<< HEAD
     "mongoose": "^5.3.12",
     "path": "^0.12.7",
     "react": "^16.6.3",
@@ -50,4 +51,21 @@
   "jest": {
   "snapshotSerializers": ["enzyme-to-json/serializer"]
 }
+=======
+    "i": "^0.3.6",
+    "lodash": "^4.17.11",
+    "mongoose": "^5.4.10",
+    "npm": "^6.7.0",
+    "path": "^0.12.7",
+    "react": "^16.8.1",
+    "react-burger-menu": "^2.6.4",
+    "react-dom": "^16.8.1",
+    "react-font-awesome": "^1.0.3",
+    "react-fontawesome": "^1.6.1",
+    "react-native-vector-icons": "^6.2.0",
+    "react-router-dom": "^4.3.1",
+    "react-table": "^6.9.0",
+    "url-loader": "^1.1.2"
+  }
+>>>>>>> 0bffeb7592208abe7ad9498c976bdb4ed870d43d
 }
