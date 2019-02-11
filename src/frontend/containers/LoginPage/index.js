@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Link } from 'react-router-dom';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
@@ -46,7 +47,19 @@ export default class Login extends React.Component {
       <div>
         <GenericNavigationBar/>
         <div class="Content">
-        <p>Login component</p>
+        <p>Log in</p>
+        
+        <p>Username or Email</p>
+        <input type="text" name="username"></input><br></br>
+        
+        <p>Password</p>
+        <input type="text" name="password"></input><br></br>
+        
+        <p><button id="loginButton">Log In</button></p>
+
+        <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
+        
+        <p><button id="signUpButton" to="/login/#" >New to Pantry Maestro? Sign Up</button></p>
         </div>
       </div>
     );
