@@ -24,9 +24,9 @@ export default class Login extends React.Component {
   }
   
   verifyPass(password) {
-    //check for valid lengths
     console.log('Inputted password (verifyPass): ', password);
 
+    //check for valid lengths
     if(password.length == 0){
       return false;
     }
@@ -70,6 +70,12 @@ export default class Login extends React.Component {
     }
 
   }
+  
+  enterPressedOnPassword() {
+    if (event.keyCode === 13) {
+      document.getElementById("loginButton").click();
+    }
+  }
 
   render() {
     return (
@@ -77,12 +83,13 @@ export default class Login extends React.Component {
         <GenericNavigationBar/>
         <div class="Content">
         <p>Log in</p>
+        <form>
+          <p>Username or Email</p>
+          <input type="text" name="usernameField" id="usernameField"></input><br></br>
         
-        <p>Username or Email</p>
-        <input type="text" name="usernameField" id="usernameField"></input><br></br>
-        
-        <p>Password</p>
-        <input type="text" name="passwordField" id="passwordField"></input><br></br>
+          <p>Password</p>
+          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input><br></br>
+        </form>
         <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
         
