@@ -6,7 +6,7 @@ import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
 
-export default class Login extends React.Component {
+export default class Register extends React.Component {
   verifyUser(username) {
     
     console.log('Inputted username (verifyUser): ', username);
@@ -49,27 +49,34 @@ export default class Login extends React.Component {
   }
   
 
-  loginProcedure() {
+  signUpProcedure() {
     // Grab username and password from field
     var username = document.getElementById("usernameField").value;
     var password = document.getElementById("passwordField").value;
+    var confirmPassword = document.getElementById("confirmPasswordField").value;
+
     console.log('Inputted username (loginProcedure): ', username);
     console.log('Inputted password (loginProcedure): ', password);
 
-    if ((this.verifyUser(username)) == true) {
-      console.log('Valid username!');
+    if (password == confirmPassword) {
+      if ((this.verifyUser(username)) == true) {
+        console.log('Valid username!');
 
-      if ((this.verifyPass(password)) == true) {
-        console.log('Valid password!');
-        // Connect with backend to verify login information is correct
+        if ((this.verifyPass(password)) == true) {
+          console.log('Valid password!');
+          // Connect with backend to register account
+
+        } else {
+          console.log('Invalid password!');
+        }
       } else {
-        console.log('Invalid password!');
+        console.log('Invalid username!');
       }
     } else {
-      console.log('Invalid username!');
+      console.log('Passwords are not the same.');
     }
-
   }
+
   
   enterPressedOnPassword() {
     if (event.keyCode === 13) {
@@ -82,18 +89,20 @@ export default class Login extends React.Component {
       <div>
         <GenericNavigationBar/>
         <div class="Content">
-        <p>Log in</p>
+        <p>Sign Up</p>
         <form>
-          <p>Username or Email</p>
+          <p>Username</p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
-        
           <p>Password</p>
-          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input><br></br>
+          <input type="password" name="passwordField" id="passwordField"></input><br></br>
+          <p>Confirm Password</p>
+          <input type="password" name="confirmPasswordField" id="confirmPasswordField"></input><br></br>
+          <p>Email</p>
+          <input type="text" name="emailField" id="emailField"></input><br></br>
         </form>
-        <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button></p>
-        <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
+        <p><button id="signUpButton" onClick={(e) => this.signUpProcedure()}>Sign Up</button></p>
         
-        <p><Link to="/register"><button id="signUpButton" >New to Pantry Maestro? Sign Up</button></Link></p>
+        <p><Link to="/login"><button id="loginButton">Already Have an account? Log In</button></Link></p>
         </div>
       </div>
     );
