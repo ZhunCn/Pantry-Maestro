@@ -1,6 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import {Link} from "react-router-dom";
 import _ from 'lodash'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
@@ -27,45 +25,30 @@ let tempData = [
         }
     }
 ]
-let parsedData = [
-    {
-        name: "Starburst",
-        expiration: "12/01/2019",
-        quantity: 20
-    },
-    {
-        name: "Starburst",
-        expiration: "02/15/2019",
-        quantity: 12
-    }, {
-        name: "Starburst",
-        expiration: "03/19/2019",
-        quantity: 23
-    }, {
-        name: "Ramen",
-        expiration: "01/07/2019",
-        quantity: 2
-    }, {
-        name: "Ramen",
-        expiration: "05/23/2019",
-        quantity: 11
-    }, {
-        name: "Ramen",
-        expiration: "06/24/2019",
-        quantity: 9
-    }, {
-        name: "Ramen",
-        expiration: "07/12/2019",
-        quantity:14
+function Item(name, expiration, quantity) {
+    this.name = name;
+    this.expiration = expiration;
+    this.quantity = quantity;
+}
+function parseData(tempData) {
+    let parsedData = [];
+    for (let i = 0; i < tempData.length; i++) {
+        for (let j = 0; j < Object.entries(tempData[1].quantities).length; j++) {
+            let tempItem = new Item(tempData[i].name,
+                Object.entries(tempData[i].quantities)[j][0],
+                Object.entries(tempData[i].quantities)[j][1])
+            parsedData.push(tempItem)
+        }
     }
-]
+    return parsedData
+}
 
 export default class Inventory extends React.Component {
     constructor(props) {
         super(props);
         // Temporary data set
         this.state = {
-            data: parsedData
+            data: parseData(tempData)
         }
     }
     render() {
@@ -76,27 +59,26 @@ export default class Inventory extends React.Component {
                 accessor: "name"
             },
             {
+                Header: "Earliest Expiration Date",
+                id: "expiration",
+                aggregate: vals => vals.sort()[0],
+                accessor: d => {
+                    let dates = Array.from(d.expiration);
+                    return dates.sort(function (a, b) {
+                        return Date.parse(a) > Date.parse(b);
+                    });
+                }
+            },
+            {
                 Header: "Quantity",
                 accessor: "quantity",
                 aggregate: vals => _.sum(vals),
                 Aggregated: row => {
                     return (
                         <span>
-              {row.value} (Total)
-            </span>
+                        {row.value} (Total)
+                        </span>
                     );
-                }
-            },
-            {
-                Header: "Earliest Expiration Date",
-                id: "expiration",
-                aggregate: vals => vals.sort()[0],
-                accessor: d => {
-                    let dates = Array.from(d.expiration);
-                    let orderedDates = dates.sort(function (a, b) {
-                        return Date.parse(a) > Date.parse(b);
-                    });
-                    return orderedDates;
                 }
             }
         ];
@@ -104,6 +86,7 @@ export default class Inventory extends React.Component {
 
         return (
             <div>
+                <GenericNavigationBar/>
                 <div class="Content">
                     <h1>Inventory</h1>
                     <ReactTable data={data} columns={columns} pivotBy={["name"]}/>
