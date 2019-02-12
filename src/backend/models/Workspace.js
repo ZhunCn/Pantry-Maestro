@@ -9,6 +9,7 @@ var WorkspaceSchema = new Schema({
     required: true
   },
   users: [{
+    _id: false,
     account: {
       type: Schema.Types.ObjectId,
       ref: 'User'

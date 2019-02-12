@@ -125,7 +125,7 @@ module.exports = function(router) {
    */
   router.put('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
     if (!req.query) {
-      res.status(c.status.BAD_REQUEST).json({'message': 'No fields to update'});
+      res.status(c.status.OK).json({'message': 'No fields to update'});
       return;
     }
     else if (req.query && !isJSON(req.query.quantities)) {

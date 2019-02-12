@@ -1,5 +1,6 @@
 const express = require('express');
 const {Workspace, User} = require('models');
+const {complete, isJSON} = require('utils');
 const c = require('const');
 
 module.exports = function(router) {
@@ -11,7 +12,7 @@ module.exports = function(router) {
 
     Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -inventory -name -deleted').populate({
       path: 'users.account',
-      select: '-workspaces -email -salt -hash'
+      select: '-__v -workspaces -email -salt -hash'
     }).exec((err, workspace) => {
       if (err || !workspace) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
@@ -25,13 +26,11 @@ module.exports = function(router) {
   /*
    * Add a user to a workspace
    */
-  router.post('/api/workspaces/:workspace_id/users', (req, res) => {
+  router.post('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     // Authorize
 
     let fields = [
-      'email',
-      'username',
-      'password'
+      'roles'
     ];
 
     // Check if request contains necessary fields
@@ -39,8 +38,47 @@ module.exports = function(router) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
+    else if (!isJSON(req.query.roles)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON for field `roles`'});
+      return;
+    }
 
-    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
+        return;
+      }
+      else if (!workspace) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'No workspace exists with the specified id'});
+        return;
+      }
+
+      workspace.users.push({'account': req.params.user_id, 'roles': JSON.parse(req.query.roles)});
+
+      workspace.save((err) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
+          return;
+        }
+
+        User.findById(req.params.user_id).exec((err, user) => {
+          if (err) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
+            return;
+          }
+
+          user.workspaces.push(req.params.workspace_id);
+          user.save((err) => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'message': 'Added user to workspace'});
+          });
+        });
+      });
+    });
   });
 
   /*
@@ -93,6 +131,15 @@ module.exports = function(router) {
   router.put('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     // Authorize
 
+    if (!req.query) {
+      res.status(c.status.OK).json({'message': 'No fields to update'});
+      return;
+    }
+    else if (!isJSON(req.query.roles)) {
+      res.status(c.status.BAD_REQUEST).json({'message': 'Invalid JSON for field `roles`'});
+      return;
+    }
+
     res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
   });
 
@@ -102,15 +149,11 @@ module.exports = function(router) {
   router.delete('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     // Authorize
 
-    console.log(req.params);
-
     Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
         return;
       }
-
-      console.log(workspace);
 
       User.findById(req.params.user_id).exec((err, user) => {
         if (err) {
@@ -137,7 +180,7 @@ module.exports = function(router) {
             workspace.save(err => {
               if (err) {
                 // TODO: Add user back into workspace if there's an error?
-                
+
                 res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing the user from the workspace: ' + err});
                 return;
               }
