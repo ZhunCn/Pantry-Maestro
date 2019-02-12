@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
@@ -8,21 +9,21 @@ import './styles.scss';
 
 export default class Login extends React.Component {
   verifyUser(username) {
-    
+
     console.log('Inputted username (verifyUser): ', username);
 
     //check for valid lengths
     if(username.length == 0){
       return false;
     }
-    
+
     if(username.length > 32){
       return false;
     }
-  
+
     return true;
   }
-  
+
   verifyPass(password) {
     console.log('Inputted password (verifyPass): ', password);
 
@@ -30,24 +31,24 @@ export default class Login extends React.Component {
     if(password.length == 0){
       return false;
     }
-    
+
     if(password.length > 32){
       return false;
     }
-    
+
     //check that password has letters AND numbers
-  
+
     //modular regex design
     var letters = /^[a-zA-Z]+$/;
     var numbers = /^[0-9]+$/;
-  
+
     if(password.match(letters) != null || password.match(numbers) != null){
       return false;
     }
-  
+
     return true;
   }
-  
+
 
   loginProcedure() {
     // Grab username and password from field
@@ -61,7 +62,14 @@ export default class Login extends React.Component {
 
       if ((this.verifyPass(password)) == true) {
         console.log('Valid password!');
+
         // Connect with backend to verify login information is correct
+        axios.post('/api/auth/login', {
+          'username': username,
+          'password': password
+        }).then(res => {
+          console.log(res.data);
+        });
       } else {
         console.log('Invalid password!');
       }
@@ -70,7 +78,7 @@ export default class Login extends React.Component {
     }
 
   }
-  
+
   enterPressedOnPassword() {
     if (event.keyCode === 13) {
       document.getElementById("loginButton").click();
@@ -86,13 +94,13 @@ export default class Login extends React.Component {
         <form>
           <p>Username or Email</p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
-        
+
           <p>Password</p>
           <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input><br></br>
         </form>
         <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
-        
+
         <p><Link to="/register"><button id="signUpButton" >New to Pantry Maestro? Sign Up</button></Link></p>
         </div>
       </div>

@@ -10,6 +10,13 @@ var config = require('./config');
 
 require('dotenv').config();
 
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
+	config = config.prod;
+}
+else {
+	config = config.dev;
+}
+
 app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -18,7 +25,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(require('./src/backend/routes')());
 
 
-// Serve dashboard main.js
+// Serve main.js
 app.get('/public/main.js', (req, res) => {
 	res.sendFile(path.join(__dirname, '/dist/main.js'));
 });
@@ -30,21 +37,30 @@ app.get('/index.html', (req, res) => {
 	res.redirect('/');
 });
 
-
 // Frontend endpoints
 app.use('/public', express.static(path.join(__dirname, '/dist')));
 
 // Catch all for frontend routes
 app.all('/*', function(req, res) {
+	let headers = req.headers.host.split('.');
+	let index = headers.indexOf(config.host);
+
+	if (index === 1) {
+		// console.log('Subdomain: ' + headers[0]);
+	}
+	else if (index > 1) {
+		// Send error page
+	}
+
 	res.sendFile(path.join(__dirname, '/dist', '/index.html'));
 });
 
-const PORT = process.env.PORT || config.dev.port;
+const PORT = process.env.PORT || config.port;
 app.listen(PORT);
 
 console.log(chalk.green("Started on port " + PORT));
 
-const DATABASE = process.env.MONGODB_URI || config.dev.database;
+const DATABASE = process.env.MONGODB_URI || config.database;
 
 mongoose.Promise = global.Promise;
 mongoose.connect(DATABASE, { useNewUrlParser: true })

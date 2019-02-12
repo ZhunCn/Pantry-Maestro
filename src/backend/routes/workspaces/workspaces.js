@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const {complete} = require('utils');
 const {Workspace, Inventory} = require('models');
 const c = require('const');
@@ -15,12 +16,12 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
-    Workspace.findOne({'name': req.query.name, 'deleted': false}).exec((err, workspace) => {
+    Workspace.findOne({'name': req.body.name, 'deleted': false}).exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;
@@ -45,12 +46,12 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
-    Workspace.findOne({'name': req.query.name}).exec((err, workspace) => {
+    Workspace.findOne({'name': req.body.name}).exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
         return;
@@ -71,7 +72,7 @@ module.exports = function(router) {
         }
 
         let workspace = new Workspace({
-          'name': req.query.name,
+          'name': req.body.name,
           'inventory': inventory['_id'],
           'users': []
         });
@@ -118,7 +119,7 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
@@ -136,7 +137,7 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }

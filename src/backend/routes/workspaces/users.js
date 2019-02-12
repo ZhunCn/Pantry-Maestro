@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const {Workspace, User} = require('models');
 const {complete, isJSON} = require('utils');
 const c = require('const');
@@ -10,7 +11,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id/users', (req, res) => {
     // Authorize
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -inventory -name -deleted').populate({
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -name -deleted').populate({
       path: 'users.account',
       select: '-__v -workspaces -email -salt -hash'
     }).exec((err, workspace) => {
@@ -34,11 +35,11 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
-    else if (!isJSON(req.query.roles)) {
+    else if (!isJSON(req.body.roles)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON for field `roles`'});
       return;
     }
@@ -53,7 +54,7 @@ module.exports = function(router) {
         return;
       }
 
-      workspace.users.push({'account': req.params.user_id, 'roles': JSON.parse(req.query.roles)});
+      workspace.users.push({'account': req.params.user_id, 'roles': JSON.parse(req.body.roles)});
 
       workspace.save((err) => {
         if (err) {
@@ -131,11 +132,11 @@ module.exports = function(router) {
   router.put('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     // Authorize
 
-    if (!req.query) {
+    if (!req.body) {
       res.status(c.status.OK).json({'message': 'No fields to update'});
       return;
     }
-    else if (!isJSON(req.query.roles)) {
+    else if (!isJSON(req.body.roles)) {
       res.status(c.status.BAD_REQUEST).json({'message': 'Invalid JSON for field `roles`'});
       return;
     }

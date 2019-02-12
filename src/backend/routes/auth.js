@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
 const {User} = require('models');
 const {complete, isJSON} = require('utils');
 const c = require('const');
@@ -13,15 +14,17 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
+    // TODO: Validate fields
+
     let newUser = new User({
-      'email': req.query.email,
-      'username': req.query.username,
-      'password': req.query.password,
+      'email': req.body.email,
+      'username': req.body.username,
+      'password': req.body.password,
       'workspaces': []
     });
 
@@ -49,13 +52,15 @@ module.exports = function(router) {
       'password'
     ];
 
+    console.log(req.body);
+
     // Check if request contains necessary fields
-    if (fields && !complete(req.query, fields)) {
+    if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
 
-    User.findOne({'username': req.query.username}).exec((err, user) => {
+    User.findOne({'username': req.body.username}).exec((err, user) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error authenticating: ' + err});
         return;
@@ -65,7 +70,7 @@ module.exports = function(router) {
         return;
       }
 
-      user.verifyPassword(req.query.password, (err, result) => {
+      user.verifyPassword(req.body.password, (err, result) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error authenticating: ' + err});
           return;
@@ -79,7 +84,7 @@ module.exports = function(router) {
 
         // Create JWT
         let token = jwt.sign({
-          'username': req.query.username
+          'username': req.body.username
         }, process.env.JWT_SECRET, {
           'expiresIn': '12h'
         });
