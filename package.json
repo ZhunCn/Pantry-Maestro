@@ -49,6 +49,7 @@
     "font-awesome": "^4.7.0",
     "fs": "0.0.1-security",
     "i": "^0.3.6",
+    "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "mongoose": "^5.4.10",
     "npm": "^6.7.0",
