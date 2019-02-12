@@ -15,8 +15,7 @@ var UserSchema = new Schema({
     required: true
   },
   hash: {
-    type: String,
-    required: true
+    type: String
   },
   workspaces: [{
     type: Schema.Types.ObjectId,
@@ -24,30 +23,35 @@ var UserSchema = new Schema({
   }]
 }, {collection: 'users'});
 
-UserSchema.virtual('password').set((password) => {
-  this.password = password;
+UserSchema.virtual('password').set(function(password) {
+  console.log('Setting password: ' + password);
+  this._password = password;
 });
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function(next) {
   const user = this;
 
-  if (user.password === undefined) {
-    return next();
+  console.log(this);
+
+  if (user._password === undefined) {
+    next();
   }
 
-  bcrypt.hash(user.password, saltRounds, (err, hash)  => {
+  bcrypt.hash(user._password, saltRounds, function(err, hash) {
     if (err) {
-      console.log('Error adding user: ' + this.username + ' to database: ' + err);
       next();
     }
 
     user.hash = hash;
-    user.password = undefined;
+    console.log('Hash: ' + hash);
+
+    console.log(user);
+
     next();
   });
 });
 
-UserSchema.methods.verifyPassword = (candidate, cb) => {
+UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {
   bcrypt.compare(candidate, this.hash, (err, match) => {
     if (err) {
       return cb(err);
