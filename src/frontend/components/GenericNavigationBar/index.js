@@ -8,13 +8,16 @@ export default class GenericNavigationBar extends React.Component {
   render() {
     return (
       <Menu>
-          <Link to="/"><img src={prof} alt = "Profile" /></Link>
+          <Link to="/settings">
+          <img class="img" src={prof} alt = "Profile" />
+          <p class="italic">Firstname Lastname</p>
+          <p class="italic">Volunteer</p>
+          </Link>
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/login">Login</Link>
           <Link to="/inventory">Inventory</Link>
           <Link to="/settings">Settings</Link>
-          <Link to="/#">Blank</Link>
         </Menu>
       );
   }

@@ -6,6 +6,13 @@
   /* Prevent sidebar from showing a scrollbar on page */
   overflow: auto;
 }
+.italic{
+  font-style: italic;
+  text-align: center;
+  font-size: 15pt;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 
 /* Individual item */
 .bm-item {
@@ -17,6 +24,8 @@
   color: #d1d1d1;
   font-size: 20pt;
   transition: color 0.2s;
+  outline: 0 !important;
+  border:0 none !important;
 }
 
 /* Change color on hover */
@@ -53,7 +62,7 @@
 
 /* General sidebar styles */
 .bm-menu {
-  background: #A9A9A9;
+  background: #636363;
   padding: 2.5em 1.5em 0;
   font-size: 1.15em;
 }
