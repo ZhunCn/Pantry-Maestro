@@ -35,12 +35,14 @@ module.exports = function(router) {
       'quantities'
     ];
 
+    console.log(req.body);
+
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
-    else if (!isJSON(req.body.quantities)) {
+    else if (typeof(req.body.quantities) !== 'object' && !isJSON(req.body.quantities)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON syntax'});
       return;
     }
@@ -63,7 +65,7 @@ module.exports = function(router) {
         // Create new item
         let item = new Item({
           'name': req.body.name,
-          'quantities': JSON.parse(req.body.quantities)
+          'quantities': req.body.quantities
         });
 
         item.save((err, item) => {

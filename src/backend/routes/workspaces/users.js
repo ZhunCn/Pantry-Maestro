@@ -39,7 +39,7 @@ module.exports = function(router) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
-    else if (!isJSON(req.body.roles)) {
+    else if (typeof(req.body.roles) != 'object' && !isJSON(req.body.roles)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON for field `roles`'});
       return;
     }
@@ -54,7 +54,7 @@ module.exports = function(router) {
         return;
       }
 
-      workspace.users.push({'account': req.params.user_id, 'roles': JSON.parse(req.body.roles)});
+      workspace.users.push({'account': req.params.user_id, 'roles': req.body.roles});
 
       workspace.save((err) => {
         if (err) {
