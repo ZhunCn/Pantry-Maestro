@@ -3,3 +3,39 @@
     margin-left: 108px;
     margin-top: 36px;
 }
+.Total {
+    column-count: 2;
+    column-rule-style: solid;
+    column-rule-width: 1px;
+    display: block;
+	margin-top: 0px;
+	margin-bottom: 70px;
+}
+.Total .Left {
+	vertical-align: top;
+    display: inline-block;
+}
+.Total .Right {
+	display: block;
+	vertical-align: top;
+}
+.Footer{
+	background:rgba(0, 0, 0, .25);
+	padding-top: 10px;
+	padding-bottom: 10px;
+	bottom: 0px;
+	position: fixed;
+	width: 100%;
+}
+.flex{
+	display: flex;
+	justify-content: space-around;
+}
+.Footer button{
+	width: 200px;
+	height: 40px;
+	font-size: 20pt;
+	background-color: white;
+	font-weight: bold;
+	display: block;
+}
