@@ -4,6 +4,26 @@ import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
+import axios from 'axios'
+
+const workspaceID = "5c64def057910030016ba7c1";
+
+function Item(name, expiration, quantity) {
+    this.name = name;
+    this.expiration = expiration;
+    this.quantity = quantity;
+}
+
+const requestData = () => {
+    return new Promise((resolve, reject) => {
+        axios.get(`/api/workspaces/${workspaceID}/inventory`, {
+
+        }).then(res => {
+            resolve(parseData(res.data));
+            console.log(res.data);
+        });
+    })
+}
 
 let tempData = [
     {
@@ -24,35 +44,53 @@ let tempData = [
             "06/24/2019": 9
         }
     }
-]
-function Item(name, expiration, quantity) {
-    this.name = name;
-    this.expiration = expiration;
-    this.quantity = quantity;
-}
-function parseData(tempData) {
+];
+function parseData(serverData) {
     let parsedData = [];
-    for (let i = 0; i < tempData.length; i++) {
-        for (let j = 0; j < Object.entries(tempData[1].quantities).length; j++) {
-            let tempItem = new Item(tempData[i].name,
-                Object.entries(tempData[i].quantities)[j][0],
-                Object.entries(tempData[i].quantities)[j][1])
-            parsedData.push(tempItem)
+    for (let i = 0; i < Object.entries(serverData.inventory.items).length; i++) {
+        for (let j = 0; j < Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities).length; j++) {
+            let tempItem = new Item(Object.entries(serverData.inventory.items)[i][1].name,
+                Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][0],
+                Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][1]);
+            parsedData.push(tempItem);
         }
     }
-    return parsedData
+    return parsedData;
 }
+
+function getInitialData() {
+// Get the items from the server
+// Hard-coding 5c64def057910030016ba7c1 for now
+    axios.get('/api/workspaces/5c64def057910030016ba7c1/inventory', {}).then(res => {
+        let serverData = parseData(res.data);
+        console.log(serverData);
+        return serverData;
+    });
+}
+
+
 
 export default class Inventory extends React.Component {
     constructor(props) {
         super(props);
         // Temporary data set
         this.state = {
-            data: parseData(tempData)
+            data: []
         }
     }
+
+    componentDidMount() {
+        // Get the items from the server
+        // Hard-coding 5c64def057910030016ba7c1 for now
+        axios.get('/api/workspaces/5c64def057910030016ba7c1/inventory', {}).then(res => {
+            let serverData = parseData(res.data);
+            this.setState({ data: serverData });
+            console.log(serverData);
+        });
+    }
+
     render() {
-        const {data} = this.state;
+        const { data } = this.state;
         const columns = [
             {
                 Header: "Name",
@@ -83,13 +121,18 @@ export default class Inventory extends React.Component {
             }
         ];
 
-
         return (
             <div>
                 <GenericNavigationBar/>
                 <div class="Content">
+                    {/*<button onClick={this.buttonHandleRefresh()}>Refresh</button>*/}
                     <h1>Inventory</h1>
-                    <ReactTable data={data} columns={columns} pivotBy={["name"]}/>
+                    <ReactTable ref={(refReactTable) => {this.refReactTable = refReactTable;}}
+                                data={data}
+                                columns={columns}
+                                pivotBy={["name"]}
+                                sortable={true}
+                    />
                 </div>
             </div>
         );
