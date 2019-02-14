@@ -24,8 +24,7 @@ module.exports = function(router) {
     let newUser = new User({
       'email': req.body.email,
       'username': req.body.username,
-      'password': req.body.password,
-      'workspaces': []
+      'password': req.body.password
     });
 
     newUser.save((err, user) => {
@@ -35,13 +34,16 @@ module.exports = function(router) {
       }
 
       user.workspaces.push(req.params.workspace_id);
-      user.save((err) => {
+      user.save((err, user) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving user: ' + err});
           return;
         }
 
-        res.status(c.status.OK).json({'message': 'Added user to workspace'});
+        res.status(c.status.OK).json({
+          'message': 'Added user to workspace',
+          'user_id': user['_id']
+        });
       });
     });
   });
@@ -51,8 +53,6 @@ module.exports = function(router) {
       'username',
       'password'
     ];
-
-    console.log(req.body);
 
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {

@@ -67,6 +67,10 @@ module.exports = function(router) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
             return;
           }
+          else if (!user) {
+            res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
+            return;
+          }
 
           user.workspaces.push(req.params.workspace_id);
           user.save((err) => {

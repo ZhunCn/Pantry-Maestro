@@ -30,13 +30,19 @@ UserSchema.virtual('password').set(function(password) {
 UserSchema.pre('save', function(next) {
   const user = this;
 
-  if (user._password === undefined) {
-    next();
+  if (user) {
+    user.workspaces.filter(workspace => {
+      return workspace !== null;
+    });
+  }
+
+  if (user && user.hash && user.hash !== null && typeof(user._password) == 'undefined') {
+    return next();
   }
 
   bcrypt.hash(user._password, saltRounds, function(err, hash) {
     if (err) {
-      next();
+      return next();
     }
 
     user.hash = hash;
@@ -45,7 +51,7 @@ UserSchema.pre('save', function(next) {
 });
 
 UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {
-  bcrypt.compare(candidate, this.hash, (err, match) => {
+  bcrypt.compare(candidate, this.hash, function(err, match) {
     if (err) {
       return cb(err);
     }
@@ -54,25 +60,25 @@ UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {
   });
 }
 
-// UserSchema.methods.getRoles = function getRoles(workspace_id, cb) {
-//   const user = this;
-//
-//   Workspace.findOne({'_id': workspace_id, 'deleted': false}).exec((err, workspace) => {
-//     if (err) {
-//       return cb(err);
-//     }
-//     else if (!workspace) {
-//       return cb('A workspace with that id does not exist');
-//     }
-//
-//     for (let i = 0; i < workspace.users; i++) {
-//       if (workspaces.users[i].account == user['_id']) {
-//         return cb(null, workspaces.users[i].roles);
-//       }
-//     }
-//
-//     cb('User is not a part of that workspace');
-//   });
-// }
+UserSchema.methods.getRoles = function getRoles(workspace_id, cb) {
+  const user = this;
+
+  Workspace.findOne({'_id': workspace_id, 'deleted': false}).exec((err, workspace) => {
+    if (err) {
+      return cb(err);
+    }
+    else if (!workspace) {
+      return cb('A workspace with that id does not exist');
+    }
+
+    for (let i = 0; i < workspace.users; i++) {
+      if (workspace.users[i].account == user['_id']) {
+        return cb(null, workspace.users[i].roles);
+      }
+    }
+
+    cb('User is not a part of that workspace');
+  });
+}
 
 module.exports = mongoose.model('User', UserSchema);
