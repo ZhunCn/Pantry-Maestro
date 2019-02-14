@@ -75,7 +75,38 @@ export default class Inventory extends React.Component {
         super(props);
         // Temporary data set
         this.state = {
-            data: []
+            data: [
+                {
+                    name: "TEST1",
+                    expiration: "12/01/2019",
+                    quantity: 20
+                },
+                {
+                    name: "TEST1",
+                    expiration: "02/15/2019",
+                    quantity: 12
+                }, {
+                    name: "TEST1",
+                    expiration: "03/19/2019",
+                    quantity: 23
+                }, {
+                    name: "TEST2",
+                    expiration: "01/07/2019",
+                    quantity: 2
+                }, {
+                    name: "TEST2",
+                    expiration: "05/23/2019",
+                    quantity: 11
+                }, {
+                    name: "TEST2",
+                    expiration: "06/24/2019",
+                    quantity: 9
+                }, {
+                    name: "TEST2",
+                    expiration: "07/12/2019",
+                    quantity:14
+                }
+            ]
         }
     }
 
