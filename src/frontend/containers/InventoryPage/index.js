@@ -5,51 +5,34 @@ import 'react-table/react-table.css'
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import axios from 'axios'
+import AddChangeItemComponent from '@/components/AddChangeItemComponent';
 
 const workspaceID = "5c64def057910030016ba7c1";
 
-function Item(name, expiration, quantity) {
+function Item(id, name, expiration, quantity) {
+    this.id = id;
     this.name = name;
     this.expiration = expiration;
     this.quantity = quantity;
 }
 
-const requestData = () => {
-    return new Promise((resolve, reject) => {
-        axios.get(`/api/workspaces/${workspaceID}/inventory`, {
+// const requestData = () => {
+//     return new Promise((resolve, reject) => {
+//         axios.get(`/api/workspaces/${workspaceID}/inventory`, {
+//
+//         }).then(res => {
+//             resolve(parseData(res.data));
+//             console.log(res.data);
+//         });
+//     })
+// };
 
-        }).then(res => {
-            resolve(parseData(res.data));
-            console.log(res.data);
-        });
-    })
-}
-
-let tempData = [
-    {
-        "_id:": "123456789",
-        name: "Starburst",
-        quantities: {
-            "01/01/2019": 20,
-            "02/15/2019": 12,
-            "03/19/2019": 23
-        }
-    },
-    {
-        "_id:": "987654321",
-        name: "Ramen",
-        quantities: {
-            "01/07/2019": 2,
-            "05/23/2019": 11,
-            "06/24/2019": 9
-        }
-    }
-];
 function parseData(serverData) {
     let parsedData = [];
     for (let i = 0; i < Object.entries(serverData.inventory.items).length; i++) {
         for (let j = 0; j < Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities).length; j++) {
-            let tempItem = new Item(Object.entries(serverData.inventory.items)[i][1].name,
+            let tempItem = new Item(Object.entries(serverData.inventory.items)[i][1]._id,
+                Object.entries(serverData.inventory.items)[i][1].name,
                 Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][0],
                 Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][1]);
             parsedData.push(tempItem);
@@ -61,7 +44,7 @@ function parseData(serverData) {
 function getInitialData() {
 // Get the items from the server
 // Hard-coding 5c64def057910030016ba7c1 for now
-    axios.get('/api/workspaces/5c64def057910030016ba7c1/inventory', {}).then(res => {
+    axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
         let serverData = parseData(res.data);
         console.log(serverData);
         return serverData;
@@ -73,8 +56,8 @@ function getInitialData() {
 export default class Inventory extends React.Component {
     constructor(props) {
         super(props);
-        // Temporary data set
         this.state = {
+            // Temporary data set
             data: [
                 {
                     name: "TEST1",
@@ -112,12 +95,15 @@ export default class Inventory extends React.Component {
 
     componentDidMount() {
         // Get the items from the server
-        // Hard-coding 5c64def057910030016ba7c1 for now
-        axios.get('/api/workspaces/5c64def057910030016ba7c1/inventory', {}).then(res => {
+        axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
             let serverData = parseData(res.data);
             this.setState({ data: serverData });
             console.log(serverData);
         });
+    }
+
+    handleDayClick(day) {
+
     }
 
     render() {
@@ -133,7 +119,7 @@ export default class Inventory extends React.Component {
                 aggregate: vals => vals.sort()[0],
                 accessor: d => {
                     let dates = Array.from(d.expiration);
-                    return dates.sort(function (a, b) {
+                    return dates.sort((a, b) => {
                         return Date.parse(a) > Date.parse(b);
                     });
                 }
@@ -156,7 +142,6 @@ export default class Inventory extends React.Component {
             <div>
                 <GenericNavigationBar/>
                 <div class="Content">
-                    {/*<button onClick={this.buttonHandleRefresh()}>Refresh</button>*/}
                     <h1>Inventory</h1>
                     <ReactTable ref={(refReactTable) => {this.refReactTable = refReactTable;}}
                                 data={data}
@@ -164,6 +149,7 @@ export default class Inventory extends React.Component {
                                 pivotBy={["name"]}
                                 sortable={true}
                     />
+                    <AddChangeItemComponent/>
                 </div>
             </div>
         );
