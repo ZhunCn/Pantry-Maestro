@@ -27,10 +27,11 @@ module.exports = function(router) {
   /*
    * Add a user to a workspace
    */
-  router.post('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
+  router.post('/api/workspaces/:workspace_id/users/', (req, res) => {
     // Authorize
 
     let fields = [
+      'user_id',
       'roles'
     ];
 
@@ -54,7 +55,7 @@ module.exports = function(router) {
         return;
       }
 
-      workspace.users.push({'account': req.params.user_id, 'roles': req.body.roles});
+      workspace.users.push({'account': req.body.user_id, 'roles': req.body.roles});
 
       workspace.save((err) => {
         if (err) {
@@ -62,7 +63,7 @@ module.exports = function(router) {
           return;
         }
 
-        User.findById(req.params.user_id).exec((err, user) => {
+        User.findById(req.body.user_id).exec((err, user) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
             return;
@@ -71,6 +72,11 @@ module.exports = function(router) {
             res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
             return;
           }
+
+          // Fixes bug where user.workspaces contains a null value
+          user.workspaces = user.workspaces.filter(workspace => {
+            return workspace != null;
+          });
 
           user.workspaces.push(req.params.workspace_id);
           user.save((err) => {

@@ -28,7 +28,7 @@ UserSchema.virtual('password').set(function(password) {
   this._password = password;
 });
 
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function() {
   const user = this;
 
   if (user) {
@@ -38,21 +38,17 @@ UserSchema.pre('save', function(next) {
   }
 
   if (user && user.hash && user.hash !== null && typeof(user._password) == 'undefined') {
-    return next();
+    return;
   }
 
   bcrypt.hash(user._password, saltRounds, function(err, hash) {
     if (err) {
-      return next();
+      return;
     }
 
     user.hash = hash;
-    next();
   });
 });
-
-
-// UserSchema.post('save') // Remove nulls from workspaces
 
 UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {
   bcrypt.compare(candidate, this.hash, function(err, match) {
