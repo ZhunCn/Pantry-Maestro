@@ -84,7 +84,7 @@ module.exports = function(router) {
 
         // Create JWT
         let token = jwt.sign({
-          'username': req.body.username
+          'user_id': user['_id']
         }, process.env.JWT_SECRET, {
           'expiresIn': '12h'
         });
@@ -120,7 +120,10 @@ module.exports = function(router) {
         return;
       }
 
-      res.status(c.status.OK).json({'message': 'Successfully decoded token'});
+      res.status(c.status.OK).json({
+        'message': 'Successfully decoded token',
+        'decoded': decoded
+      });
     });
   });
 }

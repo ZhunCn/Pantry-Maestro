@@ -1,3 +1,6 @@
+const {User, Workspace} = require('models');
+const jwt = require('jsonwebtoken');
+
 /*
  * Check whether the object contains all keys in array
  *
@@ -44,8 +47,74 @@ function isJSON(input) {
   } catch (e) {
     return false;
   }
-  
+
   return true;
 }
 
-module.exports = {complete, sanitize, isJSON};
+/*
+ * See if a request has the correct authorization
+ *
+ * @arg     req       Request to be checked
+ * @return  Callback
+ */
+function authorize(req, params = {}) {
+  return new Promise((resolve, reject) => {
+    if (!req || !params) {
+      return reject('Missing req or params');
+    }
+
+    if (!req.headers.authorization) {
+      return reject('Missing necessary authorization');
+    }
+
+    let token = req.headers.authorization;
+
+    if (token.startsWith('Bearer ')) {
+      token = token.slice(7, token.length);
+    }
+
+    if (!token) {
+      return reject('Invalid token');
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return reject('Invalid token');
+      }
+
+      if (!decoded.user_id) {
+        return reject('Invalid token: Token is mutated');
+      }
+
+      if (params.hasOwnProperty('workspace_id')) {
+        Workspace.findOne({'_id': params.workspace_id, 'deleted': false}).exec((err, workspace) => {
+          if (err) {
+            return reject('Error retrieving workspace: ' + err);
+          }
+          else if (!workspace) {
+            return reject('Invalid workspace_id');
+          }
+
+          for (let i = 0; i < workspace.users.length; i++) {
+            // user_id in users array
+            if (workspace.users[i].account == decoded.user_id) {
+              // See if there's an intersection
+              if (params.roles.filter(role => workspace.users[i].roles.indexOf(role) !== -1).length > 0) {
+                return resolve(decoded);
+              }
+              else {
+                return reject('Insufficient permissions');
+              }
+            }
+          }
+          return reject('User is not a member of this workspace');
+        });
+      }
+      else {
+        return resolve(decoded);
+      }
+    });
+  });
+}
+
+module.exports = {complete, sanitize, isJSON, authorize};

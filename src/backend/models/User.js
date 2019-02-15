@@ -7,6 +7,7 @@ const saltRounds = 10;
 var UserSchema = new Schema({
   email: {
     type: String,
+    unique: true,
     required: true
   },
   username: {
@@ -49,6 +50,9 @@ UserSchema.pre('save', function(next) {
     next();
   });
 });
+
+
+// UserSchema.post('save') // Remove nulls from workspaces
 
 UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {
   bcrypt.compare(candidate, this.hash, function(err, match) {

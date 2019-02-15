@@ -35,8 +35,6 @@ module.exports = function(router) {
       'quantities'
     ];
 
-    console.log(req.body);
-
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});

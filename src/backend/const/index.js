@@ -1,5 +1,7 @@
-const status = require('./status.js');
+const status = require('./status');
+const roles = require('./roles');
 
 module.exports = {
-  'status': status
+  'status': status,
+  'roles': roles
 }

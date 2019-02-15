@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {complete} = require('utils');
+const {complete, authorize} = require('utils');
 const {Workspace, Inventory} = require('models');
 const c = require('const');
 
@@ -115,16 +115,27 @@ module.exports = function(router) {
    * Handle the updating of old workspaces
    */
   router.put('/api/workspaces/:workspace_id', (req, res) => {
-    let fields = [
-    ];
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [
+        c.roles.OWNER,
+        c.roles.ADMIN
+      ]
+    }).then(decoded => {
+      let fields = [
+      ];
 
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      // Check if request contains necessary fields
+      if (fields && !complete(req.body, fields)) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+        return;
+      }
+
+      res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not finished'});
+    }).catch(err => {
+      res.json({'error': 'Authorization error: ' + err});
       return;
-    }
-
-    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not finished'});
+    });
   });
 
   /*
