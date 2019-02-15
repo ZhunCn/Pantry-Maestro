@@ -111,7 +111,10 @@ export default class Inventory extends React.Component {
         const columns = [
             {
                 Header: "Name",
-                accessor: "name"
+                accessor: "name",
+                sortMethod: (a,b) => {
+                    return (a<b?-1:(a>b?1:0));  
+                }
             },
             {
                 Header: "Earliest Expiration Date",
@@ -122,6 +125,18 @@ export default class Inventory extends React.Component {
                     return dates.sort((a, b) => {
                         return Date.parse(a) > Date.parse(b);
                     });
+                },
+                sortMethod: (a,b) => {
+                    let date1 = new Date(a.join(""))
+                    let date2 = new Date(b.join(""))
+                    if (date1 > date2) {
+                        return 1;
+                      }
+                      if (date1 < date2) {
+                        return -1;
+                      }
+                      // returning 0 or undefined will use any subsequent column sorting methods or the row index as a tiebreaker
+                      return 0;
                 }
             },
             {

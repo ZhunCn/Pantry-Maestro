@@ -2,6 +2,8 @@ import React from 'react';
 import './styles.scss';
 import { Link } from 'react-router-dom';
 import axios from 'axios'
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
 
 const workspaceID = "5c64def057910030016ba7c1";
 export default class AddChangeItemComponent extends React.Component {
@@ -11,6 +13,7 @@ export default class AddChangeItemComponent extends React.Component {
                 "name": "",
                 "quantities": [{"date":"", "quantity": 0}]
         }
+        this.handleChange = this.handleChange.bind(this);
     }   
 
     addQuantity = (e) => {
@@ -31,6 +34,11 @@ export default class AddChangeItemComponent extends React.Component {
         }
     }
 
+    calendarHandleChange(date) {
+        let quantities = [...this.state.quantities]
+        quantities[date.id][date.className] = date.value
+    }
+
     render() {
         let {name, quantities} = this.state
         return (
@@ -46,13 +54,19 @@ export default class AddChangeItemComponent extends React.Component {
                         return (
                             <div key={idx}>
                                 <label htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
-                                <input
+                                {/* <input
                                     type="text"
                                     name={dateId}
                                     data-id={idx}
                                     id={dateId}
                                     className="date"
                                     placeholder="Enter Expiration"
+                                /> */}
+                                <DatePicker 
+                                    name={dateId}
+                                    id={dateId}
+                                    className="date"
+
                                 />
                                 <label htmlFor={quantityId}>Quantity:  </label>
                                 <input 
