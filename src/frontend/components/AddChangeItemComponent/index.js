@@ -24,25 +24,6 @@ export default class AddChangeItemComponent extends React.Component {
         }))
     }
 
-    // parseData(unparsedData) {
-    //     // "name": "Starburst",
-    //     // "quantities": {
-    //     //     "01/01/2019": 12,
-    //     //     "02/13/2020": 23,
-    //     //     "12/22/2019": 5
-    //     // }
-    //     let parsedData = {
-    //         "name": unparsedData.name,
-    //         "quantities": {}
-    //     }
-    //     for (let i = 0; i < unparsedData.quantities.length; i++) {
-    //         parsedData.quantities[unparsedData.quantities[i].date] = parseInt(unparsedData.quantities[i].quantity);
-    //     }
-    //     console.log(parsedData);
-    //     return parsedData;
-
-    // }
-
     handleSubmit = (e) => { 
         e.preventDefault();
 
@@ -51,8 +32,9 @@ export default class AddChangeItemComponent extends React.Component {
             "quantities": {}
         }
         for (let i = 0; i < this.state.quantities.length; i++) {
-            if (this.state.quantities[i].date != "") { 
-                parsedData.quantities[this.state.quantities[i].date] = parseInt(this.state.quantities[i].quantity);
+            let parsedDate = new Date(this.state.quantities[i].date).toLocaleDateString();
+            if (parsedDate != "" || parsedDate === "Invalid Date") { 
+                parsedData.quantities[parsedDate] = parseInt(this.state.quantities[i].quantity);
             }
         }
         console.log(parsedData);
@@ -76,10 +58,12 @@ export default class AddChangeItemComponent extends React.Component {
         }
     }
 
-    // calendarHandleChange(date) {
-    //     let quantities = [...this.state.quantities]
-    //     quantities[date.id][date.className] = date.value
-    // }
+    handleCalendarChange(date, idx) {
+        console.log(this.state.quantities[idx].date)
+        let quantities = [...this.state.quantities]
+        quantities[idx].date = date;
+        this.setState({quantities}, () => console.log(this.state.quantities))
+    }
 
     render() {
         let {name, quantities} = this.state
@@ -92,17 +76,23 @@ export default class AddChangeItemComponent extends React.Component {
                 <button onClick={this.addQuantity}>Add expiration date and quantity</button>
                 {
                     this.state.quantities.map((val, idx) => {
+                        const { startDate } = this.state.quantities[idx].date;
                         let dateId = `date-${idx}`, quantityId = `quantity-${idx}`;
                         return (
                             <div key={idx}>
                                 <label htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
-                                <input
-                                    type="text"
+
+                                <DatePicker  
+                                    onChange={(date) => this.handleCalendarChange(date, idx)}
+                                    selected={this.state.quantities[idx].date}
                                     name={dateId}
-                                    data-id={idx}
-                                    id={dateId}
                                     className="date"
-                                    placeholder="Enter Expiration"
+                                    id={dateId}
+                                    placeholderText="Click to select a date"
+                                    peekNextMonth
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    dropdownMode="select"
                                 />
                                 <label htmlFor={quantityId}>Quantity:  </label>
                                 <input 
