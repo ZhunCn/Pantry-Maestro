@@ -36,10 +36,11 @@ module.exports = {
       loader: 'url-loader?limit=100000' }
     ]
   },
-  plugins: [
+  plugins: [      
     new HtmlWebPackPlugin({
       template: './src/frontend/index.html',
-      title: config.dev.name
+      title: config.dev.name,
+      
     })
   ]
 };
