@@ -8,6 +8,7 @@ import Login from '@/containers/LoginPage'
 import Register from '@/containers/RegisterPage'
 import Inventory from '@/containers/InventoryPage'
 import Settings from "@/containers/SettingsPage";
+import Workspace from "@/containers/WorkspacePage";
 
 const Router = () => {
   return (
@@ -19,6 +20,7 @@ const Router = () => {
         <Route path="/register" component={Register} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/settings" component={Settings} />
+        <Route path="/workspace" component={Workspace} />
         <Route path="*" render={() => (<Redirect to="/"/>)} />
       </Switch>
     </BrowserRouter>
