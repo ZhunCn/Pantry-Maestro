@@ -16,17 +16,6 @@ function Item(id, name, expiration, quantity) {
     this.quantity = quantity;
 }
 
-// const requestData = () => {
-//     return new Promise((resolve, reject) => {
-//         axios.get(`/api/workspaces/${workspaceID}/inventory`, {
-//
-//         }).then(res => {
-//             resolve(parseData(res.data));
-//             console.log(res.data);
-//         });
-//     })
-// };
-
 function parseData(serverData) {
     let parsedData = [];
     for (let i = 0; i < Object.entries(serverData.inventory.items).length; i++) {
@@ -40,18 +29,6 @@ function parseData(serverData) {
     }
     return parsedData;
 }
-
-function getInitialData() {
-// Get the items from the server
-// Hard-coding 5c64def057910030016ba7c1 for now
-    axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
-        let serverData = parseData(res.data);
-        console.log(serverData);
-        return serverData;
-    });
-}
-
-
 
 export default class Inventory extends React.Component {
     constructor(props) {
@@ -102,8 +79,14 @@ export default class Inventory extends React.Component {
         });
     }
 
-    handleDayClick(day) {
-
+    handleRefreshClick() {
+        axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
+            // Add functionality to see if the last modified item is the same as the local last modified item.
+            // Only refresh i.e. setState when the last modified items are different
+            let serverData = parseData(res.data);
+            this.setState({ data: serverData });
+            console.log(serverData);
+        });
     }
 
     render() {
@@ -113,8 +96,8 @@ export default class Inventory extends React.Component {
                 Header: "Name",
                 accessor: "name",
                 sortMethod: (a,b) => {
-                    return (a<b?-1:(a>b?1:0));  
-                }
+                    return (a.toLowerCase() > b.toLowerCase()) ? 1 : ((b.toLowerCase() > a.toLowerCase()) ? -1 : 0);
+            }
             },
             {
                 Header: "Earliest Expiration Date",
@@ -157,7 +140,10 @@ export default class Inventory extends React.Component {
             <div>
                 <GenericNavigationBar/>
                 <div class="Content">
-                    <h1>Inventory</h1>
+                    <div class="InventoryTopBar">
+                        <h1>Inventory</h1>
+                        <button class="button refreshButton" onClick={() => {this.handleRefreshClick()}}>Refresh</button>
+                    </div>
                     <ReactTable ref={(refReactTable) => {this.refReactTable = refReactTable;}}
                                 data={data}
                                 columns={columns}

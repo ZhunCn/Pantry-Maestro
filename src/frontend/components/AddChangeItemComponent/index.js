@@ -1,6 +1,6 @@
 import React from 'react';
 import './styles.scss';
-import { Link } from 'react-router-dom';
+import { ToastConsumer, ToastProvider, withToastManager } from 'react-toast-notifications';
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,34 +27,47 @@ export default class AddChangeItemComponent extends React.Component {
     handleSubmit = (e) => {
         e.preventDefault();
 
+        let emptyFlag = true;
+
         let parsedData = {
             "name": this.state.name,
             "quantities": {}
         };
+        if (this.state.name === "") {
+            alert("Enter a name!");
+            return;
+        }
         for (let i = 0; i < this.state.quantities.length; i++) {
             console.log(this.state.quantities[i].date);
             if (this.state.quantities[i].date.toString() === "" || this.state.quantities[i].date.toString() === "Invalid Date") {
-                alert("One or more date field(s) is/are empty");
-                return;
-            }
-            let parsedDate = new Date(this.state.quantities[i].date).toLocaleDateString();
-            parsedData.quantities[parsedDate] = parseInt(this.state.quantities[i].quantity);
-        }
-        console.log(parsedData);
-        axios.post(`/api/workspaces/${workspaceID}/inventory`, parsedData).then(res => {
-            // HTTP status 200 OK
-            if (res.status === 200) {
-                alert("Item has been successfully added to the database");
-            }
-            console.log(res.data);
-        }).catch(error => {
-            if (error.response.data.error === "Item with this name already exists") {
-                alert(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`);
+                if ((this.state.quantities[i].quantity !== 0 || this.state.quantities[i].quantity !== "") && Object.entries(parsedData.quantities).length === 0) {
+                    alert("One or more date field(s) is/are empty");
+                    return;
+                }
             } else {
-                alert(`An error has occurred. ${error}`);
+                let quantity = parseInt(this.state.quantities[i].quantity);
+                let parsedDate = new Date(this.state.quantities[i].date).toLocaleDateString();
+                parsedData.quantities[parsedDate] = isNaN(quantity) ? 0 : quantity;
+                emptyFlag = false;
             }
+        }
+        if (!emptyFlag) {
+            console.log(parsedData);
+            axios.post(`/api/workspaces/${workspaceID}/inventory`, parsedData).then(res => {
+                // HTTP status 200 OK
+                if (res.status === 200) {
+                    alert("Item has been successfully added to the database");
+                }
+                console.log(res.data);
+            }).catch(error => {
+                if (error.response.data.error === "Item with this name already exists") {
+                    alert(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`);
+                } else {
+                    alert(`An error has occurred. ${error}`);
+                }
 
-        })
+            })
+        }
     };
  
     handleChange = (e) => {
@@ -79,6 +92,7 @@ export default class AddChangeItemComponent extends React.Component {
     render() {
         let {name, quantities} = this.state;
         return (
+            <ToastProvider>
             <div class="AddChangeItemForm">
             <form onChange={this.handleChange}>
                 <h2>Add new food items</h2>
@@ -122,6 +136,7 @@ export default class AddChangeItemComponent extends React.Component {
                 <input class="button submitButton" type="button" value="Submit" onClick={this.handleSubmit}/>
             </form>
             </div>
+            </ToastProvider>
         );
     }
 };
