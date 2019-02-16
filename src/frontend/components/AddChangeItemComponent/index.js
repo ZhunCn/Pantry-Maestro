@@ -1,6 +1,7 @@
 import React from 'react';
 import './styles.scss';
-import { ToastConsumer, ToastProvider, withToastManager } from 'react-toast-notifications';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
@@ -34,14 +35,16 @@ export default class AddChangeItemComponent extends React.Component {
             "quantities": {}
         };
         if (this.state.name === "") {
-            alert("Enter a name!");
+            toast("Enter a name!",
+                { type: "warning" });
             return;
         }
         for (let i = 0; i < this.state.quantities.length; i++) {
             console.log(this.state.quantities[i].date);
             if (this.state.quantities[i].date.toString() === "" || this.state.quantities[i].date.toString() === "Invalid Date") {
                 if ((this.state.quantities[i].quantity !== 0 || this.state.quantities[i].quantity !== "") && Object.entries(parsedData.quantities).length === 0) {
-                    alert("One or more date field(s) is/are empty");
+                    toast("One or more date field(s) is/are empty",
+                        { type: "error" });
                     return;
                 }
             } else {
@@ -56,14 +59,16 @@ export default class AddChangeItemComponent extends React.Component {
             axios.post(`/api/workspaces/${workspaceID}/inventory`, parsedData).then(res => {
                 // HTTP status 200 OK
                 if (res.status === 200) {
-                    alert("Item has been successfully added to the database");
+                    toast("Item has been successfully added to the database",
+                        { type: "success" });
                 }
                 console.log(res.data);
             }).catch(error => {
                 if (error.response.data.error === "Item with this name already exists") {
-                    alert(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`);
+                    toast(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`,
+                        { type: "warning" });
                 } else {
-                    alert(`An error has occurred. ${error}`);
+                    toast(`An error has occurred. ${error}`, { type: "error"});
                 }
 
             })
@@ -92,8 +97,8 @@ export default class AddChangeItemComponent extends React.Component {
     render() {
         let {name, quantities} = this.state;
         return (
-            <ToastProvider>
             <div class="AddChangeItemForm">
+                <ToastContainer autoClose={3000}/>
             <form onChange={this.handleChange}>
                 <h2>Add new food items</h2>
                 <label htmlFor="name">Name:</label>
@@ -106,7 +111,7 @@ export default class AddChangeItemComponent extends React.Component {
                         return (
                             <div key={idx} class="dateQuantityInputs">
                                 <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
-                                <DatePicker  
+                                <DatePicker
                                     onChange={(date) => this.handleCalendarChange(date, idx)}
                                     selected={this.state.quantities[idx].date}
                                     name={dateId}
@@ -120,7 +125,7 @@ export default class AddChangeItemComponent extends React.Component {
                                     dropdownMode="select"
                                 />
                                 <label class="quantityLabel" htmlFor={quantityId}>Quantity:  </label>
-                                <input 
+                                <input
                                     type="number"
                                     name={quantityId}
                                     data-id={idx}
@@ -135,8 +140,9 @@ export default class AddChangeItemComponent extends React.Component {
                 }
                 <input class="button submitButton" type="button" value="Submit" onClick={this.handleSubmit}/>
             </form>
+
             </div>
-            </ToastProvider>
+
         );
     }
 };
