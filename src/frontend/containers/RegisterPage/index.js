@@ -117,7 +117,7 @@ export default class Register extends React.Component {
       <div>
         <GenericNavigationBar/>
         <div class="Content">
-        <p>Sign Up</p>
+        <h2>Login</h2>
         <form>
           <p>Username<p id="usernamePrompt"></p></p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
@@ -130,8 +130,13 @@ export default class Register extends React.Component {
         </form>
         <p><button id="signUpButton" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
         
-        <p><Link to="/login"><button id="loginButton">Already Have an account? Log In</button></Link></p>
+        <Link to="/login"><button id="loginButton">Already Have an account? Log In</button></Link>
+
+        <div class="Footer"></div>
+          <div class="Flex">
+          </div>
         </div>
+
       </div>
     );
   }

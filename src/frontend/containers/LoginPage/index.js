@@ -109,7 +109,7 @@ export default class Login extends React.Component {
       <div>
         <GenericNavigationBar/>
         <div class="Content">
-        <p>Log in</p>
+        <h2>Login</h2>
         <form>
           <p>Username or Email<p id="usernamePrompt"></p></p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
@@ -119,8 +119,13 @@ export default class Login extends React.Component {
         </form>
         <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
+        <Link to="/register"><button id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
+        
+        <div class="Footer">
+          <div class="Flex">
+          </div>
+        </div>
 
-        <p><Link to="/register"><button id="signUpButton" >New to Pantry Maestro? Sign Up</button></Link></p>
         </div>
       </div>
     );
