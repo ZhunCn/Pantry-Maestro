@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
@@ -74,9 +75,15 @@ export default class Login extends React.Component {
           'password': password
         }).then(res => {
           console.log(res.data);
+          localStorage.setItem('loginToken', res.token);
+          document.getElementById("successParagraph").textContent = "Successfully logged in!";
+          document.getElementById("successParagraph").style = "color:green;";
+
+          this.props.history.push('/');
+
         })
-        .catch(function (error) {
-          console.log(res.error);
+        .catch((error) => {
+          console.log(error.data);
         });
       } else {
         console.log('Invalid password!');
@@ -110,7 +117,7 @@ export default class Login extends React.Component {
           <p>Password<p id="passwordPrompt"></p></p>
           <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input>
         </form>
-        <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button></p>
+        <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
 
         <p><Link to="/register"><button id="signUpButton" >New to Pantry Maestro? Sign Up</button></Link></p>

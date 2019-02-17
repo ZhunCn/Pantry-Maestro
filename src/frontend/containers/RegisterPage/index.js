@@ -56,10 +56,12 @@ export default class Register extends React.Component {
 
     // Grab username and password from field
     var username = document.getElementById("usernameField").value;
+    var email = document.getElementById("emailField").value;
     var password = document.getElementById("passwordField").value;
     var confirmPassword = document.getElementById("confirmPasswordField").value;
 
     console.log('Inputted username (loginProcedure): ', username);
+    console.log('Inputted email (loginProcedure): ', email);
     console.log('Inputted password (loginProcedure): ', password);
     console.log('Inputted password #2 (loginProcedure): ', confirmPassword);
 
@@ -70,8 +72,21 @@ export default class Register extends React.Component {
 
         if ((this.verifyPass(password)) == true) {
           console.log('Valid password!');
-          // Connect with backend to register account
 
+          // Connect with backend to register account
+          axios.post('/api/auth/register', {
+            'email': email,
+            'username': username,
+            'password': password
+          }).then(res => {
+            console.log(res.data);
+            document.getElementById("successParagraph").textContent = "Successfully registered an account!";
+            document.getElementById("successParagraph").style = "color:green;";
+            this.props.history.push('/login');
+          })
+          .catch((error) => {
+            console.log(error.data);
+          });
         } else {
           console.log('Invalid password!');
           document.getElementById("passwordPrompt").textContent = "(Invalid password!)";
@@ -112,7 +127,7 @@ export default class Register extends React.Component {
           <p>Email</p>
           <input type="text" name="emailField" id="emailField"></input><br></br>
         </form>
-        <p><button id="signUpButton" onClick={(e) => this.signUpProcedure()}>Sign Up</button></p>
+        <p><button id="signUpButton" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
         
         <p><Link to="/login"><button id="loginButton">Already Have an account? Log In</button></Link></p>
         </div>
