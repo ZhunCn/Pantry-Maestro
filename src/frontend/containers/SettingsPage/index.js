@@ -20,7 +20,7 @@ let validUser = function verifyUser(username){
 
 let validPass = function verifyPass(password){
   //check for valid lengths
-  if(password.getLength == 0){
+  if(password.getLength == 6){
     return false;
   }
 

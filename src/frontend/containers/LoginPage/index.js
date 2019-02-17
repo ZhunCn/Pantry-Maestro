@@ -29,7 +29,7 @@ export default class Login extends React.Component {
     console.log('Inputted password (verifyPass): ', password);
 
     //check for valid lengths
-    if(password.length == 0){
+    if(password.length == 6){
       return false;
     }
 

@@ -28,7 +28,7 @@ export default class Register extends React.Component {
     console.log('Inputted password (verifyPass): ', password);
 
     //check for valid lengths
-    if(password.length == 0){
+    if(password.length < 6){
       return false;
     }
     
@@ -89,18 +89,18 @@ export default class Register extends React.Component {
             console.log(error.data);
           });
         } else {
-          console.log('Invalid password!');
-          document.getElementById("passwordPrompt").textContent = "(Invalid password!)";
+          console.log('Invalid password! Make sure your password contains at least 1 number and is longer than 6 characters');
+          document.getElementById("passwordPrompt").textContent = "(Invalid password! Make sure your password contains at least 1 number and is longer than 6 characters)";
           document.getElementById("passwordPrompt").style = "color:red;";
         }
       } else {
-        console.log('Invalid username!');
-        document.getElementById("usernamePrompt").textContent = "(Invalid username!)";
+        console.log('Invalid username! Usernames must be less than 32 characters in length');
+        document.getElementById("usernamePrompt").textContent = "(Invalid username! Usernames must be less than 32 characters in length)";
         document.getElementById("usernamePrompt").style = "color:red;";
       }
     } else {
-      console.log('Passwords are not the same.');
-      document.getElementById("confirmPrompt").textContent = "(Passwords are not the same!)";
+      console.log('Passwords do not match, check again');
+      document.getElementById("confirmPrompt").textContent = "(Passwords are not the same, check again!)";
         document.getElementById("confirmPrompt").style = "color:red;";
     }
   }
@@ -117,7 +117,7 @@ export default class Register extends React.Component {
       <div>
         <GenericNavigationBar/>
         <div class="Content">
-        <h2>Login</h2>
+        <h2>Register</h2>
         <form>
           <p>Username<p id="usernamePrompt"></p></p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
