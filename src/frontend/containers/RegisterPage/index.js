@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
@@ -60,10 +61,10 @@ export default class Register extends React.Component {
     var password = document.getElementById("passwordField").value;
     var confirmPassword = document.getElementById("confirmPasswordField").value;
 
-    console.log('Inputted username (loginProcedure): ', username);
-    console.log('Inputted email (loginProcedure): ', email);
-    console.log('Inputted password (loginProcedure): ', password);
-    console.log('Inputted password #2 (loginProcedure): ', confirmPassword);
+    console.log('Inputted username (signUpProcedure): ', username);
+    console.log('Inputted email (signUpProcedure): ', email);
+    console.log('Inputted password (signUpProcedure): ', password);
+    console.log('Inputted password #2 (signUpProcedure): ', confirmPassword);
 
 
     if (password == confirmPassword) {
