@@ -51,11 +51,16 @@ export default class Login extends React.Component {
 
 
   loginProcedure() {
+    document.getElementById("usernamePrompt").textContent = "";
+    document.getElementById("passwordPrompt").textContent = "";
+
+
     // Grab username and password from field
     var username = document.getElementById("usernameField").value;
     var password = document.getElementById("passwordField").value;
     console.log('Inputted username (loginProcedure): ', username);
     console.log('Inputted password (loginProcedure): ', password);
+    
 
     if ((this.verifyUser(username)) == true) {
       console.log('Valid username!');
@@ -69,12 +74,19 @@ export default class Login extends React.Component {
           'password': password
         }).then(res => {
           console.log(res.data);
+        })
+        .catch(function (error) {
+          console.log(res.error);
         });
       } else {
         console.log('Invalid password!');
+        document.getElementById("passwordPrompt").textContent = "(Invalid password!)";
+        document.getElementById("passwordPrompt").style = "color:red;";
       }
     } else {
       console.log('Invalid username!');
+      document.getElementById("usernamePrompt").textContent = "(Invalid username!)";
+      document.getElementById("usernamePrompt").style = "color:red;";
     }
 
   }
@@ -92,11 +104,11 @@ export default class Login extends React.Component {
         <div class="Content">
         <p>Log in</p>
         <form>
-          <p>Username or Email</p>
+          <p>Username or Email<p id="usernamePrompt"></p></p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
 
-          <p>Password</p>
-          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input><br></br>
+          <p>Password<p id="passwordPrompt"></p></p>
+          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input>
         </form>
         <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>

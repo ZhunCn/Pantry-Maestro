@@ -50,6 +50,10 @@ export default class Register extends React.Component {
   
 
   signUpProcedure() {
+    document.getElementById("usernamePrompt").textContent = "";
+    document.getElementById("passwordPrompt").textContent = "";
+    document.getElementById("confirmPrompt").textContent = "";
+
     // Grab username and password from field
     var username = document.getElementById("usernameField").value;
     var password = document.getElementById("passwordField").value;
@@ -57,6 +61,8 @@ export default class Register extends React.Component {
 
     console.log('Inputted username (loginProcedure): ', username);
     console.log('Inputted password (loginProcedure): ', password);
+    console.log('Inputted password #2 (loginProcedure): ', confirmPassword);
+
 
     if (password == confirmPassword) {
       if ((this.verifyUser(username)) == true) {
@@ -68,12 +74,18 @@ export default class Register extends React.Component {
 
         } else {
           console.log('Invalid password!');
+          document.getElementById("passwordPrompt").textContent = "(Invalid password!)";
+          document.getElementById("passwordPrompt").style = "color:red;";
         }
       } else {
         console.log('Invalid username!');
+        document.getElementById("usernamePrompt").textContent = "(Invalid username!)";
+        document.getElementById("usernamePrompt").style = "color:red;";
       }
     } else {
       console.log('Passwords are not the same.');
+      document.getElementById("confirmPrompt").textContent = "(Passwords are not the same!)";
+        document.getElementById("confirmPrompt").style = "color:red;";
     }
   }
 
@@ -91,11 +103,11 @@ export default class Register extends React.Component {
         <div class="Content">
         <p>Sign Up</p>
         <form>
-          <p>Username</p>
+          <p>Username<p id="usernamePrompt"></p></p>
           <input type="text" name="usernameField" id="usernameField"></input><br></br>
-          <p>Password</p>
+          <p>Password<p id="passwordPrompt"></p></p>
           <input type="password" name="passwordField" id="passwordField"></input><br></br>
-          <p>Confirm Password</p>
+          <p>Confirm Password<p id="confirmPrompt"></p></p>
           <input type="password" name="confirmPasswordField" id="confirmPasswordField"></input><br></br>
           <p>Email</p>
           <input type="text" name="emailField" id="emailField"></input><br></br>
