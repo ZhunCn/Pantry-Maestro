@@ -117,9 +117,9 @@ export default class Login extends React.Component {
           <p>Password<p id="passwordPrompt"></p></p>
           <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input>
         </form>
-        <p><button id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
+        <p><button class="button" id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
-        <Link to="/register"><button id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
+        <Link to="/register"><button class="button" id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
         
         <div class="Footer">
           <div class="Flex">

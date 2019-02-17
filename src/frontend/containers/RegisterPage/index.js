@@ -128,9 +128,9 @@ export default class Register extends React.Component {
           <p>Email</p>
           <input type="text" name="emailField" id="emailField"></input><br></br>
         </form>
-        <p><button id="signUpButton" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
+        <p><button id="signUpButton" class="button" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
         
-        <Link to="/login"><button id="loginButton">Already Have an account? Log In</button></Link>
+        <Link to="/login"><button class="button" id="loginButton">Already Have an account? Log In</button></Link>
 
         <div class="Footer"></div>
           <div class="Flex">
