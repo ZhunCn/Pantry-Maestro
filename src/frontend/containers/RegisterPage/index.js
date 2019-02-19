@@ -10,7 +10,7 @@ import './styles.scss';
 export default class Register extends React.Component {
   verifyUser(username) {
 
-    console.log('Inputted username (verifyUser): ', username);
+    //console.log('Inputted username (verifyUser): ', username);
 
     //check for valid lengths
     if(username.length == 0){
@@ -25,7 +25,7 @@ export default class Register extends React.Component {
   }
 
   verifyPass(password) {
-    console.log('Inputted password (verifyPass): ', password);
+    //console.log('Inputted password (verifyPass): ', password);
 
     //check for valid lengths
     if(password.length < 6){
@@ -50,7 +50,7 @@ export default class Register extends React.Component {
   }
 
   verifyEmail(email) {
-    console.log('Inputted email (verifyEmail): ', email);
+    //console.log('Inputted email (verifyEmail): ', email);
 
     //modular regex design
     var emailregex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -127,15 +127,27 @@ export default class Register extends React.Component {
   }
 
 
-  enterPressedOnPassword() {
+  enterPressedOnEmail() {
     if (event.keyCode === 13) {
-      document.getElementById("loginButton").click();
+      document.getElementById("signUpButton").click();
     }
   }
 
   handlePasswordChange(event) {
-    if (this.validPass(event.target.value)) {
-      document.getElementById.textContent = "";
+    if (this.verifyPass(event.target.value)) {
+      document.getElementById("passwordPrompt").textContent = "";
+    }
+  }
+
+  handleUsernameChange(event) {
+    if (this.verifyUser(event.target.value)) {
+      document.getElementById("usernamePrompt").textContent = "";
+    }
+  }
+
+  handleEmailChange(event) {
+    if (this.verifyEmail(event.target.value)) {
+      document.getElementById("emailPrompt").textContent = "";
     }
   }
 
@@ -147,13 +159,13 @@ export default class Register extends React.Component {
         <h2>Register</h2>
         <form>
           <p>Username<p id="usernamePrompt"></p></p>
-          <input type="text" name="usernameField" id="usernameField" placeholder="Username"></input><br></br>
+          <input type="text" name="usernameField" id="usernameField" onChange={(event) => {this.handleUsernameChange(event)}} placeholder="Username" ></input><br></br>
           <p>Password<p id="passwordPrompt"></p></p>
           <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} placeholder="Password"></input><br></br>
           <p>Confirm Password<p id="confirmPrompt"></p></p>
           <input type="password" name="confirmPasswordField" id="confirmPasswordField" placeholder="Confirm Password"></input><br></br>
           <p>Email<p id="emailPrompt"></p></p>
-          <input type="text" name="emailField" id="emailField" placeholder="someone@example.com"></input><br></br>
+          <input type="text" name="emailField" id="emailField"  onChange={(event) => {this.handleEmailChange(event)}} onKeyDown={(e) => this.enterPressedOnEmail()}  placeholder="someone@example.com"></input><br></br>
         </form>
         <p><button id="signUpButton" class="button" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
 
