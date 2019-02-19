@@ -147,13 +147,13 @@ export default class Register extends React.Component {
         <h2>Register</h2>
         <form>
           <p>Username<p id="usernamePrompt"></p></p>
-          <input type="text" name="usernameField" id="usernameField"></input><br></br>
+          <input type="text" name="usernameField" id="usernameField" placeholder="Username"></input><br></br>
           <p>Password<p id="passwordPrompt"></p></p>
-          <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}}></input><br></br>
+          <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} placeholder="Password"></input><br></br>
           <p>Confirm Password<p id="confirmPrompt"></p></p>
-          <input type="password" name="confirmPasswordField" id="confirmPasswordField"></input><br></br>
+          <input type="password" name="confirmPasswordField" id="confirmPasswordField" placeholder="Confirm Password"></input><br></br>
           <p>Email<p id="emailPrompt"></p></p>
-          <input type="text" name="emailField" id="emailField"></input><br></br>
+          <input type="text" name="emailField" id="emailField" placeholder="someone@example.com"></input><br></br>
         </form>
         <p><button id="signUpButton" class="button" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
 

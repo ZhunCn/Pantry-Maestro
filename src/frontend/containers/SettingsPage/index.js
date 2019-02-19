@@ -49,10 +49,10 @@ function verifyPass(password){
   //check that password has letters AND numbers
 
   //modular regex design
-  var letters = /^[a-zA-Z]+$/;
-  var numbers = /^[0-9]+$/;
+  var letters = /[a-zA-Z]+/;
+  var numbers = /[0-9]+/;
 
-  if(password.match(letters) != null || password.match(numbers) != null){
+  if(password.match(letters) == null || password.match(numbers) == null) {
     return false;
   }
 

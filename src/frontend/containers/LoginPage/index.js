@@ -19,7 +19,13 @@ export default class Login extends React.Component {
     }
 
     if(username.length > 32){
-      return false;
+      var emailregex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+
+      //check if username looks like an email
+      if(username.match(emailregex) == null){
+        return false;
+      } 
+      return true;
     }
 
     return true;
@@ -40,10 +46,10 @@ export default class Login extends React.Component {
     //check that password has letters AND numbers
 
     //modular regex design
-    var letters = /^[a-zA-Z]+$/;
-    var numbers = /^[0-9]+$/;
+    var letters = /[a-zA-Z]+/;
+    var numbers = /[0-9]+/;
 
-    if(password.match(letters) != null || password.match(numbers) != null){
+    if(password.match(letters) == null || password.match(numbers) == null) {
       return false;
     }
 
@@ -112,10 +118,10 @@ export default class Login extends React.Component {
         <h2>Login</h2>
         <form>
           <p>Username or Email<p id="usernamePrompt"></p></p>
-          <input type="text" name="usernameField" id="usernameField"></input><br></br>
+          <input type="text" name="usernameField" id="usernameField" placeholder="Username"></input><br></br>
 
           <p>Password<p id="passwordPrompt"></p></p>
-          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()}></input>
+          <input type="password" name="passwordField" id="passwordField" onKeyDown={(e) => this.enterPressedOnPassword()} placeholder="Password"></input>
         </form>
         <p><button class="button" id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
