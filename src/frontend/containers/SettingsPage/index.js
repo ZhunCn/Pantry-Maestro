@@ -5,41 +5,60 @@ import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
 //add input checking on Settings similar to Login/Register
-let validUser = function verifyUser(username){
+function verifyUser(username){
+  console.log('Inputted username (verifyUser): ', username);
+
   //check for valid lengths
-  if(username.getLength == 0){
+  if(username.length == 0){
     return false;
   }
 
-  if(username.getLength > 32){
+  if(username.length > 32){
     return false;
   }
 
   return true;
 }
 
-let validPass = function verifyPass(password){
-  //check for valid lengths
-  if(password.getLength == 6){
+function verifyEmail(email) {
+  console.log('Inputted email (verifyEmail): ', email);
+
+  //modular regex design
+  var emailregex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+
+  //check if email looks like an email
+  if(email.match(emailregex) == null){
     return false;
   }
 
-  if(password.getLength > 32){
+  return true;
+}
+
+function verifyPass(password){
+  console.log('Inputted password (verifyPass): ', password);
+
+  //check for valid lengths
+  if(password.length < 6){
+    return false;
+  }
+
+  if(password.length > 32){
     return false;
   }
 
   //check that password has letters AND numbers
 
   //modular regex design
-  var letters = /^[a-zA-Z]+$/;
-  var numbers = /^[0-9]+$/;
+  var letters = /[a-zA-Z]+/;
+  var numbers = /[0-9]+/;
 
-  if(!password.value.match(letters) || !password.value.match(numbers)){
+  if(password.match(letters) == null || password.match(numbers) == null) {
     return false;
   }
 
   return true;
 }
+
 class Popup extends React.Component {
   render() {
     if(this.props.text=="username"){
@@ -53,7 +72,7 @@ class Popup extends React.Component {
             <p>New Username:</p>
             <input type="text" id="usernameInput" name="username" placeholder="Username"/>
             </form>
-          <button onClick={()=>this.ret(document.getElementById("usernameInput").value, "username")}>Save</button>
+          <button onClick={()=>this.processUsername(document.getElementById("usernameInput").value)}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
           </div>
         </div>
@@ -72,7 +91,7 @@ class Popup extends React.Component {
             <p>Last Name:</p>
             <input type="text" id="lastnameInput" name="lastname" placeholder="Last name"/>
             </form>
-          <button onClick={()=>this.ret([document.getElementById("firstnameInput").value, document.getElementById("lastnameInput").value], "name")}>Save</button>
+          <button onClick={()=>this.processName([document.getElementById("firstnameInput").value, document.getElementById("lastnameInput").value])}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
           </div>
         </div>
@@ -89,7 +108,7 @@ class Popup extends React.Component {
             <p>New Email:</p>
             <input type="text" id="emailInput" name="email" placeholder="email"/>
             </form>
-          <button onClick={()=>this.ret(document.getElementById("emailInput").value, "email")}>Save</button>
+          <button onClick={()=>this.processEmail(document.getElementById("emailInput").value)}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
           </div>
         </div>
@@ -118,15 +137,55 @@ class Popup extends React.Component {
             <p>Current password:</p>
             <input type="text" id="curPasswordInput" name="pass1" placeholder="Current Password"/>
             <p>New Password:</p>
-            <input type="text" id="newPasswordInput" name="pass2" placeholder="New Password"/>
+            <input type="password" id="newPasswordInput" name="pass2" placeholder="New Password"/>
             <p>Confirm Password:</p>
-            <input type="text" id="confirmPassword" name="pass3" placeholder="Confirm Password"/>
+            <input type="password" id="confirmPassword" name="pass3" placeholder="Confirm Password"/>
             </form>
-          <button onClick={()=>this.ret([document.getElementById("curPasswordInput").value, document.getElementById("newPasswordInput").value, document.getElementById("confirmPassword").value], "password")}>Save</button>
+          <button onClick={()=>this.processPassword([document.getElementById("curPasswordInput").value, document.getElementById("newPasswordInput").value, document.getElementById("confirmPassword").value])}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
           </div>
         </div>
       );
+    }
+  }
+  processUsername = (username) =>{
+    if(verifyUser(username)===true){
+      this.ret(username, "username");
+    }
+    else{
+      console.log("invalid");
+    }
+  }
+  processName = (name) =>{
+    const first=name[0];
+    const last=name[1];
+    if(verifyUser(first)===true&&verifyUser(last)===true){
+      this.ret(name, "name");
+    }
+    else{
+      console.log("invalid");
+    }
+  }
+  processEmail = (email) =>{
+    if(verifyEmail(email)===true){
+      this.ret(email, "email");
+    }
+    else{
+      console.log("invalid");
+    }
+  }
+  processPassword = (password) =>{
+    const pass1=password[0];
+    const pass2=password[1];
+    const pass3=password[2];
+    if(pass2!==pass3){
+      console.log("passwords do not match");
+    }
+    else if(verifyPass(pass2)!==true){
+      console.log("invalid password");
+    }
+    else{
+      this.ret(password, "password");
     }
   }
   ret = (user, pass) =>{
@@ -142,6 +201,9 @@ export default class Settings extends React.Component {
       showPopup: false
     };
   }
+  logoutProcedure(){
+    console.log("It's supposed to logout, but it don't");
+  }
   togglePopup(value) {
     this.setState({
       showPopup: !this.state.showPopup,
@@ -151,7 +213,7 @@ export default class Settings extends React.Component {
   callbackFunction = (data, field) =>{
     //Here is where all the data stuff goes.
     //data is the actual user input,
-    //whereas field is the name of the aspect the user is trying to change, e.g. "username" or "password"
+    //field is the name of the aspect the user is trying to change, e.g. "username" or "password"
     console.log(data+" "+field);
     this.props.closePopup;
   }
@@ -179,7 +241,7 @@ export default class Settings extends React.Component {
 		        <p><i>{curWorkspace}</i></p>
   			    <button onClick={() => {this.togglePopup("leave")}}>Leave Workspace</button>
 			      <p><strong>Change Password:</strong></p>
-            <button onClick={() => {this.togglePopup("password")}}>Change Password</button>
+            <button onClick={() => {this.togglePopup("password")}}>Change Password</button><br />
             <button onClick={() => {this.logoutProcedure()}}>Log out</button>
           </div>
 	    </div>
