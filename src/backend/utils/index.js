@@ -77,6 +77,11 @@ function authorize(req, params = {}) {
       return reject('Invalid token');
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.log('Error: You are missing a private key. Please add it to your .env under `JWT_SECRET` and try agaain');
+      return reject('Error parsing authorization');
+    }
+
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         return reject('Invalid token');

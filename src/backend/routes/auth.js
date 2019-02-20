@@ -82,6 +82,12 @@ module.exports = function(router) {
           return;
         }
 
+        if (!process.env.JWT_SECRET) {
+          console.log('Error: You are missing a private key. Please add it to your .env under `JWT_SECRET` and try agaain');
+          res.status(c.status.OK).json({'error': 'There was an error logging in'});
+          return;
+        }
+
         // Create JWT
         let token = jwt.sign({
           'user_id': user['_id']
