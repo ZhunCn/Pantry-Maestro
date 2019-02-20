@@ -15,6 +15,10 @@ module.exports = function(router) {
       'name'
     ];
 
+    if (req.query['name']) {
+      req.body['name'] = req.query['name'];
+    }
+
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
@@ -77,13 +81,16 @@ module.exports = function(router) {
           'users': []
         });
 
-        workspace.save(err => {
+        workspace.save((err, workspace) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
             return;
           }
 
-          res.status(c.status.OK).json({'message': 'Successfully created the workspace'});
+          res.status(c.status.OK).json({
+            'message': 'Successfully created the workspace',
+            'workspace_id': workspace['_id']
+          });
         });
       });
     });
