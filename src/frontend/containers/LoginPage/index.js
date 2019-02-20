@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import axios from 'axios';
 
+import {authorize} from '@/utils';
 
-import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
 
 export default class Login extends React.Component {
   verifyUser(username) {
-    /** 
+    /**
       * Inputted "Username" for login can either be actual Username
       * or email. Check Username requirements first, then
       * email requirements with regex.
@@ -29,7 +29,7 @@ export default class Login extends React.Component {
       //check if username looks like an email
       if(username.match(emailregex) == null){
         return false;
-      } 
+      }
       return true;
     }
 
@@ -72,7 +72,7 @@ export default class Login extends React.Component {
     var password = document.getElementById("passwordField").value;
     console.log('Inputted username (loginProcedure): ', username);
     console.log('Inputted password (loginProcedure): ', password);
-    
+
 
     if ((this.verifyUser(username)) == true) {
       console.log('Valid username!');
@@ -86,12 +86,11 @@ export default class Login extends React.Component {
           'password': password
         }).then(res => {
           console.log(res.data);
-          localStorage.setItem('loginToken', res.token);
+          localStorage.setItem('loginToken', res.data.token);
           document.getElementById("successParagraph").textContent = "Successfully logged in!";
           document.getElementById("successParagraph").style = "color:green;";
 
           this.props.history.push('/');
-
         })
         .catch((error) => {
           console.log(error.data);
@@ -128,9 +127,14 @@ export default class Login extends React.Component {
   }
 
   render() {
+    if (authorize()) {
+      return (
+        <Redirect to="/"/>
+      )
+    }
+
     return (
-      <div>
-        <GenericNavigationBar/>
+      <div class="loginPage">
         <div class="Content">
         <h2>Login</h2>
         <form>
@@ -143,7 +147,7 @@ export default class Login extends React.Component {
         <p><button class="button" id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
         <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
         <Link to="/register"><button class="button" id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
-        
+
         <div class="Footer">
           <div class="Flex">
           </div>

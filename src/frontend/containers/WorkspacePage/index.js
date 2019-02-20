@@ -1,14 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
+
+import {authorize} from '@/utils';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
-export default class Home extends React.Component {
+export default class Workspace extends React.Component {
   render() {
+    if (!authorize()) {
+      return (
+        <Redirect to="/login"/>
+      );
+    }
+    
     return (
-      <div>
+      <div class="workspacePage">
         <GenericNavigationBar/>
         <div class="Content">
         <h2>Workspaces</h2>

@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
+import {Link, Redirect} from 'react-router-dom';
 import axios from 'axios';
 
-import GenericNavigationBar from '@/components/GenericNavigationBar';
-import './styles.scss';
+import {authorize} from '@/utils';
 
+import './styles.scss';
 
 export default class Register extends React.Component {
   verifyUser(username) {
@@ -152,9 +152,14 @@ export default class Register extends React.Component {
   }
 
   render() {
+    if (authorize()) {
+      return (
+        <Redirect to="/"/>
+      )
+    }
+
     return (
-      <div>
-        <GenericNavigationBar/>
+      <div class="registerPage">
         <div class="Content">
         <h2>Register</h2>
         <form>

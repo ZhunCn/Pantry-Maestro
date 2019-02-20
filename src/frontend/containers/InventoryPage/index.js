@@ -1,10 +1,13 @@
 import React from 'react';
-import _ from 'lodash'
 import ReactTable from 'react-table'
+import {Redirect} from 'react-router-dom';
 import 'react-table/react-table.css'
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import axios from 'axios'
+
+import {sum, authorize} from '@/utils';
+
 import AddChangeItemComponent from '@/components/AddChangeItemComponent';
 
 const workspaceID = "5c64def057910030016ba7c1";
@@ -90,6 +93,12 @@ export default class Inventory extends React.Component {
     }
 
     render() {
+        if (!authorize()) {
+          return (
+            <Redirect to="/login"/>
+          );
+        }
+
         const { data } = this.state;
         const columns = [
             {
@@ -125,7 +134,7 @@ export default class Inventory extends React.Component {
             {
                 Header: "Quantity",
                 accessor: "quantity",
-                aggregate: vals => _.sum(vals),
+                aggregate: vals => sum(vals),
                 Aggregated: row => {
                     return (
                         <span>
@@ -137,7 +146,7 @@ export default class Inventory extends React.Component {
         ];
 
         return (
-            <div>
+            <div class="inventoryPage">
                 <GenericNavigationBar/>
                 <div class="Content">
                     <div class="InventoryTopBar">

@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Redirect} from 'react-router-dom';
+
+import {authorize} from '@/utils';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
@@ -217,13 +220,20 @@ export default class Settings extends React.Component {
     console.log(data+" "+field);
     this.props.closePopup;
   }
+
   render() {
+    if (!authorize()) {
+      return (
+        <Redirect to="/login"/>
+      );
+    }
+
     const user = "currentUsername";
     const name = "Firstname" + " " + "Lastname";
     const email = "email@email.com";
     const curWorkspace = "currentWorkspace";
     return (
-      <div>
+      <div class="settingsPage">
         <GenericNavigationBar/>
         <div class="Content">
         <h2>Settings</h2>

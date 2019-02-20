@@ -1,21 +1,24 @@
 @charset "UTF-8";
-.Content{
-    margin-left: 108px;
-    margin-top: 36px;
-}
-.Total {
-    column-count: 2;
-    column-rule-style: solid;
-    column-rule-width: 1px;
-    display: block;
-	margin-top: 0px;
-	margin-bottom: 70px;
-}
-.Total .Left {
-	vertical-align: top;
-    display: block;
-}
-.Total .Right {
-	display: inline-block;
-	vertical-align: top;
+
+.workspacePage {
+  .Content {
+      margin-left: 108px;
+      margin-top: 36px;
+  }
+  .Total {
+      column-count: 2;
+      column-rule-style: solid;
+      column-rule-width: 1px;
+      display: block;
+  	margin-top: 0px;
+  	margin-bottom: 70px;
+  }
+  .Total .Left {
+  	vertical-align: top;
+      display: block;
+  }
+  .Total .Right {
+  	display: inline-block;
+  	vertical-align: top;
+  }
 }

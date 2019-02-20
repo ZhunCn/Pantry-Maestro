@@ -7,7 +7,7 @@ import './styles.scss';
 export default class About extends React.Component {
   render() {
     return (
-      <div>
+      <div class="aboutPage">
         <GenericNavigationBar/>
         <div class="Content">
         <p>About component!</p>

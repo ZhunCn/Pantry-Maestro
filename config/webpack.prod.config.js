@@ -1,4 +1,7 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const HtmlPlugin = require('html-webpack-plugin');
+const BrotliPlugin = require('brotli-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require('compression-webpack-plugin');
 const path = require('path');
 const config = require('./');
 
@@ -8,17 +11,17 @@ function resolve(dir) {
 
 module.exports = {
   entry: './src/frontend/index.js',
+  output: {
+    filename: 'main.js',
+    path: resolve('dist'),
+    publicPath: '/public/'
+  },
   resolve: {
     extensions: ['.js', '.json', '.scss'],
     alias: {
       '@': resolve('src/frontend'),
       '@theme': resolve('src/frontend/assets/scss/_theme.scss')
     }
-  },
-  output: {
-    filename: 'main.js',
-    path: resolve('dist'),
-    publicPath: '/public/'
   },
   module: {
     rules: [
@@ -37,14 +40,36 @@ module.exports = {
         use:['style-loader','css-loader', 'sass-loader']
       },
       {
-      test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
-      loader: 'url-loader?limit=100000' }
+        test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)(\?[a-z0-9=.]+)?$/,
+        loader: 'url-loader?limit=100000'
+      }
     ]
   },
   plugins: [
-    new HtmlWebPackPlugin({
+    new HtmlPlugin({
       template: './src/frontend/index.html',
       title: config.prod.name
     })
-  ]
+    // ,
+    // new CompressionPlugin({
+    //   filename: '[path].gz[query]',
+    //   algorithm: "gzip",
+    //   test: /\.js$|\.css$|\.html$/,
+    //   threshold: 10240,
+    //   minRatio: 0.8
+    // })
+    // ,
+    // new BundleAnalyzerPlugin()
+  ],
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        }
+      }
+    }
+  }
 };

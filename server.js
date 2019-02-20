@@ -10,6 +10,12 @@ var config = require('./config');
 
 require('dotenv').config();
 
+// Check for private key
+if (!process.env.JWT_SECRET) {
+	console.log(chalk.red('You are missing a private key. Please add it to your .env under `JWT_SECRET` for authentization to work properly.'));
+	return;
+}
+
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
 	config = config.prod;
 }
