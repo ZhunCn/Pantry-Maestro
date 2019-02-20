@@ -17,7 +17,9 @@ var InvitationSchema = new Schema({
   token: {
     type: String
   }
-}, {collection: 'invitations'});
+}, {
+  collection: 'invitations'
+});
 
 InvitationSchema.pre('save', function(next) {
   const invitation = this;
@@ -27,6 +29,9 @@ InvitationSchema.pre('save', function(next) {
   }
 
   next();
+}, {
+  collection: 'invitations',
+  versionKey: false
 });
 
 module.exports = mongoose.model('Invitation', InvitationSchema);

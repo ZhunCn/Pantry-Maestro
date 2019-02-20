@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {complete, sanitize, isJSON} = require('utils');
+const {complete, sanitize} = require('utils');
 const {Inventory, Item, Workspace} = require('models');
 const c = require('const');
 
@@ -9,7 +9,7 @@ module.exports = function(router) {
    * Sends information about the inventory of a workspace
    */
   router.get('/api/workspaces/:workspace_id/inventory', (req, res) => {
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -name -users -deleted').populate({
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -deleted').populate({
       path: 'inventory',
       select: '-_id  -__v',
       populate: {
@@ -38,10 +38,6 @@ module.exports = function(router) {
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
-      return;
-    }
-    else if (typeof(req.body.quantities) !== 'object' && !isJSON(req.body.quantities)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON syntax'});
       return;
     }
 
@@ -107,7 +103,7 @@ module.exports = function(router) {
    * Sends information on a specific item
    */
   router.get('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    Item.findById(req.params.item_id).select('-_id').exec((err, item) => {
+    Item.findById(req.params.item_id).select('-_id -__v').exec((err, item) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
         return;
@@ -129,10 +125,6 @@ module.exports = function(router) {
       res.status(c.status.OK).json({'message': 'No fields to update'});
       return;
     }
-    else if (req.body && !isJSON(req.body.quantities)) {
-      res.status(c.status.BAD_REQUEST).json({'message': 'Invalid JSON for field `quantities`'});
-      return;
-    }
 
     // In the future, add functionality to change item's name
     let fields = [
@@ -143,7 +135,7 @@ module.exports = function(router) {
     fields.forEach(field => {
       if (req.body.hasOwnProperty(field)) {
         if (field === 'quantities') {
-          toUpdate[field] = JSON.parse(req.body[field]);
+          toUpdate[field] = req.body[field];
         }
         else {
           toUpdate[field] = req.body[field];

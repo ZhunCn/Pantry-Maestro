@@ -78,7 +78,7 @@ module.exports = function(router) {
 
         // Incorrect password
         if (!result) {
-          res.status(c.status.BAD_REQUEST).json({'error': 'Invalid credentials'});
+          res.status(c.status.OK).json({'error': 'Invalid credentials'});
           return;
         }
 

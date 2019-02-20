@@ -10,7 +10,9 @@ var ItemSchema = new Schema({
     type: Object,
     required: true
   }
-}, {collection: 'items'});
+}, {
+  collection: 'items'
+});
 
 ItemSchema.virtual('quantities.total').get(() => {
   return Object.values(this.expirations).reduce((a, b) => a + b);
@@ -18,6 +20,9 @@ ItemSchema.virtual('quantities.total').get(() => {
 
 ItemSchema.virtual('expirations').get(() => {
   return this.quantities.keys();
+}, {
+  collection: 'items',
+  versionKey: false
 });
 
 module.exports = mongoose.model('Item', ItemSchema);

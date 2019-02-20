@@ -22,13 +22,15 @@ var UserSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Workspace'
   }]
-}, {collection: 'users'});
+}, {
+  collection: 'users'
+});
 
 UserSchema.virtual('password').set(function(password) {
   this._password = password;
 });
 
-UserSchema.pre('save', function() {
+UserSchema.pre('save', function(next) {
   const user = this;
 
   if (user) {
@@ -37,17 +39,23 @@ UserSchema.pre('save', function() {
     });
   }
 
-  if (user && user.hash && user.hash !== null && typeof(user._password) == 'undefined') {
+  if (user && user.hash && user.hash !== undefined) {
+    next();
     return;
   }
+  else {
+    bcrypt.hash(user._password, saltRounds, function(err, hash) {
+      if (err) {
+        next(err);
+        return;
+      }
 
-  bcrypt.hash(user._password, saltRounds, function(err, hash) {
-    if (err) {
+      user.hash = hash;
+
+      next();
       return;
-    }
-
-    user.hash = hash;
-  });
+    });
+  }
 });
 
 UserSchema.methods.verifyPassword = function verifyPassword(candidate, cb) {

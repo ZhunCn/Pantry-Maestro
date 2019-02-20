@@ -28,6 +28,8 @@ var WorkspaceSchema = new Schema({
     default: false,
     required: true
   }
-}, {collection: 'workspaces'});
+}, {
+  collection: 'workspaces'
+});
 
 module.exports = mongoose.model('Workspace', WorkspaceSchema);

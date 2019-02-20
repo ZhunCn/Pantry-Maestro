@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {Workspace, User} = require('models');
-const {complete, isJSON} = require('utils');
+const {complete} = require('utils');
 const c = require('const');
 
 module.exports = function(router) {
@@ -30,6 +30,8 @@ module.exports = function(router) {
   router.post('/api/workspaces/:workspace_id/users/', (req, res) => {
     // Authorize
 
+    console.log('/api/workspaces/:workspace_id/users/');
+
     let fields = [
       'user_id',
       'roles'
@@ -38,10 +40,6 @@ module.exports = function(router) {
     // Check if request contains necessary fields
     if (fields && !complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
-      return;
-    }
-    else if (typeof(req.body.roles) != 'object' && !isJSON(req.body.roles)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Invalid JSON for field `roles`'});
       return;
     }
 
@@ -144,10 +142,6 @@ module.exports = function(router) {
 
     if (!req.body) {
       res.status(c.status.OK).json({'message': 'No fields to update'});
-      return;
-    }
-    else if (!isJSON(req.body.roles)) {
-      res.status(c.status.BAD_REQUEST).json({'message': 'Invalid JSON for field `roles`'});
       return;
     }
 

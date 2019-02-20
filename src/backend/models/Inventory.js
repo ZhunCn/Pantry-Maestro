@@ -7,6 +7,8 @@ var InventorySchema = new Schema({
     ref: 'Item',
     required: true
   }]
-}, {collection: 'inventories'});
+}, {
+  collection: 'inventories'
+});
 
 module.exports = mongoose.model('Inventory', InventorySchema);

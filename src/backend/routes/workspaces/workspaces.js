@@ -21,7 +21,7 @@ module.exports = function(router) {
       return;
     }
 
-    Workspace.findOne({'name': req.body.name, 'deleted': false}).exec((err, workspace) => {
+    Workspace.findOne({'name': req.body.name, 'deleted': false}).select('-__v').exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;
@@ -97,7 +97,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id', (req, res) => {
     // Authorize
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -inventory -users -deleted').exec((err, workspace) => {
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -users -deleted').exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;

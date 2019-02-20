@@ -42,16 +42,6 @@ app.use('/public', express.static(path.join(__dirname, '/dist')));
 
 // Catch all for frontend routes
 app.all('/*', function(req, res) {
-	let headers = req.headers.host.split('.');
-	let index = headers.indexOf(config.host);
-
-	if (index === 1) {
-		// console.log('Subdomain: ' + headers[0]);
-	}
-	else if (index > 1) {
-		// Send error page
-	}
-
 	res.sendFile(path.join(__dirname, '/dist', '/index.html'));
 });
 
