@@ -1,8 +1,10 @@
 @charset "UTF-8";
 
 .inventoryPage {
+  display:flex;
   .Content {
+    flex: 1;
     margin-left: 108px;
-    margin-top: 36px;
+    margin-top: 24px;
   }
 }

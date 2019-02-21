@@ -4,9 +4,11 @@
   * {
     box-sizing: border-box;
   }
+  display:flex;
   .Content {
-      margin-left: 108px;
-      margin-top: 36px;
+    flex: 1;
+    margin-left: 108px;
+    margin-top: 24px;
   }
   .Total {
     display: grid;
