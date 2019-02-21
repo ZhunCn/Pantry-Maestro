@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Redirect} from 'react-router-dom';
-
+import axios from 'axios';
 import {authorize} from '@/utils';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
@@ -228,7 +228,11 @@ export default class Settings extends React.Component {
     super();
     this.state = {
       value:"",
-      showPopup: false
+      showPopup: false,
+      user: "currentUsername",
+      name: "Firstname Lastname",
+      email: "email@email.com",
+      curWorkspace: "currentWorkspace"
     };
   }
   //function to log the user out and redirect to the login page
@@ -256,17 +260,23 @@ export default class Settings extends React.Component {
     this.props.closePopup;
   }
 
+  componentDidMount(){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        this.setState({
+          user: res.data.username,
+          email: res.data.email
+        });
+    });
+  }
+
   render() {
     if (!authorize()) {
       return (
         <Redirect to="/login"/>
       );
     }
-    //Placeholder fields. Needs information from the backend.
-    const user = "currentUsername";
-    const name = "Firstname" + " " + "Lastname";
-    const email = "email@email.com";
-    const curWorkspace = "currentWorkspace";
+
     return (
       <div class="settingsPage">
         <GenericNavigationBar/>
@@ -274,16 +284,16 @@ export default class Settings extends React.Component {
         <h2>Settings</h2>
 	       <div class="Total">
 	        <div class="col">
-            <p><strong>Username: </strong><i>{user}</i></p>
+            <p><strong>Username: </strong><i>{this.state.user}</i></p>
             <button onClick={() => {this.togglePopup("username")}}>Change Username</button>
-            <p><strong>Name: </strong><i>{name}</i></p>
+            <p><strong>Name: </strong><i>{this.state.name}</i></p>
             <button onClick={() => {this.togglePopup("name")}}>Change Name</button>
-            <p><strong>Email: </strong><i>{email}</i></p>
+            <p><strong>Email: </strong><i>{this.state.email}</i></p>
             <button onClick={() => {this.togglePopup("email")}}>Change Email</button>
 	        </div>
 	        <div class="col">
             <p><strong>Workspace Information: </strong></p>
-		        <p><i>{curWorkspace}</i></p>
+		        <p><i>{this.state.curWorkspace}</i></p>
   			    <button onClick={() => {this.togglePopup("leave")}}>Leave Workspace</button>
 			      <p><strong>Change Password:</strong></p>
             <button onClick={() => {this.togglePopup("password")}}>Change Password</button><br />
