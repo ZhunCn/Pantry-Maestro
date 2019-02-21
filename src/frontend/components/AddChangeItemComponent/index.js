@@ -6,7 +6,7 @@ import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
 
-const workspaceID = "5c64def057910030016ba7c1";
+let workspaceID = localStorage.getItem("currWorkspaceID");
 export default class AddChangeItemComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -56,6 +56,7 @@ export default class AddChangeItemComponent extends React.Component {
         }
         if (!emptyFlag) {
             console.log(parsedData);
+            workspaceID = localStorage.getItem("currWorkspaceID");
             axios.post(`/api/workspaces/${workspaceID}/inventory`, parsedData).then(res => {
                 // HTTP status 200 OK
                 if (res.status === 200) {

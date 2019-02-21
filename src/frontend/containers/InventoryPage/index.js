@@ -10,7 +10,7 @@ import {sum, authorize} from '@/utils';
 
 import AddChangeItemComponent from '@/components/AddChangeItemComponent';
 
-const workspaceID = "5c64def057910030016ba7c1";
+let workspaceID = localStorage.getItem("currWorkspaceID");
 
 function Item(id, name, expiration, quantity) {
     this.id = id;
@@ -75,6 +75,7 @@ export default class Inventory extends React.Component {
 
     componentDidMount() {
         // Get the items from the server
+        workspaceID = localStorage.getItem("currWorkspaceID")
         axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
             let serverData = parseData(res.data);
             this.setState({ data: serverData });
@@ -83,6 +84,7 @@ export default class Inventory extends React.Component {
     }
 
     handleRefreshClick() {
+        workspaceID = localStorage.getItem("currWorkspaceID")
         axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
             // Add functionality to see if the last modified item is the same as the local last modified item.
             // Only refresh i.e. setState when the last modified items are different

@@ -6,6 +6,7 @@ import {authorize} from '@/utils';
 
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
+import AddWorkspaceComponent from "../../components/AddWorkspaceComponent";
 
 export default class Workspace extends React.Component {
   render() {
@@ -34,11 +35,7 @@ export default class Workspace extends React.Component {
         		<button>Accept All</button>
         	</div>
         	<div class="Right">
-        		<form>
-        			<p><strong>Create a new Workspace:</strong></p>
-        			Workspace Name:<br />
-          			<input type="text" name="name" />
-        		</form>
+        		<AddWorkspaceComponent/>
         		<ul>List of your Workspaces
         			<li>Workspace A<br /><button>Remove Workspace</button></li>
         			<li>Workspace B<br /><button>Remove Workspace</button></li>
