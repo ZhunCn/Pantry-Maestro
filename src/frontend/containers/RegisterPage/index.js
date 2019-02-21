@@ -161,21 +161,22 @@ export default class Register extends React.Component {
     return (
       <div class="registerPage">
         <div class="Content">
-        <h2>Register</h2>
-        <form>
-          <p>Username<p id="usernamePrompt"></p></p>
-          <input type="text" name="usernameField" id="usernameField" onChange={(event) => {this.handleUsernameChange(event)}} placeholder="Username" ></input><br></br>
-          <p>Password<p id="passwordPrompt"></p></p>
-          <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} placeholder="Password"></input><br></br>
-          <p>Confirm Password<p id="confirmPrompt"></p></p>
-          <input type="password" name="confirmPasswordField" id="confirmPasswordField" placeholder="Confirm Password"></input><br></br>
-          <p>Email<p id="emailPrompt"></p></p>
-          <input type="text" name="emailField" id="emailField"  onChange={(event) => {this.handleEmailChange(event)}} onKeyDown={(e) => this.enterPressedOnEmail()}  placeholder="someone@example.com"></input><br></br>
-        </form>
-        <p><button id="signUpButton" class="button" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
+        <center>
+          <h2>Register</h2>
+          <form>
+            <p>Username<p id="usernamePrompt"></p></p>
+            <input type="text" name="usernameField" id="usernameField" onChange={(event) => {this.handleUsernameChange(event)}} placeholder="Username" ></input><br></br>
+            <p>Password<p id="passwordPrompt"></p></p>
+            <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} placeholder="Password"></input><br></br>
+            <p>Confirm Password<p id="confirmPrompt"></p></p>
+            <input type="password" name="confirmPasswordField" id="confirmPasswordField" placeholder="Confirm Password"></input><br></br>
+            <p>Email<p id="emailPrompt"></p></p>
+            <input type="text" name="emailField" id="emailField"  onChange={(event) => {this.handleEmailChange(event)}} onKeyDown={(e) => this.enterPressedOnEmail()}  placeholder="someone@example.com"></input><br></br>
+          </form>
+          <p><button id="signUpButton" class="button" onClick={(e) => this.signUpProcedure()}>Sign Up</button><p id="successParagraph"></p></p>
 
-        <Link to="/login"><button class="button" id="loginButton">Already Have an account? Log In</button></Link>
-
+          <Link to="/login"><button class="button" id="loginButton">Already Have an account? Log In</button></Link>
+        </center>
         <div class="Footer"></div>
           <div class="Flex">
           </div>

@@ -136,18 +136,19 @@ export default class Login extends React.Component {
     return (
       <div class="loginPage">
         <div class="Content">
-        <h2>Login</h2>
-        <form>
-          <p>Username or Email<p id="usernamePrompt"></p></p>
-          <input type="text" name="usernameField" id="usernameField" onChange={(event) => {this.handleUsernameChange(event)}} placeholder="Username"></input><br></br>
+        <center>
+          <h2>Login</h2>
+          <form>
+            <p>Username or Email<p id="usernamePrompt"></p></p>
+            <input type="text" name="usernameField" id="usernameField" onChange={(event) => {this.handleUsernameChange(event)}} placeholder="Username"></input><br></br>
 
-          <p>Password<p id="passwordPrompt"></p></p>
-          <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} onKeyDown={(e) => this.enterPressedOnPassword()} placeholder="Password"></input>
-        </form>
-        <p><button class="button" id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
-        <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
-        <Link to="/register"><button class="button" id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
-
+            <p>Password<p id="passwordPrompt"></p></p>
+            <input type="password" name="passwordField" id="passwordField" onChange={(event) => {this.handlePasswordChange(event)}} onKeyDown={(e) => this.enterPressedOnPassword()} placeholder="Password"></input>
+          </form>
+          <p><button class="button" id="loginButton" onClick={(e) => this.loginProcedure()}>Log In</button><p id="successParagraph"></p></p>
+          <p><Link id="forgotPasswordLink" to="/login/#">Forgot Password?</Link></p>
+          <Link to="/register"><button class="button" id="signUpButton">New to Pantry Maestro? Sign Up</button></Link>
+        </center>
         <div class="Footer">
           <div class="Flex">
           </div>
