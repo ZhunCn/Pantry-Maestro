@@ -44,7 +44,7 @@ module.exports = function(router) {
     sanitize(req.body, fields);
 
     // Check if item exists
-    Item.findOne({name: req.body.name}).exec((err, item) => {
+    Item.findOne({inventory: req.params.workspace_id, name: req.body.name}).exec((err, item) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
         return;
@@ -59,7 +59,8 @@ module.exports = function(router) {
         // Create new item
         let item = new Item({
           'name': req.body.name,
-          'quantities': req.body.quantities
+          'quantities': req.body.quantities,
+          'inventory': req.params.workspace_id
         });
 
         item.save((err, item) => {

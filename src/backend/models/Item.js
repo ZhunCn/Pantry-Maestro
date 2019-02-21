@@ -9,6 +9,10 @@ var ItemSchema = new Schema({
   quantities: {
     type: Object,
     required: true
+  },
+  inventory: {
+    type: Schema.Types.ObjectId,
+    ref: 'Inventory'
   }
 }, {
   collection: 'items'
