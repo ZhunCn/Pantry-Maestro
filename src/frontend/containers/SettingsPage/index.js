@@ -64,6 +64,7 @@ function verifyPass(password){
 
 class Popup extends React.Component {
   render() {
+    //Popup for username change
     if(this.props.text=="username"){
       return (
         <div className='popup'>
@@ -81,6 +82,7 @@ class Popup extends React.Component {
         </div>
       );
     }
+    //Popup for name change
     else if(this.props.text=="name"){
       return (
         <div className='popup'>
@@ -100,6 +102,7 @@ class Popup extends React.Component {
         </div>
       );
     }
+    //Popup for email change
     else if(this.props.text=="email"){
       return (
         <div className='popup'>
@@ -117,6 +120,7 @@ class Popup extends React.Component {
         </div>
       );
     }
+    //Popup for leaving workspace
     else if(this.props.text=="leave"){
       return (
         <div className='popup'>
@@ -131,6 +135,7 @@ class Popup extends React.Component {
         </div>
       );
     }
+    //Popup for changing password
     else if(this.props.text=="password"){
       return (
         <div className='popup'>
@@ -150,7 +155,21 @@ class Popup extends React.Component {
         </div>
       );
     }
+    //Popup for logging out
+    else if(this.props.text=="logout"){
+      return (
+        <div className='popup'>
+          <div className='popup_inner'>
+            <h1>Logout</h1>
+            <p>Are you sure you want to log out?</p>
+          <button onClick={()=>this.ret("logout", "logout")}>Yes, log out</button>
+          <button onClick={()=>this.props.closePopup()}>No, do not log out</button>
+          </div>
+        </div>
+      );
+    }
   }
+  //function to verify username
   processUsername = (username) =>{
     if(verifyUser(username)===true){
       this.ret(username, "username");
@@ -159,6 +178,7 @@ class Popup extends React.Component {
       console.log("invalid");
     }
   }
+  //function to verify name
   processName = (name) =>{
     const first=name[0];
     const last=name[1];
@@ -169,6 +189,7 @@ class Popup extends React.Component {
       console.log("invalid");
     }
   }
+  //function to verify email
   processEmail = (email) =>{
     if(verifyEmail(email)===true){
       this.ret(email, "email");
@@ -177,6 +198,7 @@ class Popup extends React.Component {
       console.log("invalid");
     }
   }
+  //function to verify password
   processPassword = (password) =>{
     const pass1=password[0];
     const pass2=password[1];
@@ -191,12 +213,17 @@ class Popup extends React.Component {
       this.ret(password, "password");
     }
   }
+  //return function to return fields back to Settings class
   ret = (user, pass) =>{
     this.props.closePopup();
     this.props.callBack(user, pass);
   }
 }
 export default class Settings extends React.Component {
+  /*
+  * value: the string to control the popup that shows up
+  * showPopup: boolean to control when the popup shows up
+  */
   constructor() {
     super();
     this.state = {
@@ -204,19 +231,27 @@ export default class Settings extends React.Component {
       showPopup: false
     };
   }
+  //function to log the user out and redirect to the login page
   logoutProcedure(){
-    console.log("It's supposed to logout, but it don't");
+    localStorage.removeItem('loginToken');
+    this.props.history.push('/login');
+    console.log("Logged out");
   }
+  //function to enable popup when disabled and vice versa
   togglePopup(value) {
     this.setState({
       showPopup: !this.state.showPopup,
       value: value
     });
   }
+  //callback function to get user input from the popup
   callbackFunction = (data, field) =>{
     //Here is where all the data stuff goes.
     //data is the actual user input,
     //field is the name of the aspect the user is trying to change, e.g. "username" or "password"
+    if(data == "logout" && field =="logout"){
+      this.logoutProcedure();
+    }
     console.log(data+" "+field);
     this.props.closePopup;
   }
@@ -227,7 +262,7 @@ export default class Settings extends React.Component {
         <Redirect to="/login"/>
       );
     }
-
+    //Placeholder fields. Needs information from the backend.
     const user = "currentUsername";
     const name = "Firstname" + " " + "Lastname";
     const email = "email@email.com";
@@ -252,7 +287,7 @@ export default class Settings extends React.Component {
   			    <button onClick={() => {this.togglePopup("leave")}}>Leave Workspace</button>
 			      <p><strong>Change Password:</strong></p>
             <button onClick={() => {this.togglePopup("password")}}>Change Password</button><br />
-            <button onClick={() => {this.logoutProcedure()}}>Log out</button>
+            <button onClick={() => {this.togglePopup("logout")}}>Log out</button>
           </div>
 	    </div>
       </div>

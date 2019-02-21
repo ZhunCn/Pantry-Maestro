@@ -11,7 +11,6 @@ export default class GenericNavigationBar extends React.Component {
           <Link to="/settings">
           <img class="img" src={prof} alt = "Profile" />
           <p class="italic">Firstname Lastname</p>
-          <p class="italic">Volunteer</p>
           </Link>
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
