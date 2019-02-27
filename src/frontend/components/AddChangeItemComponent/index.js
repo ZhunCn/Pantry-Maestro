@@ -12,7 +12,7 @@ export default class AddChangeItemComponent extends React.Component {
         super(props);
         this.state = {
                 "name": "",
-                "quantities": [{"date":"", "quantity": 0}]
+                "quantities": [{"date":"", "quantity": undefined}]
         }
         this.handleChange = this.handleChange.bind(this);
     }   
@@ -21,7 +21,7 @@ export default class AddChangeItemComponent extends React.Component {
         e.preventDefault();
 
         this.setState((prevState) => ({
-            quantities: [...prevState.quantities, {"date":"", "quantity": 0}],
+            quantities: [...prevState.quantities, {"date":"", "quantity": undefined}],
         }))
     }
 
@@ -64,6 +64,7 @@ export default class AddChangeItemComponent extends React.Component {
                         { type: "success" });
                 }
                 console.log(res.data);
+                this.props.fetchData();
             }).catch(error => {
                 if (error.response.data.error === "Item with this name already exists") {
                     toast(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`,
@@ -75,13 +76,15 @@ export default class AddChangeItemComponent extends React.Component {
             })
         }
     };
- 
+
     handleChange = (e) => {
         e.preventDefault();
+        if (["quantity"].includes(e.target.className)) {
+            let newQuantity;
+            newQuantity = e.target.value < 0 ? 0 : e.target.value;
 
-        if (["date", "quantity"].includes(e.target.className)) {
             let quantities = [...this.state.quantities]
-            quantities[e.target.dataset.id][e.target.className] = e.target.value
+            quantities[e.target.dataset.id][e.target.className] = newQuantity;
             this.setState({ quantities }, () => console.log(this.state.quantities))
         } else {
             this.setState({ [e.target.name]: e.target.value })
@@ -100,10 +103,10 @@ export default class AddChangeItemComponent extends React.Component {
         return (
             <div class="AddChangeItemForm">
                 <ToastContainer autoClose={3000}/>
-            <form onChange={this.handleChange}>
+            <form>
                 <h2>Add new food items</h2>
                 <label htmlFor="name">Name:</label>
-                <input type="text" name="name" id="name"/>
+                <input type="text" name="name" id="name" value={name} onChange={this.handleChange}/>
                 <button class="button addQuantityButton" onClick={this.addQuantity}>Click me to add more expiration dates/quantities!</button>
                 {
                     this.state.quantities.map((val, idx) => {
@@ -114,7 +117,7 @@ export default class AddChangeItemComponent extends React.Component {
                                 <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
                                 <DatePicker
                                     onChange={(date) => this.handleCalendarChange(date, idx)}
-                                    selected={this.state.quantities[idx].date}
+                                    selected={quantities[idx].date}
                                     name={dateId}
                                     className="date"
                                     class="date"
@@ -134,6 +137,10 @@ export default class AddChangeItemComponent extends React.Component {
                                     className="quantity"
                                     placeholder="Enter Quantity"
                                     class="quantity"
+                                    onChange={(e) => {this.handleChange(e)}}
+                                    value={quantities[idx].quantity}
+                                    min="0"
+                                    step="1"
                                 />
                             </div>
                         )
