@@ -7,4 +7,21 @@
     margin-left: 108px;
     margin-top: 24px;
   }
+  .tab-list {
+    border-bottom: 1px solid #bdc3c7;
+    padding-left: 108px;
+  }
+
+  .tab-list-item {
+    display: inline-block;
+    list-style: none;
+    margin-bottom: -1px;
+    padding: 0.5rem 2rem;
+  }
+
+  .tab-list-active {
+    background-color: white;
+    border: solid #bdc3c7;
+    border-width: 1px 1px 0px 1px;
+  }
 }
