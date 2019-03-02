@@ -21,7 +21,8 @@ var InviteSchema = new Schema({
     required: true
   },
   token: {
-    type: String
+    type: String,
+    unique: true
   },
   expires: {
     type: Date

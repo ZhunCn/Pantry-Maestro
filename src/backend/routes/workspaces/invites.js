@@ -128,4 +128,34 @@ module.exports = function(router) {
       });
     });
   });
+
+  /*
+   * Confirm an invitation
+   */
+  // router.post('/api/workspaces/:workspace_id/invites/confirm', (req, res) => {
+  //   // Authorize
+  //
+  //   let fields = [
+  //     'token'
+  //   ];
+  //
+  //   // Check if request contains necessary fields
+  //   if (fields && !complete(req.body, fields)) {
+  //     res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+  //     return;
+  //   }
+  //
+  //   Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v').populate('invites').exec((err, workspace) => {
+  //     if (err) {
+  //       res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+  //       return;
+  //     }
+  //     else if (!workspace) {
+  //       res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
+  //       return;
+  //     }
+  //
+  //
+  //   });
+  // });
 }

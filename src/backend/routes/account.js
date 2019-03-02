@@ -43,6 +43,7 @@ module.exports = function(router) {
     });
 
     authorize(req).then(decoded => {
+      // Find the user by the user_id
       User.findById(decoded.user_id).select('').exec((err, user) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error retrieving account information'});
@@ -53,17 +54,48 @@ module.exports = function(router) {
           return;
         }
 
+        // Update the fields
         for (key in toUpdate) {
           user[key] = toUpdate[key];
         }
 
-        user.save(err => {
+        // Save the user with these fields
+        if (!req.body.old_password || !req.body.new_password) {
+          user.save(err => {
+            if (err) {
+              res.json({'error': 'There was an error updating the account information: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'message': 'Successfully updated your account information'});
+            return;
+          });
+
+          return;
+        }
+
+        // Update the password
+        user.verifyPassword(req.body.old_password, (err, match) => {
           if (err) {
-            res.json({'error': 'There was an error updating the account information: ' + err});
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'err': 'There was an error updating the account: ' + err});
+            return;
+          }
+          else if (!match) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'err': 'Error updating fields: Incorrect password'});
             return;
           }
 
-          res.json({'message': 'Successfully updated your account information'});
+          user._password = req.body.new_password;
+          user.hash = undefined;
+
+          user.save(err => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'err': 'There was an error updating the account: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'message': 'Successfully updated your account information'});
+          });
         });
       });
     }).catch(err => {
