@@ -1,5 +1,6 @@
 const {User, Workspace} = require('models');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
 /*
  * Check whether the object contains all keys in array
@@ -49,6 +50,31 @@ function isJSON(input) {
   }
 
   return true;
+}
+
+/*
+ * Check if a string is valid JSON
+ *
+ * @arg     input    String being sanitized
+ * @return  Boolean
+ */
+function sendEmail(to, subject, body, cb) {
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASSWORD
+    }
+  });
+
+  transporter.sendMail({
+    from: process.env.NODEMAILER_EMAIL,
+    to: to,
+    subject: subject,
+    html: body
+  }, (err, info) => {
+    cb(err, info);
+  });
 }
 
 /*
@@ -117,4 +143,4 @@ function authorize(req, params = {}) {
   });
 }
 
-module.exports = {complete, sanitize, isJSON, authorize};
+module.exports = {complete, sanitize, isJSON, sendEmail, authorize};

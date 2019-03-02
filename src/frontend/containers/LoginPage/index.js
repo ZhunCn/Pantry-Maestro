@@ -90,7 +90,7 @@ export default class Login extends React.Component {
           document.getElementById("successParagraph").textContent = "Successfully logged in!";
           document.getElementById("successParagraph").style = "color:green;";
 
-          this.props.history.push('/');
+          this.props.history.push('/inventory');
         })
         .catch((error) => {
           console.log(error.data);

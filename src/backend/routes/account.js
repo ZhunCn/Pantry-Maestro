@@ -43,7 +43,7 @@ module.exports = function(router) {
     });
 
     authorize(req).then(decoded => {
-      User.findById(decoded.user_id).select('-__v -hash').exec((err, user) => {
+      User.findById(decoded.user_id).select('').exec((err, user) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error retrieving account information'});
           return;

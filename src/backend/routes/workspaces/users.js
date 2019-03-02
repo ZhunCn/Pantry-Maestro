@@ -30,8 +30,6 @@ module.exports = function(router) {
   router.post('/api/workspaces/:workspace_id/users/', (req, res) => {
     // Authorize
 
-    console.log('/api/workspaces/:workspace_id/users/');
-
     let fields = [
       'user_id',
       'roles'

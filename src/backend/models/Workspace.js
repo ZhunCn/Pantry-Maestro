@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const User = require('./User');
+const Invite = require('./Invite');
 
 var WorkspaceSchema = new Schema({
   name: {
@@ -18,6 +19,10 @@ var WorkspaceSchema = new Schema({
       type: [String],
       required: true
     }
+  }],
+  invites: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Invite'
   }],
   inventory: {
     type: Schema.Types.ObjectId,
