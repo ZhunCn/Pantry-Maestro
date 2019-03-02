@@ -75,15 +75,10 @@ export default class Inventory extends React.Component {
 
     componentDidMount() {
         // Get the items from the server
-        workspaceID = localStorage.getItem("currWorkspaceID")
-        axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
-            let serverData = parseData(res.data);
-            this.setState({ data: serverData });
-            console.log(serverData);
-        });
+        this.fetchData();
     }
 
-    handleRefreshClick() {
+    fetchData() {
         workspaceID = localStorage.getItem("currWorkspaceID")
         axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
             // Add functionality to see if the last modified item is the same as the local last modified item.
@@ -153,7 +148,7 @@ export default class Inventory extends React.Component {
                 <div class="Content">
                     <div class="InventoryTopBar">
                         <h1>Inventory</h1>
-                        <button class="button refreshButton" onClick={() => {this.handleRefreshClick()}}>Refresh</button>
+                        <button class="button refreshButton" onClick={() => {this.fetchData()}}>Refresh</button>
                     </div>
                     <ReactTable ref={(refReactTable) => {this.refReactTable = refReactTable;}}
                                 data={data}
@@ -161,7 +156,7 @@ export default class Inventory extends React.Component {
                                 pivotBy={["name"]}
                                 sortable={true}
                     />
-                    <AddChangeItemComponent/>
+                    <AddChangeItemComponent fetchData={() => {this.fetchData()}}/>
                 </div>
             </div>
         );
