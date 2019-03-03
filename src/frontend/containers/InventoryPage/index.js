@@ -1,14 +1,17 @@
 import React from 'react';
 import ReactTable from 'react-table'
-import {Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import 'react-table/react-table.css'
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import axios from 'axios'
+import DatePicker from 'react-datepicker'
+import "react-datepicker/dist/react-datepicker.css";
 
-import {sum, authorize} from '@/utils';
+import { sum, authorize } from '@/utils';
 
 import AddChangeItemComponent from '@/components/AddChangeItemComponent';
+import { toast } from 'react-toastify';
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
@@ -67,9 +70,11 @@ export default class Inventory extends React.Component {
                 }, {
                     name: "TEST2",
                     expiration: "07/12/2019",
-                    quantity:14
+                    quantity: 14
                 }
-            ]
+            ],
+            dateRangeStart: undefined,
+            dateRangeEnd: undefined
         }
     }
 
@@ -85,25 +90,46 @@ export default class Inventory extends React.Component {
             // Only refresh i.e. setState when the last modified items are different
             let serverData = parseData(res.data);
             this.setState({ data: serverData });
-            console.log(serverData);
+            localStorage.setItem("inventory", JSON.stringify(serverData));
+            // console.log(serverData);
         });
+    }
+
+    handleCalendarChangeStart(date) {
+        let startDate = new Date(date);
+        this.setState({ dateRangeStart: startDate })
+    }
+
+    handleCalendarChangeEnd(date) {
+        let endDate = new Date(date);
+        this.setState({ dateRangeEnd: endDate })
+    }
+
+    dateDiff(first, second) {
+        // Take the difference between the dates and divide by milliseconds per day.
+        // Round to nearest whole number to deal with DST.
+        return Math.round((second - first) / (1000 * 60 * 60 * 24));
     }
 
     render() {
         if (!authorize()) {
-          return (
-            <Redirect to="/login"/>
-          );
+            return (
+                <Redirect to="/login" />
+            );
         }
 
         const { data } = this.state;
         const columns = [
             {
                 Header: "Name",
-                accessor: "name",
-                sortMethod: (a,b) => {
+                id: "name",
+                accessor: d => d.name,
+                sortMethod: (a, b) => {
                     return (a.toLowerCase() > b.toLowerCase()) ? 1 : ((b.toLowerCase() > a.toLowerCase()) ? -1 : 0);
-            }
+                },
+                filterMethod: (filter, row) => {
+                    return (row.name.toLowerCase().indexOf(filter.value.toLowerCase()) !== -1)
+                }
             },
             {
                 Header: "Earliest Expiration Date",
@@ -115,27 +141,97 @@ export default class Inventory extends React.Component {
                         return Date.parse(a) > Date.parse(b);
                     });
                 },
-                sortMethod: (a,b) => {
+                sortMethod: (a, b) => {
                     let date1 = new Date(a.join(""))
                     let date2 = new Date(b.join(""))
                     if (date1 > date2) {
                         return 1;
-                      }
-                      if (date1 < date2) {
+                    }
+                    if (date1 < date2) {
                         return -1;
-                      }
-                      // returning 0 or undefined will use any subsequent column sorting methods or the row index as a tiebreaker
-                      return 0;
-                }
-            },
-            {
+                    }
+                    // returning 0 or undefined will use any subsequent column sorting methods or the row index as a tiebreaker
+                    return 0;
+                },
+                filterMethod: (filter, row) => {
+                    var currDate = new Date();
+                    var rowDate = new Date(row.expiration.join(""));
+                    console.log(rowDate);
+                    // Terrible, *TERRIBLE* code. Very copypasted. 
+                    // I'll refactor it when I have time later
+                    // Right now, functionality is paramount
+                    if (filter.value == "all") {
+                        // Show all items
+                        return true;
+                    }
+                    if (filter.value == "expired") {
+                        if (rowDate < currDate) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (filter.value == "sevenDays") {
+                        if (this.dateDiff(currDate, rowDate) <= 7) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (filter.value == "thirtyDays") {
+                        if (this.dateDiff(currDate, rowDate) <= 30) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (filter.value == "sixtyDays") {
+                        if (this.dateDiff(currDate, rowDate) <= 60) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (filter.value == "ninetyDays") {
+                        if (this.dateDiff(currDate, rowDate) <= 90) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    if (filter.value == "later") {
+                        if (this.dateDiff(currDate, rowDate) > 90) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    console.log(row);
+                    console.log(filter);
+                },
+                Filter: ({ filter, onChange }) =>
+                    <select
+                        onChange={event => onChange(event.target.value)}
+                        style={{ width: "100%" }}
+                        value={filter ? filter.value : "all"}
+                    >
+                        <option value="all">Show all</option>
+                        <option value="expired">Already Expired</option>
+                        <option value="sevenDays">7 Days</option>
+                        <option value="thirtyDays">30 Days</option>
+                        <option value="sixtyDays">60 Days</option>
+                        <option value="ninetyDays">90 Days</option>
+                        <option value="later">91+ Days</option>
+                    </select>
+            }, {
                 Header: "Quantity",
                 accessor: "quantity",
                 aggregate: vals => sum(vals),
                 Aggregated: row => {
                     return (
                         <span>
-                        {row.value} (Total)
+                            {row.value} (Total)
                         </span>
                     );
                 }
@@ -143,20 +239,23 @@ export default class Inventory extends React.Component {
         ];
 
         return (
-            <div class="inventoryPage">
-                <GenericNavigationBar/>
+            <div class="inventoryPage" >
+                <GenericNavigationBar />
                 <div class="Content">
                     <div class="InventoryTopBar">
                         <h1>Inventory</h1>
-                        <button class="button refreshButton" onClick={() => {this.fetchData()}}>Refresh</button>
+                        <button class="button refreshButton" onClick={() => { this.fetchData() }}>Refresh</button>
                     </div>
-                    <ReactTable ref={(refReactTable) => {this.refReactTable = refReactTable;}}
-                                data={data}
-                                columns={columns}
-                                pivotBy={["name"]}
-                                sortable={true}
+                    <ReactTable ref={(refReactTable) => { this.refReactTable = refReactTable; }}
+                        data={data}
+                        columns={columns}
+                        pivotBy={["name"]}
+                        sortable={true}
+                        filterable
+                        defaultFilterMethod={(filter, row) =>
+                            String(row[filter.id]) === filter.value}
                     />
-                    <AddChangeItemComponent fetchData={() => {this.fetchData()}}/>
+                    <AddChangeItemComponent fetchData={() => { this.fetchData() }} />
                 </div>
             </div>
         );
