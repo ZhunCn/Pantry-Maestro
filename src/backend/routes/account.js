@@ -1,6 +1,6 @@
 const express = require('express');
-const {authorize} = require('utils');
-const {User} = require('models');
+const {authorize, complete} = require('utils');
+const {User, Workspace} = require('models');
 const c = require('const');
 
 module.exports = function(router) {
@@ -100,6 +100,58 @@ module.exports = function(router) {
       });
     }).catch(err => {
       res.json({'error': 'There was an error getting your account information: ' + err});
+    });
+  });
+
+  router.post('/api/account/leave', (req, res) => {
+    let fields = [
+      'workspace_id'
+    ];
+
+    // Check if request contains necessary fields
+    if (fields && !complete(req.body, fields)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      return;
+    }
+
+    authorize(req).then(decoded => {
+      Workspace.findOne({'_id': req.body.workspace_id, 'deleted': false}).exec((err, workspace) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error leaving this workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with this given id'});
+          return;
+        }
+
+        workspace.hasUser(decoded.user_id, (has, user) => {
+          if (!has) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'User is not a part of that workspace'});
+            return;
+          }
+
+          workspace.removeUser(decoded.user_id, (removed) => {
+            if (!removed) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing user from the workspace'});
+              return;
+            }
+
+            user.removeWorkspace(req.body.workspace_id, (removed) => {
+              if (!removed) {
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing user from the workspace'});
+                return;
+              }
+
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'message': 'Removed the user from the workspace'});
+              return;
+            });
+          });
+        });
+      });
+    }).catch(err => {
+      console.log(err);
+      res.json({'error': 'There was an error leaving this workspace: ' + err});
     });
   });
 }

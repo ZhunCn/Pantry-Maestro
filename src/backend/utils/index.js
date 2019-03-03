@@ -112,7 +112,7 @@ function authorize(req, params = {}) {
         return reject('Invalid token: Token is mutated');
       }
 
-      if (params.hasOwnProperty('workspace_id')) {
+      if (params.hasOwnProperty('workspace_id') && params.hasOwnProperty('roles')) {
         Workspace.findOne({'_id': params.workspace_id, 'deleted': false}).exec((err, workspace) => {
           if (err) {
             return reject('Error retrieving workspace: ' + err);

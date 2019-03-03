@@ -89,4 +89,35 @@ UserSchema.methods.getRoles = function getRoles(workspace_id, cb) {
   });
 }
 
+UserSchema.methods.removeWorkspace = function(workspace_id, cb) {
+  var user = this;
+
+  let workspaces = [];
+  let removed = false;
+
+  user.workspaces.forEach(workspace => {
+    if (workspace.toString() !== workspace_id) {
+      workspaces.push(workspace);
+    }
+    else {
+      removed = true;
+    }
+  });
+
+  if (!removed) {
+    cb(false);
+    return;
+  }
+
+  user.workspaces = workspaces;
+  user.save((err) => {
+    if (err) {
+      cb(false);
+      return;
+    }
+
+    cb(true);
+  });
+}
+
 module.exports = mongoose.model('User', UserSchema);
