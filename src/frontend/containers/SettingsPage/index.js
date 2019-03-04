@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import {Redirect} from 'react-router-dom';
 import axios from 'axios';
 import {authorize} from '@/utils';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 
@@ -248,6 +249,26 @@ export default class Settings extends React.Component {
       value: value
     });
   }
+  changePassProcedure(password){
+    let userLoginToken = localStorage.getItem("loginToken");
+    let passwordJson = {
+      "old_password": password[0],
+      "new_password": password[1]
+    }
+    console.log(userLoginToken);
+    axios.put("/api/account",
+      passwordJson,
+    { headers: { "Authorization": `${userLoginToken}`,
+      'Accept' : 'application/json',
+      'Content-Type': 'application/json' }
+    }).then(res => {
+        toast("Successfully updated password", {type: "success"})
+        console.log(res.data);
+    }).catch(error => {
+      toast("Failed to update password", {type: "error"})
+      console.log(error);
+    })
+  }
   //callback function to get user input from the popup
   callbackFunction = (data, field) =>{
     //Here is where all the data stuff goes.
@@ -255,6 +276,9 @@ export default class Settings extends React.Component {
     //field is the name of the aspect the user is trying to change, e.g. "username" or "password"
     if(data == "logout" && field =="logout"){
       this.logoutProcedure();
+    }
+    if(field =="password"){
+      this.changePassProcedure(data);
     }
     console.log(data+" "+field);
     this.props.closePopup;
@@ -279,6 +303,7 @@ export default class Settings extends React.Component {
 
     return (
       <div class="settingsPage">
+      <ToastContainer/>
         <GenericNavigationBar/>
         <div class="Content">
         <h2>Settings</h2>
