@@ -96,9 +96,23 @@ export default class Invite extends React.Component {
               'password': password
             }).then(res => {
               console.log(res.data);
-              document.getElementById("successParagraph").textContent = "Successfully registered an account!";
+            })
+            .catch((error) => {
+              console.log(error.data);
+              return;
+            });
+
+            // Log into the newly made account, then procede to add account to workspace
+            axios.post('/api/auth/login', {
+              'username': username,
+              'password': password
+            }).then(res => {
+              console.log(res.data);
+              localStorage.setItem('loginToken', res.data.token);
+              document.getElementById("successParagraph").textContent = "Successfully registered and logged in!";
               document.getElementById("successParagraph").style = "color:green;";
-              this.props.history.push('/login');
+              
+              confirmProcedure();
             })
             .catch((error) => {
               console.log(error.data);
@@ -155,14 +169,27 @@ export default class Invite extends React.Component {
     }
   }
 
+  getCurrentUsername() {
+    console.log("Grabbing current Username!");
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } })
+    .then(res => {
+      console.log(res.data.username);
+      return res.data.username;
+    });
+
+  }
+
   render() {
     if (authorize()) {
+      
       return (
+        
         <div class="invitePage">
           <div class="Content">
           <center>
             <h2>You have been invited to the pantry workplace: </h2>
-            <p>You are already signed in as: </p>
+            <p id="currentUser">You are already signed in as:</p>
             <p>Would you like to join the pantry?</p>
             <p><button id="confirmButton" class="button" onClick={(e) => this.confirmProcedure()}>Accept</button>
             <button id="cancelButton" class="button" onClick={(e) => <Redirect to="/"/>}>Decline</button></p>
@@ -173,8 +200,8 @@ export default class Invite extends React.Component {
           </div>
   
         </div>
+        
       )
-      
     } else {
       return (
         <div class="invitePage">
