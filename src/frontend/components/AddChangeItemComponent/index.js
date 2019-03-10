@@ -11,17 +11,17 @@ export default class AddChangeItemComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-                "name": "",
-                "quantities": [{"date":"", "quantity": undefined}]
+            "name": "",
+            "quantities": [{ "date": "", "quantity": undefined }]
         }
         this.handleChange = this.handleChange.bind(this);
-    }   
+    }
 
     addQuantity = (e) => {
         e.preventDefault();
 
         this.setState((prevState) => ({
-            quantities: [...prevState.quantities, {"date":"", "quantity": undefined}],
+            quantities: [...prevState.quantities, { "date": "", "quantity": undefined }],
         }))
     }
 
@@ -70,7 +70,7 @@ export default class AddChangeItemComponent extends React.Component {
                     toast(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`,
                         { type: "warning" });
                 } else {
-                    toast(`An error has occurred. ${error}`, { type: "error"});
+                    toast(`An error has occurred. ${error}`, { type: "error" });
                 }
 
             })
@@ -95,59 +95,59 @@ export default class AddChangeItemComponent extends React.Component {
         console.log(this.state.quantities[idx].date)
         let quantities = [...this.state.quantities]
         quantities[idx].date = date;
-        this.setState({quantities}, () => console.log(this.state.quantities))
+        this.setState({ quantities }, () => console.log(this.state.quantities))
     }
 
     render() {
-        let {name, quantities} = this.state;
+        let { name, quantities } = this.state;
         return (
             <div class="AddChangeItemForm">
-                <ToastContainer autoClose={3000}/>
-            <form>
-                <h2>Add new food items</h2>
-                <label htmlFor="name">Name:</label>
-                <input type="text" name="name" id="name" value={name} onChange={this.handleChange}/>
-                <button class="button addQuantityButton" onClick={this.addQuantity}>Click me to add more expiration dates/quantities!</button>
-                {
-                    this.state.quantities.map((val, idx) => {
-                        const { startDate } = this.state.quantities[idx].date;
-                        let dateId = `date-${idx}`, quantityId = `quantity-${idx}`;
-                        return (
-                            <div key={idx} class="dateQuantityInputs">
-                                <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
-                                <DatePicker
-                                    onChange={(date) => this.handleCalendarChange(date, idx)}
-                                    selected={quantities[idx].date}
-                                    name={dateId}
-                                    className="date"
-                                    class="date"
-                                    id={dateId}
-                                    placeholderText="Click to select a date"
-                                    peekNextMonth
-                                    showMonthDropdown
-                                    showYearDropdown
-                                    dropdownMode="select"
-                                />
-                                <label class="quantityLabel" htmlFor={quantityId}>Quantity:  </label>
-                                <input
-                                    type="number"
-                                    name={quantityId}
-                                    data-id={idx}
-                                    id={quantityId}
-                                    className="quantity"
-                                    placeholder="Enter Quantity"
-                                    class="quantity"
-                                    onChange={(e) => {this.handleChange(e)}}
-                                    value={quantities[idx].quantity}
-                                    min="0"
-                                    step="1"
-                                />
-                            </div>
-                        )
-                    })
-                }
-                <input class="button submitButton" type="button" value="Submit" onClick={this.handleSubmit}/>
-            </form>
+                <ToastContainer autoClose={3000} />
+                <form>
+                    <h2>Add new food items</h2>
+                    <label htmlFor="name">Name:</label>
+                    <input type="text" name="name" id="name" value={name} onChange={this.handleChange} />
+                    <button class="button addQuantityButton" onClick={this.addQuantity}>Click me to add more expiration dates/quantities!</button>
+                    {
+                        this.state.quantities.map((val, idx) => {
+                            const { startDate } = this.state.quantities[idx].date;
+                            let dateId = `date-${idx}`, quantityId = `quantity-${idx}`;
+                            return (
+                                <div key={idx} class="dateQuantityInputs">
+                                    <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
+                                    <DatePicker
+                                        onChange={(date) => this.handleCalendarChange(date, idx)}
+                                        selected={quantities[idx].date}
+                                        name={dateId}
+                                        className="date"
+                                        class="date"
+                                        id={dateId}
+                                        placeholderText="Click to select a date"
+                                        peekNextMonth
+                                        showMonthDropdown
+                                        showYearDropdown
+                                        dropdownMode="select"
+                                    />
+                                    <label class="quantityLabel" htmlFor={quantityId}>Quantity:  </label>
+                                    <input
+                                        type="number"
+                                        name={quantityId}
+                                        data-id={idx}
+                                        id={quantityId}
+                                        className="quantity"
+                                        placeholder="Enter Quantity"
+                                        class="quantity"
+                                        onChange={(e) => { this.handleChange(e) }}
+                                        value={quantities[idx].quantity}
+                                        min="0"
+                                        step="1"
+                                    />
+                                </div>
+                            )
+                        })
+                    }
+                    <input class="button submitButton" type="button" value="Submit" onClick={this.handleSubmit} />
+                </form>
 
             </div>
 
