@@ -203,7 +203,7 @@ export default class Inventory extends React.Component {
                 },
                 filterMethod: (filter, row) => {
                     var currDate = new Date();
-                    var rowDate = new Date(row.expiration.join(""));
+                    var rowDate = new Date(Date.parse(row.expiration.join("")));
                     console.log(rowDate);
                     // Terrible, *TERRIBLE* code. Very copypasted. 
                     // I'll refactor it when I have time later
@@ -273,30 +273,64 @@ export default class Inventory extends React.Component {
                         <option value="later">91+ Days</option>
                     </select>
                 , Cell: row => {
+                    let rowDate = new Date(Date.parse(row.row.expiration.join("")));
+                    const diff = rowDate < Date.now();
+                    const style = {
+                        color: diff ? 'red' : 'inherit',
+                        fontWeight: diff ? 'bold' : 'inherit'
+                    };
                     if (row.original) {
-                        return (
-                            <div>
-                                <label>{row.row.expiration.join("")}</label>
-                                <div style={{ float: 'right', marginRight: '20px' }}>
-                                    <DatePicker
-                                        onChange={(date) => this.handleCalendarEdit(row.row._original, date)}
-                                        selected={Date.parse(row.row.expiration.join(""))}
-                                        className="date"
-                                        class="date"
-                                        id={row.row._original.id + row.row._original.expiration}
-                                        ref={(c) => this._calendar = c}
-                                        customInput={<button {...this.props}
-                                            calendar={this._calendar}>Edit Date</button>}
-                                    />
+                        if (diff) {
+                            return (
+                                <div style={style}>
+                                    <label>EXPIRED: {row.row.expiration.join("")}</label>
+                                    <div style={{ float: 'right', marginRight: '20px' }}>
+                                        <DatePicker
+                                            onChange={(date) => this.handleCalendarEdit(row.row._original, date)}
+                                            selected={Date.parse(row.row.expiration.join(""))}
+                                            className="date"
+                                            class="date"
+                                            id={row.row._original.id + row.row._original.expiration}
+                                            ref={(c) => this._calendar = c}
+                                            customInput={<button {...this.props}
+                                                calendar={this._calendar}>Edit Date</button>}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        )
+                            )
+                        } else {
+                            return (
+                                <div style={style}>
+                                    <label>{row.row.expiration.join("")}</label>
+                                    <div style={{ float: 'right', marginRight: '20px' }}>
+                                        <DatePicker
+                                            onChange={(date) => this.handleCalendarEdit(row.row._original, date)}
+                                            selected={Date.parse(row.row.expiration.join(""))}
+                                            className="date"
+                                            class="date"
+                                            id={row.row._original.id + row.row._original.expiration}
+                                            ref={(c) => this._calendar = c}
+                                            customInput={<button {...this.props}
+                                                calendar={this._calendar}>Edit Date</button>}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        }
                     } else {
-                        return (
-                            <div>
-                                <label>{row.row.expiration.join("")}</label>
-                            </div>
-                        )
+                        if (diff) {
+                            return (
+                                <div style={style}>
+                                    <label>One or more items are expired: {row.row.expiration.join("")}</label>
+                                </div>
+                            )
+                        } else {
+                            return (
+                                <div style={style}>
+                                    <label>{row.row.expiration.join("")}</label>
+                                </div>
+                            )
+                        }
                     }
                 }
             }, {
