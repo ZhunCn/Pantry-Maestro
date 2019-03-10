@@ -111,6 +111,30 @@ export default class Inventory extends React.Component {
         return Math.round((second - first) / (1000 * 60 * 60 * 24));
     }
 
+    editQuantityButton(item, updown) {
+        console.log(item);
+        console.log(updown);
+
+        let updatedQuantity = {
+            "quantities": {
+                [item.expiration]: updown
+            }
+        }
+        console.log(updatedQuantity);
+        workspaceID = localStorage.getItem("currWorkspaceID");
+        let itemID = item.id;
+        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updatedQuantity).then(res => {
+            // HTTP status 200 OK
+            if (res.status === 200) {
+                console.log("updated quantity");
+            }
+            console.log(res.data);
+            // this.fetchData();
+        }).catch(error => {
+            console.log(error);
+        })
+    }
+
     render() {
         if (!authorize()) {
             return (
@@ -234,6 +258,16 @@ export default class Inventory extends React.Component {
                             {row.value} (Total)
                         </span>
                     );
+                },
+                Cell: row => {
+                    console.log(row);
+                    return (
+                        <div>
+                            <label style={{ padding: '10px' }}>{row.row.quantity}</label>
+                            <button onClick={() => this.editQuantityButton(row.row._original, 1)}>+</button>
+                            <button onClick={() => this.editQuantityButton(row.row._original, -1)}>-</button>
+                        </div>
+                    )
                 }
             }
         ];
