@@ -36,7 +36,7 @@ module.exports = function(router) {
     ];
 
     // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
+    if (!complete(req.body, fields)) {
       res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
       return;
     }
@@ -127,20 +127,15 @@ module.exports = function(router) {
       return;
     }
 
-    // In the future, add functionality to change item's name
     let fields = [
-      'quantities'
+      'quantities',
+      'name'
     ];
     let toUpdate = {};
 
     fields.forEach(field => {
       if (req.body.hasOwnProperty(field)) {
-        if (field === 'quantities') {
-          toUpdate[field] = req.body[field];
-        }
-        else {
-          toUpdate[field] = req.body[field];
-        }
+        toUpdate[field] = req.body[field];
       }
     });
 
@@ -154,19 +149,74 @@ module.exports = function(router) {
         return;
       }
 
-      Object.keys(toUpdate['quantities']).forEach(quantity => {
-        if (item.quantities.hasOwnProperty(quantity)) {
-          item.quantities[quantity] += toUpdate['quantities'][quantity];
-        }
-        else {
-          item.quantities[quantity] = toUpdate['quantities'][quantity];
+      // Update quantities
+      if (toUpdate['quantities']) {
+        Object.keys(toUpdate['quantities']).forEach(quantity => {
+          if (item.quantities.hasOwnProperty(quantity)) {
+            item.quantities[quantity] += toUpdate['quantities'][quantity];
+          }
+          else {
+            item.quantities[quantity] = toUpdate['quantities'][quantity];
+          }
+
+          if (item.quantities[quantity] <= 0) {
+            delete item.quantities[quantity];
+          }
+        });
+        item.markModified('quantities');
+      }
+
+      if (toUpdate['name']) {
+        item.name = toUpdate['name'];
+      }
+
+      item.save((err, item) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+          return;
         }
 
-        if (item.quantities[quantity] <= 0) {
-          delete item.quantities[quantity];
-        }
+        res.status(c.status.OK).json({'message': 'Successfully updated item'});
       });
+    });
+  });
 
+  /*
+   * Delete quantities for an item given an expiration date
+   */
+  router.delete('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
+    if (!req.body) {
+      res.status(c.status.OK).json({'message': 'No fields to update'});
+      return;
+    }
+
+    // In the future, add functionality to change item's name
+    let fields = [
+      'expiration'
+    ];
+
+    // Check if request contains necessary fields
+    if (!complete(req.body, fields)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      return;
+    }
+
+    Item.findById(req.params.item_id).exec((err, item) => {
+      if (err) {
+        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error updating item(s): ' + err});
+        return;
+      }
+      else if (!item) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'No item with this id exists'});
+        return;
+      }
+
+      if (!item.quantities[req.body.expiration]) {
+        res.status(c.status.OK).json({'error': 'Invalid expiration date'});
+        return;
+      }
+
+      delete item.quantities[req.body.expiration];
       item.markModified('quantities');
 
       item.save((err, item) => {
@@ -175,7 +225,7 @@ module.exports = function(router) {
           return;
         }
 
-        res.status(c.status.OK).json({'message': 'Successfully updated item(s)'});
+        res.status(c.status.OK).json({'message': 'Successfully updated item'});
       });
     });
   });
