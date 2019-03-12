@@ -52,7 +52,7 @@ module.exports = function(router) {
 
       // If it already exists, send back an error
       if (item) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'Item with this name already exists'});
+        res.status(c.status.BAD_REQUEST).json({'error': 'Item with this name already exists', 'item_id': item._id});
         return;
       }
       else {

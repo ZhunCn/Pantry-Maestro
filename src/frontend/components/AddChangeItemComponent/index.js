@@ -60,15 +60,24 @@ export default class AddChangeItemComponent extends React.Component {
             axios.post(`/api/workspaces/${workspaceID}/inventory`, parsedData).then(res => {
                 // HTTP status 200 OK
                 if (res.status === 200) {
-                    toast("Item has been successfully added to the database",
-                        { type: "success" });
+                    toast("Item has been successfully added to the database", { type: "success" });
                 }
                 console.log(res.data);
                 this.props.fetchData();
             }).catch(error => {
                 if (error.response.data.error === "Item with this name already exists") {
-                    toast(`${this.state.name} already exists. Rename the item or edit ${this.state.name} directly instead`,
-                        { type: "warning" });
+                    let itemID = error.response.data.item_id;
+                    console.log(itemID);
+                    axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, { "quantities": parsedData.quantities }).then(res => {
+                        // HTTP status 200 OK
+                        if (res.status === 200) {
+                            console.log("updated quantity");
+                            this.props.fetchData();
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        toast(`An error has occurred. ${error}`, { type: "error" });
+                    })
                 } else {
                     toast(`An error has occurred. ${error}`, { type: "error" });
                 }
