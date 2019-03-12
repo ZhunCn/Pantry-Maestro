@@ -25,14 +25,20 @@ function Item(id, name, expiration, quantity) {
 // Parses JSON from server into format that the table understands
 function parseData(serverData) {
     let parsedData = [];
-    for (let i = 0; i < Object.entries(serverData.inventory.items).length; i++) {
-        for (let j = 0; j < Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities).length; j++) {
-            let tempItem = new Item(Object.entries(serverData.inventory.items)[i][1]._id,
-                Object.entries(serverData.inventory.items)[i][1].name,
-                Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][0],
-                Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][1]);
-            parsedData.push(tempItem);
-        }
+    let dataLength = Object.entries(serverData.inventory.items).length;
+    for (let i = 0; i < dataLength; i++) {
+        console.log("quantities" in Object.entries(serverData.inventory.items)[i][1]);
+        if ("quantities" in Object.entries(serverData.inventory.items)[i][1]) {
+            for (let j = 0; j < Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities).length; j++) {
+                let tempItem = new Item(Object.entries(serverData.inventory.items)[i][1]._id,
+                    Object.entries(serverData.inventory.items)[i][1].name,
+                    Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][0],
+                    Object.entries(Object.entries(serverData.inventory.items)[i][1].quantities)[j][1]);
+                parsedData.push(tempItem);
+            }
+        } else { ("Empty item"); }
+
+
     }
     return parsedData;
 }
@@ -149,12 +155,25 @@ export default class Inventory extends React.Component {
             this.fetchData();
         }).catch(error => {
             console.log(error);
+            toast(`There was error updating the quantity. ${error}`, { type: "error" });
         })
     }
 
     handleDeleteItemButton(item) {
-        console.log("Removing item: " + item.id);
+        console.log("Removing item: " + item.expiration);
         // use axios.delete here
+        workspaceID = localStorage.getItem("currWorkspaceID");
+        let itemID = item.id;
+        axios.delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, { data: { expiration: item.expiration } }).then(res => {
+            if (res.status === 200) {
+                console.log("Deleted item");
+                toast("Deleted item successfully!", { type: "success" });
+                this.fetchData();
+            }
+        }).catch(error => {
+            console.log(error.response);
+            toast(`There was error deleting this item. ${error}`, { type: "error" });
+        })
 
         // toast that item has been deleted
     }
