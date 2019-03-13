@@ -13,6 +13,8 @@ import { sum, authorize } from '@/utils';
 import AddChangeItemComponent from '@/components/AddChangeItemComponent';
 import { toast } from 'react-toastify';
 
+import { Button, Icon, Modal } from 'semantic-ui-react'
+
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
 function Item(id, name, expiration, quantity) {
@@ -311,8 +313,8 @@ export default class Inventory extends React.Component {
                                             class="date"
                                             id={row.row._original.id + row.row._original.expiration}
                                             ref={(c) => this._calendar = c}
-                                            customInput={<button {...this.props}
-                                                calendar={this._calendar}>Edit Date</button>}
+                                            customInput={<Button compact style={{ padding: "6px 7px 6px 7px" }}
+                                                calendar={this._calendar}>Edit Date</Button>}
                                         />
                                     </div>
                                 </div>
@@ -329,8 +331,8 @@ export default class Inventory extends React.Component {
                                             class="date"
                                             id={row.row._original.id + row.row._original.expiration}
                                             ref={(c) => this._calendar = c}
-                                            customInput={<button {...this.props}
-                                                calendar={this._calendar}>Edit Date</button>}
+                                            customInput={<Button compact style={{ padding: "6px 7px 6px 7px" }}
+                                                calendar={this._calendar}>Edit Date</Button>}
                                         />
                                     </div>
                                 </div>
@@ -368,10 +370,16 @@ export default class Inventory extends React.Component {
                     return (
                         <div>
                             <label>{row.row.quantity}</label>
-                            <button onClick={() => this.handleEditQuantityButton(row.row._original, 1)}
-                                style={{ float: "right", marginRight: "40px" }}>+</button>
-                            <button onClick={() => this.handleEditQuantityButton(row.row._original, -1)}
-                                style={{ float: "right", marginRight: "5px" }}>-</button>
+                            <Button.Group floated='right'>
+                                <Button icon compact style={{ padding: "6px 7px 6px 7px" }}
+                                    onClick={() => this.handleEditQuantityButton(row.row._original, -1)}>
+                                    <Icon name='minus' />
+                                </Button>
+                                <Button icon compact style={{ padding: "6px 7px 6px 7px" }}
+                                    onClick={() => this.handleEditQuantityButton(row.row._original, 1)}>
+                                    <Icon name='plus' />
+                                </Button>
+                            </Button.Group>
                         </div>
                     )
                 }
@@ -379,7 +387,8 @@ export default class Inventory extends React.Component {
                 Header: '',
                 Cell: row => (
                     <div>
-                        <button onClick={() => this.handleDeleteItemButton(row.row._original)}>Delete</button>
+                        <button className="ui fluid compact negative button" style={{ padding: "6px 7px 6px 7px" }}
+                            onClick={() => this.handleDeleteItemButton(row.row._original)}>Delete</button>
                     </div>
                 ),
                 sortable: false,
@@ -392,10 +401,14 @@ export default class Inventory extends React.Component {
         return (
             <div class="inventoryPage" >
                 <GenericNavigationBar />
-                <div class="Content">
-                    <div class="InventoryTopBar">
+                <div class="Content" style={{ position: "relative" }}>
+                    <div class="InventoryTopBar" style={{ display: "inline-block" }}>
                         <h1>Inventory</h1>
-                        <button class="button refreshButton" onClick={() => { this.fetchData() }}>Refresh</button>
+                        <Button icon='refresh' labelPosition='left' content='Refresh' size='small' onClick={() => { this.fetchData() }} />
+                        <Modal trigger={<Button icon labelPosition="left" size='small'><Icon name="add" />Add new item</Button>} centered={false}>
+                            <Modal.Header>Add a new item</Modal.Header>
+                            <AddChangeItemComponent fetchData={() => { this.fetchData() }} />
+                        </Modal>
                     </div>
                     <ReactTable ref={(refReactTable) => { this.refReactTable = refReactTable; }}
                         data={data}
@@ -408,9 +421,9 @@ export default class Inventory extends React.Component {
                         collapseOnDataChange={false}
                         collapseOnSortingChange={false}
                         collapseOnPageChange={false}
+                        style={{ marginRight: "10px" }}
 
                     />
-                    <AddChangeItemComponent fetchData={() => { this.fetchData() }} />
                 </div>
             </div>
         );

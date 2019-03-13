@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
+import { Button, Form } from 'semantic-ui-react';
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 export default class AddChangeItemComponent extends React.Component {
@@ -110,53 +111,62 @@ export default class AddChangeItemComponent extends React.Component {
     render() {
         let { name, quantities } = this.state;
         return (
-            <div class="AddChangeItemForm">
+            <div style={{ margin: "15px" }}>
                 <ToastContainer autoClose={3000} />
-                <form>
-                    <h2>Add new food items</h2>
-                    <label htmlFor="name">Name:</label>
-                    <input type="text" name="name" id="name" value={name} onChange={this.handleChange} />
-                    <button class="button addQuantityButton" onClick={this.addQuantity}>Click me to add more expiration dates/quantities!</button>
+                <Form>
+                    <Form.Field inline={true}>
+                        <label htmlFor="name">Name:</label>
+                        <input type="text" name="name" id="name" value={name} onChange={this.handleChange} />
+                    </Form.Field>
+                    <Button class="button addQuantityButton" onClick={this.addQuantity}>Click me to add more expiration dates/quantities!</Button>
                     {
                         this.state.quantities.map((val, idx) => {
                             const { startDate } = this.state.quantities[idx].date;
                             let dateId = `date-${idx}`, quantityId = `quantity-${idx}`;
                             return (
                                 <div key={idx} class="dateQuantityInputs">
-                                    <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
-                                    <DatePicker
-                                        onChange={(date) => this.handleCalendarChange(date, idx)}
-                                        selected={quantities[idx].date}
-                                        name={dateId}
-                                        className="date"
-                                        class="date"
-                                        id={dateId}
-                                        placeholderText="Click to select a date"
-                                        peekNextMonth
-                                        showMonthDropdown
-                                        showYearDropdown
-                                        dropdownMode="select"
-                                    />
-                                    <label class="quantityLabel" htmlFor={quantityId}>Quantity:  </label>
-                                    <input
-                                        type="number"
-                                        name={quantityId}
-                                        data-id={idx}
-                                        id={quantityId}
-                                        className="quantity"
-                                        placeholder="Enter Quantity"
-                                        class="quantity"
-                                        onChange={(e) => { this.handleChange(e) }}
-                                        value={quantities[idx].quantity}
-                                        min="0"
-                                        step="1"
-                                    />
+                                    <Form>
+                                        <Form.Group widths='equal'>
+                                            <Form.Field>
+                                                <label class="expirationLabel" htmlFor={dateId}>{`Expiration #${idx + 1}:  `}</label>
+                                                <DatePicker
+                                                    onChange={(date) => this.handleCalendarChange(date, idx)}
+                                                    selected={quantities[idx].date}
+                                                    name={dateId}
+                                                    className="date"
+                                                    class="date"
+                                                    id={dateId}
+                                                    placeholderText="Click to select a date"
+                                                    peekNextMonth
+                                                    showMonthDropdown
+                                                    showYearDropdown
+                                                    dropdownMode="select"
+                                                />
+                                            </Form.Field>
+                                            <Form.Field>
+                                                <label class="quantityLabel" htmlFor={quantityId}>Quantity:  </label>
+                                                <input
+                                                    type="number"
+                                                    name={quantityId}
+                                                    data-id={idx}
+                                                    id={quantityId}
+                                                    className="quantity"
+                                                    placeholder="Enter Quantity"
+                                                    class="quantity"
+                                                    onChange={(e) => { this.handleChange(e) }}
+                                                    value={quantities[idx].quantity}
+                                                    min="0"
+                                                    step="1"
+                                                />
+                                            </Form.Field>
+                                        </Form.Group>
+                                    </Form>
                                 </div>
                             )
                         })
                     }
-                    <input class="button submitButton" type="button" value="Submit" onClick={this.handleSubmit} />
-                </form>
+                    <Button content="Submit" icon="check" labelPosition="right" onClick={this.handleSubmit} />
+                </Form>
 
             </div>
 
