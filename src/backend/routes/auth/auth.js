@@ -2,24 +2,28 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const {User} = require('models');
+const joi = require('joi');
 const {complete, isJSON} = require('utils');
 const c = require('const');
 
+const registerSchema = joi.object().keys({
+  email: joi.string().email().required(),
+  username: joi.string().alphanum().required(),
+  password: joi.string().alphanum().min(6).regex(/\d/).required()
+});
+
+const loginSchema = joi.object().keys({
+  username: joi.string().alphanum().required(),
+  password: joi.string().alphanum().min(6).regex(/\d/).required()
+});
+
 module.exports = function(router) {
   router.post('/api/auth/register', (req, res) => {
-    let fields = [
-      'email',
-      'username',
-      'password'
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+    // Validate fields
+    if (joi.validate(req.body, registerSchema).error !== null) {
+      res.status(c.status.OK).json({'error': 'Invalid fields'});
       return;
     }
-
-    // TODO: Validate fields
 
     let newUser = new User({
       'email': req.body.email,
@@ -49,14 +53,9 @@ module.exports = function(router) {
   });
 
   router.post('/api/auth/login', (req, res) => {
-    let fields = [
-      'username',
-      'password'
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+    // Validate fields
+    if (joi.validate(req.body, loginSchema).error !== null) {
+      res.status(c.status.OK).json({'error': 'Invalid fields'});
       return;
     }
 
@@ -97,33 +96,33 @@ module.exports = function(router) {
     });
   });
 
-  router.post('/api/auth/test', (req, res) => {
-    if (!req.headers.authorization) {
-      res.status(c.status.UNAUTHORIZED).json({'error': 'Missing necessary authorization'});
-      return;
-    }
-
-    let token = req.headers.authorization;
-
-    if (token.startsWith('Bearer ')) {
-      token = token.slice(7, token.length);
-    }
-
-    if (!token) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
-      return;
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
-        return;
-      }
-
-      res.status(c.status.OK).json({
-        'message': 'Successfully decoded token',
-        'decoded': decoded
-      });
-    });
-  });
+  // router.post('/api/auth/test', (req, res) => {
+  //   if (!req.headers.authorization) {
+  //     res.status(c.status.UNAUTHORIZED).json({'error': 'Missing necessary authorization'});
+  //     return;
+  //   }
+  //
+  //   let token = req.headers.authorization;
+  //
+  //   if (token.startsWith('Bearer ')) {
+  //     token = token.slice(7, token.length);
+  //   }
+  //
+  //   if (!token) {
+  //     res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
+  //     return;
+  //   }
+  //
+  //   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  //     if (err) {
+  //       res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
+  //       return;
+  //     }
+  //
+  //     res.status(c.status.OK).json({
+  //       'message': 'Successfully decoded token',
+  //       'decoded': decoded
+  //     });
+  //   });
+  // });
 }
