@@ -15,7 +15,6 @@ export default class GenericNavigationBar extends React.Component {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/analytics">Analytics</Link>
-          <Link to="/login">Login</Link>
           <Link to="/inventory">Inventory</Link>
           <Link to="/workspace">Workspaces</Link>
           <Link to="/settings">Settings</Link>

@@ -13,10 +13,7 @@ function sum(arr) {
 }
 
 function authorize() {
-  console.log('Authorizing');
-
   if (!localStorage.getItem('loginToken')) {
-    console.log('Redirecting');
     return false;
   }
 
