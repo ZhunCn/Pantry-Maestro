@@ -14,7 +14,7 @@ module.exports = function(router) {
       select: '-_id  -__v',
       populate: {
         path: 'items',
-        select: ' -__v'
+        select: ' -__v -inventory'
       }
     }).exec((err, inventory) => {
       if (err || !inventory) {
@@ -77,7 +77,7 @@ module.exports = function(router) {
             }
 
             // Find inventory by inventory_id
-            Inventory.findOneAndUpdate({'_id': workspace.inventory}).exec((err, inventory) => {
+            Inventory.findOne({'_id': workspace.inventory}).exec((err, inventory) => {
               if (err) {
                 res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding item to inventory: ' + err});
                 return;
