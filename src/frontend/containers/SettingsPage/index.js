@@ -269,6 +269,44 @@ export default class Settings extends React.Component {
       console.log(error);
     })
   }
+  changeEmailProcedure(email){
+    let userLoginToken = localStorage.getItem("loginToken");
+    let emailJson = {
+      "email": email
+    }
+    console.log(userLoginToken);
+    axios.put("/api/account",
+      emailJson,
+    { headers: { "Authorization": `${userLoginToken}`,
+      'Accept' : 'application/json',
+      'Content-Type': 'application/json' }
+    }).then(res => {
+        toast("Successfully updated email", {type: "success"})
+        console.log(res.data);
+    }).catch(error => {
+      toast("Failed to update email", {type: "error"})
+      console.log(error);
+    })
+  }
+  changeUserProcedure(username){
+    let userLoginToken = localStorage.getItem("loginToken");
+    let userJson = {
+      "username": username
+    }
+    console.log(userLoginToken);
+    axios.put("/api/account",
+      userJson,
+    { headers: { "Authorization": `${userLoginToken}`,
+      'Accept' : 'application/json',
+      'Content-Type': 'application/json' }
+    }).then(res => {
+        toast("Successfully updated email", {type: "success"})
+        console.log(res.data);
+    }).catch(error => {
+      toast("Failed to update email", {type: "error"})
+      console.log(error);
+    })
+  }
   //callback function to get user input from the popup
   callbackFunction = (data, field) =>{
     //Here is where all the data stuff goes.
@@ -277,21 +315,31 @@ export default class Settings extends React.Component {
     if(data == "logout" && field =="logout"){
       this.logoutProcedure();
     }
-    if(field =="password"){
+    else if(field =="password"){
       this.changePassProcedure(data);
     }
+    else if(field =="email"){
+      this.changeEmailProcedure(data);
+    }
+    else if(field == "username"){
+      this.changeUserProcedure(data);
+    }
+    this.refreshData();
     console.log(data+" "+field);
     this.props.closePopup;
   }
-
-  componentDidMount(){
+  refreshData(){
     let userLoginToken = localStorage.getItem("loginToken");
     axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
         this.setState({
           user: res.data.username,
           email: res.data.email
         });
+        console.log(res.data);
     });
+  }
+  componentDidMount(){
+    this.refreshData();
   }
 
   render() {
