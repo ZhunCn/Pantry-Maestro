@@ -6,10 +6,20 @@ import axios from 'axios'
 
 
 export default class AddWorkspaceComponent extends React.Component {
+  componentDidMount(){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        this.setState({
+          user_id: res.data._id
+        });
+        console.log(res.data);
+    });
+  }
     constructor(props) {
         super(props);
         this.state = {
-            newWorkspaceName: ""
+            newWorkspaceName: "",
+            user_id: ""
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -37,19 +47,39 @@ export default class AddWorkspaceComponent extends React.Component {
                 toast("A workspace with that name already exists!", { type: "error" });
             }
         })
-        axios.get("/api/workspaces", {
-            params: {
-                name: this.state.newWorkspaceName
-            }
+
+        //Add user to workspace
+        let userLoginToken = localStorage.getItem("loginToken");
+        let workspaceID = localStorage.getItem("currWorkspaceID");
+        let workSpJson = {
+	          "user_id": this.state.user_id,
+	          "roles": "volunteer"
+        }
+        axios.post(`/api/workspaces/${workspaceID}/users`,
+          workSpJson,
+        { headers: { "Authorization": `${userLoginToken}`,
+          'Accept' : 'application/json',
+          'Content-Type': 'application/json' }
         }).then(res => {
-            if (res.status == 200) {
-                toast(`Joined ${this.state.newWorkspaceName} workspace`, { type: "success" });
-                localStorage.setItem("currWorkspaceID", res.data._id);
-                console.log(res.data._id)
-            }
+            toast("Successfully added user to workspace", {type: "success"})
+            console.log(res.data);
         }).catch(error => {
-            toast(`An error has occurred: ${error}`, { type: "error" });
+          toast("Failed to add user to workspace", {type: "error"})
+          console.log(error);
         })
+        // axios.get("/api/workspaces", {
+        //     params: {
+        //         name: this.state.newWorkspaceName
+        //     }
+        // }).then(res => {
+        //     if (res.status == 200) {
+        //         toast(`Joined ${this.state.newWorkspaceName} workspace`, { type: "success" });
+        //         localStorage.setItem("currWorkspaceID", res.data._id);
+        //         console.log(res.data._id);
+        //     }
+        // }).catch(error => {
+        //     toast(`An error has occurred: ${error}`, { type: "error" });
+        // })
     }
 
     render() {

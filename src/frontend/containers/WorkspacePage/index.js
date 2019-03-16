@@ -12,6 +12,17 @@ const ListItem = ({ value }) => (
   <li>{value}</li>
 );
 
+// function getName(id){
+//   let userLoginToken = localStorage.getItem("loginToken");
+//   return axios.get(`/api/workspaces/${id}`,
+//   { headers: { "Authorization": `${userLoginToken}`,
+//     'Accept' : 'application/json',
+//     'Content-Type': 'application/json' }
+//   }).then(res => {
+//     return res;
+//   });
+// }
+
 const List = ({ items }) => (
   <ul>
     {
@@ -21,11 +32,44 @@ const List = ({ items }) => (
 );
 
 export default class Workspace extends React.Component {
+  // getNames(){
+  //   let ids = this.state.works;
+  //   let names1 = ids.slice(0);
+  //   let length = ids.length;
+  //   let userLoginToken = localStorage.getItem("loginToken");
+  //   var i;
+  //   for(i = 0; i<length; i++){
+  //     let id = ids[i];
+  //     axios.get(`/api/workspaces/${id}`,
+  //     { headers: { "Authorization": `${userLoginToken}`,
+  //       'Accept' : 'application/json',
+  //       'Content-Type': 'application/json' }
+  //     }).then(res => {
+  //       this.res = res.data;
+  //       return this.res.name;
+  //     }).catch(error => {
+  //       console.log(error);
+  //     })
+  //     console.log(this.state.name);
+  //   }
+  // }
+
   constructor() {
     super();
     this.state = {
-      works: ['Workspace1']
+      works: ['5c8c62f6c2028e560362eb04'],
+      name: "",
+      names: ['']
     };
+  }
+  beforeMount(){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        this.setState({
+          works: res.data.workspaces
+        });
+        console.log(res.data);
+    });
   }
   componentDidMount(){
     let userLoginToken = localStorage.getItem("loginToken");
@@ -44,7 +88,6 @@ export default class Workspace extends React.Component {
         <Redirect to="/login"/>
       );
     }
-    const stuff = ["Workspace 1", "Workspace 2"];
     return (
       <div class="workspacePage">
         <GenericNavigationBar/>
@@ -53,7 +96,7 @@ export default class Workspace extends React.Component {
         	<div class="Total">
         	<div class="Left">
         		<strong>Workspaces you are enrolled in</strong>
-        		<List items={stuff} />
+        		<List items={this.state.works} />
             <strong>List of pending invitations</strong>
         		<ul>
         			<li>Workspace D<br /><button>Accept Invitation</button></li>
