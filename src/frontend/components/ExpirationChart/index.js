@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Bar, Line, Pie} from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 
-class PopularityChart extends Component{
+class ExpirationChart extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -19,12 +19,13 @@ class PopularityChart extends Component{
   render(){
     return (
       <div className="chart">
-        <Bar
+
+        <Line
           data={this.state.chartData}
           options={{
             title:{
               display:this.props.displayTitle,
-              text:'Most Popular Food Items In '+this.props.pantry,
+              text:'Expiring Food Items In '+this.props.pantry,
               fontSize:25
             },
             legend:{
@@ -33,9 +34,10 @@ class PopularityChart extends Component{
             }
           }}
         />
+
       </div>
     )
   }
 }
 
-export default PopularityChart;
+export default ExpirationChart;

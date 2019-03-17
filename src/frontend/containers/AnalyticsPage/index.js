@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PopularityChart from '@/components/PopularityChart';
-
+import QuantityChart from '@/components/QuantityChart';
+import ExpirationChart from '@/components/ExpirationChart';
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
@@ -65,9 +66,11 @@ export default class Analytics extends React.Component {
             What?<br/>
             Your Milk is evolving!<br/>
             Congratulations! Your Milk has evolved into Expired Milk!
+            <ExpirationChart chartData={this.state.chartData} pantry="/Insert Workspace Name Here/" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
             <em>Why?</em> Because Quantity over Quality.
+            <QuantityChart chartData={this.state.chartData} pantry="/Insert Workspace Name Here/" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
             Was gonna make a joke about AnalYtics.. but maybe not..<br/>

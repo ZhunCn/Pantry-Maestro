@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Bar, Line, Pie} from 'react-chartjs-2';
 
-class PopularityChart extends Component{
+class QuantityChart extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -19,12 +19,12 @@ class PopularityChart extends Component{
   render(){
     return (
       <div className="chart">
-        <Bar
+        <Pie
           data={this.state.chartData}
           options={{
             title:{
               display:this.props.displayTitle,
-              text:'Most Popular Food Items In '+this.props.pantry,
+              text:'Distribution Of The Quantity of Food Items In '+this.props.pantry,
               fontSize:25
             },
             legend:{
@@ -38,4 +38,4 @@ class PopularityChart extends Component{
   }
 }
 
-export default PopularityChart;
+export default QuantityChart;
