@@ -46,40 +46,27 @@ export default class AddWorkspaceComponent extends React.Component {
             if (error.response.data.error === "A workspace with that name already exists") {
                 toast("A workspace with that name already exists!", { type: "error" });
             }
+        }).then(()=>{
+          let userLoginToken = localStorage.getItem("loginToken");
+          let workspaceID = localStorage.getItem("currWorkspaceID");
+          let workSpJson = {
+  	          "user_id": this.state.user_id,
+  	          "roles": "volunteer"
+          }
+          axios.post(`/api/workspaces/${workspaceID}/users`,
+            workSpJson,
+          { headers: { "Authorization": `${userLoginToken}`,
+            'Accept' : 'application/json',
+            'Content-Type': 'application/json' }
+          }).then(res => {
+              toast("Successfully added user to workspace", {type: "success"})
+              console.log(res.data);
+          }).catch(error => {
+            toast("Failed to add user to workspace", {type: "error"})
+            console.log(error);
+          })
         })
-
-        //Add user to workspace
-        let userLoginToken = localStorage.getItem("loginToken");
-        let workspaceID = localStorage.getItem("currWorkspaceID");
-        let workSpJson = {
-	          "user_id": this.state.user_id,
-	          "roles": "volunteer"
-        }
-        axios.post(`/api/workspaces/${workspaceID}/users`,
-          workSpJson,
-        { headers: { "Authorization": `${userLoginToken}`,
-          'Accept' : 'application/json',
-          'Content-Type': 'application/json' }
-        }).then(res => {
-            toast("Successfully added user to workspace", {type: "success"})
-            console.log(res.data);
-        }).catch(error => {
-          toast("Failed to add user to workspace", {type: "error"})
-          console.log(error);
-        })
-        // axios.get("/api/workspaces", {
-        //     params: {
-        //         name: this.state.newWorkspaceName
-        //     }
-        // }).then(res => {
-        //     if (res.status == 200) {
-        //         toast(`Joined ${this.state.newWorkspaceName} workspace`, { type: "success" });
-        //         localStorage.setItem("currWorkspaceID", res.data._id);
-        //         console.log(res.data._id);
-        //     }
-        // }).catch(error => {
-        //     toast(`An error has occurred: ${error}`, { type: "error" });
-        // })
+        location.reload();
     }
 
     render() {
