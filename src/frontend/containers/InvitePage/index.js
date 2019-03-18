@@ -142,6 +142,8 @@ export default class Invite extends React.Component {
 
   confirmProcedure() {
     // TODO: Implement add to workplace
+    console.log("Hi");
+
   }
 
 
@@ -175,23 +177,29 @@ export default class Invite extends React.Component {
     axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } })
     .then(res => {
       console.log(res.data.username);
-      return res.data.username;
+      var username = res.data.username;
+      document.getElementById("currentUser").textContent = username;
     });
+  }
+
+  componentDidMount() {
+    this.getCurrentUsername();
 
   }
 
   render() {
     if (authorize()) {
-      
+
       return (
         
         <div class="invitePage">
           <div class="Content">
           <center>
             <h2>You have been invited to the pantry workplace: </h2>
-            <p id="currentUser">You are already signed in as:</p>
+            <p>You are already signed in as: <span id="currentUser"></span></p>
+
             <p>Would you like to join the pantry?</p>
-            <p><button id="confirmButton" class="button" onClick={(e) => this.confirmProcedure()}>Accept</button>
+            <p><button id="confirmButton" class="button"  onClick={(e) => this.confirmProcedure()}>Accept</button>
             <button id="cancelButton" class="button" onClick={(e) => <Redirect to="/"/>}>Decline</button></p>
           </center>
           <div class="Footer"></div>
