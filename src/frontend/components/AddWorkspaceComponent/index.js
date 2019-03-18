@@ -51,7 +51,7 @@ export default class AddWorkspaceComponent extends React.Component {
           let workspaceID = localStorage.getItem("currWorkspaceID");
           let workSpJson = {
   	          "user_id": this.state.user_id,
-  	          "roles": "volunteer"
+  	          "roles": "coordinator"
           }
           axios.post(`/api/workspaces/${workspaceID}/users`,
             workSpJson,
