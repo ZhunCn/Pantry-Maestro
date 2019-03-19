@@ -14,7 +14,8 @@ module.exports = function(router) {
       select: '-_id  -__v',
       populate: {
         path: 'items',
-        select: ' -__v -inventory'
+        select: ' -__v -inventory',
+        match: {name: new RegExp(req.body.name)}
       }
     }).exec((err, inventory) => {
       if (err || !inventory) {
