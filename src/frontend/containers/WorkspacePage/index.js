@@ -8,6 +8,7 @@ import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import AddWorkspaceComponent from "../../components/AddWorkspaceComponent";
 import DisplayWorkspaceComponent from "../../components/DisplayWorkspaceComponent";
+import InviteVolunteerComponent from "../../components/InviteVolunteerComponent";
 
 export default class Workspace extends React.Component {
   //works: 2D array of [workspaceID]
@@ -90,15 +91,7 @@ export default class Workspace extends React.Component {
         	</div>
         	<div class="Right">
         		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
-        		<ul>List of your Workspaces
-        			<li>Workspace A<br /><button>Remove Workspace</button></li>
-        			<li>Workspace B<br /><button>Remove Workspace</button></li>
-        		</ul>
-        		<p><strong>Volunteers</strong></p>
-        		<select>
-        			  <option value="a">Workspace A</option>
-          			<option value="b">Workspace B</option>
-        		</select>
+        		<InviteVolunteerComponent />
         		<ul>
         			<li>Bob Smith<br /><button>Make Admin</button><button>Remove Volunteer</button></li>
         			<li>John Bob<br /><button>Make Admin</button><button>Remove Volunteer</button></li>

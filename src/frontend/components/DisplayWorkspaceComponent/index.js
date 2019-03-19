@@ -18,6 +18,9 @@ export default class DisplayWorkspaceComponent extends React.Component {
   }
   handleLeave(id){
     console.log("LEAVE ID: "+ id);
+    if(id ==localStorage.getItem("currWorkspaceID")){
+      localStorage.setItem("currWorkspaceID", null);
+    }
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post('/api/account/leave',
     {
@@ -29,7 +32,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
       this.props.getInfo();
     }).catch(error => {
       console.log(error.message);
-      this.close1();
       toast(error.message, { type: "error" });
       this.props.getInfo();
     });
@@ -37,6 +39,9 @@ export default class DisplayWorkspaceComponent extends React.Component {
   }
   handleDelete(id){
     console.log("DELETE ID: "+ id);
+    if(id ==localStorage.getItem("currWorkspaceID")){
+      localStorage.setItem("currWorkspaceID", null);
+    }
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post('/api/account/leave',
     {
@@ -69,9 +74,24 @@ export default class DisplayWorkspaceComponent extends React.Component {
   close1 = () => this.setState({ open1: false })
   open2 = () => this.setState({ open2: true })
   close2 = () => this.setState({ open2: false })
+  setCurrentWorkspace(id){
+    localStorage.setItem("currWorkspaceID", id);
+    this.setState({state: this.state});
+  }
   listItem(value){
+    var name = value[0];
+    let workspaceID = localStorage.getItem("currWorkspaceID");
+    var isCurr = value[1]==workspaceID
+    if (isCurr){
+      name = (<strong>{value[0]} (current workspace)</strong>);
+    }
     return (<li>
-    {value[0]} <br/>
+    {name}
+    {isCurr?
+      null:
+      <Button onClick={() => this.setCurrentWorkspace(value[1])}>setWorkspace</Button>
+    }
+    <br/>
     <Modal style = {{margin:20}}
         open={this.state.open1}
         onOpen={this.open1}

@@ -143,7 +143,7 @@ module.exports = function(router) {
                 return;
               }
 
-              res.status(c.status.INTERNAL_SERVER_ERROR).json({'message': 'Removed the user from the workspace'});
+              res.status(c.status.OK).json({'message': 'Removed the user from the workspace'});
               return;
             });
           });

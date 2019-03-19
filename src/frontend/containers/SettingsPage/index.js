@@ -144,7 +144,7 @@ class Popup extends React.Component {
             <h1>Change your Password</h1>
             <form>
             <p>Current password:</p>
-            <input type="text" id="curPasswordInput" name="pass1" placeholder="Current Password"/>
+            <input type="password" id="curPasswordInput" name="pass1" placeholder="Current Password"/>
             <p>New Password:</p>
             <input type="password" id="newPasswordInput" name="pass2" placeholder="New Password"/>
             <p>Confirm Password:</p>
