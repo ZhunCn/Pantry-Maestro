@@ -51,20 +51,13 @@ InviteSchema.pre('save', function(next) {
       cid: 'logo'
     }];
 
-    sendEmail(invite.email, defaultSubject, html, attachments);
+    sendEmail(invite.email, defaultSubject, html, attachments, (err, info) => {
+      next(err);
+    });
+
+    return;
   }
   next();
 });
-
-InviteSchema.methods.sendEmail = function sendEmail(to, subject, body, cb) {
-  sendEmail(to, subject, body, (err, info) => {
-    if (err) {
-      cb(err);
-      return;
-    }
-
-    cb(null, info);
-  });
-}
 
 module.exports = mongoose.model('Invite', InviteSchema);
