@@ -5,6 +5,10 @@
       background-color:  #25BC6E;
       font-size: 24px;
     }
+    .redeemTokenButton:hover {
+      cursor: pointer;
+      background-color: #20A35F;
+    }
   </style>
 </head>
 
@@ -14,9 +18,9 @@
   <p>Token: {{token}}</p> -->
   <body bgcolor = "#EFFCF4" style="margin: 0;padding: 50;">
     <table bgcolor = "#EDE593"align = "center" border="1" cellpadding = "0" cellspacing="0" width = "600" style="border-collapse: collapse">
-      <tr>        
+      <tr>
         <td align="center" style="padding: 40px 0 30px 0;">
-          <img src="PantryMaestroLogo.png" alt="path machine broke" width="400" height="250" style="display: block;">
+          <img src="cid:logo" alt="img" width="400" height="250" style="display: block;"/>
         </td>
       </tr>
 
@@ -25,20 +29,22 @@
           <table bgcolor = "#EFFCF4" border="1" cellpadding="0" cellspacing="0" width="100%">
             <tr>
               <td align="center" style="padding: 20px 20px; font-size: 24px;">
-                <b>Join Pantry Maestro Workspace!</b> 
+                <b>Join Pantry Maestro Workspace!</b>
               </td>
             </tr>
-            
+
             <tr>
               <td align="left" style="padding: 20px 20px; font-size: 18px;">
-                Hello, you were invited to join {{workspace_name}}! To join, please use the invite token below.   
+                Hello, you were invited to join {{workspace_name}}! To join, please click the invite token below.
               </td>
             </tr>
 
             <tr>
               <td align="center" style="padding: 10px 20px;">
                 <div class="boxed">
-                    Token: {{token}}
+                  <form action="https://pantrymaestro.herokuapp.com/join/{{token}}" method="get" target="_blank" style="margin: 0;">
+                    <button class="redeemTokenButton" style="width: 100%; background: none; border: none; font-size: 20px; padding: 10px;">Join {{workspace_name}}</button>
+                  </form>
                 </div>
               </td>
             </tr>

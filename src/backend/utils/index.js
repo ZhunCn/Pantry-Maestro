@@ -58,7 +58,7 @@ function isJSON(input) {
  * @arg     input    String being sanitized
  * @return  Boolean
  */
-function sendEmail(to, subject, body, cb) {
+function sendEmail(to, subject, body, attachments, cb) {
   let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -71,7 +71,8 @@ function sendEmail(to, subject, body, cb) {
     from: process.env.NODEMAILER_EMAIL,
     to: to,
     subject: subject,
-    html: body
+    html: body,
+    attachments: attachments
   }, (err, info) => {
     cb(err, info);
   });

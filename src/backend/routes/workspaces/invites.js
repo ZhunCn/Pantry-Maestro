@@ -27,7 +27,7 @@ module.exports = function(router) {
         return;
       }
 
-      res.status(c.status.OK).json(workspace.invites);
+      res.status(c.status.OK).json({'invites': workspace.invites});
     });
   });
 

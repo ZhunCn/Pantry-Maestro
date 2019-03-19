@@ -37,10 +37,21 @@ InviteSchema.pre('save', function(next) {
   if (invite.token === undefined) {
     invite.token = randToken.generate(tokenLength);
     let html = fs.readFileSync(path.join(__dirname, '../assets/templates/defaultInvite.html'), 'utf8');
-    html = html.replace('{{workspace_name}}', invite.workspace_name);
-    html = html.replace('{{token}}', invite.token);
 
-    sendEmail(invite.email, defaultSubject, html);
+    while (html.indexOf('{{workspace_name}}') != -1) {
+        html = html.replace('{{workspace_name}}', invite.workspace_name);
+    }
+    while (html.indexOf('{{token}}') != -1) {
+        html = html.replace('{{token}}', invite.token);
+    }
+
+    let attachments = [{
+      filename: 'PantryMaestroLogo.png',
+      path: path.join(__dirname, '../assets/templates/PantryMaestroLogo.png'),
+      cid: 'logo'
+    }];
+
+    sendEmail(invite.email, defaultSubject, html, attachments);
   }
   next();
 });
