@@ -7,6 +7,7 @@ import {authorize} from '@/utils';
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import AddWorkspaceComponent from "../../components/AddWorkspaceComponent";
+import DisplayWorkspaceComponent from "../../components/DisplayWorkspaceComponent";
 
 export default class Workspace extends React.Component {
   //works: 2D array of [workspaceID]
@@ -20,50 +21,7 @@ export default class Workspace extends React.Component {
       names: [['','']],
     };
   }
-  handleLeave(id){
-    console.log("LEAVE ID: "+ id);
-    let userLoginToken = localStorage.getItem("loginToken");
-    axios.post('/api/account/leave',
-    {
-      "workspace_id": `${id}`
-    },
-    { headers: { "Authorization": `${userLoginToken}`}
-    }).then(()=>{
-      console.log("Successfully left workspace");
-      this.getInfo();
-    }).catch(error => {
-      console.log(error.message);
-      this.getInfo();
-    });
-  }
-  handleDelete(id){
-    console.log("DELETE ID: "+ id);
-    this.handleLeave(id);
-    let userLoginToken = localStorage.getItem("loginToken");
-    axios.delete(`/api/workspaces/${id}`,
-    { headers: { "Authorization": `${userLoginToken}`}
-    }).then(()=>{
-      console.log("Successfully deleted workspace");
-      this.getInfo();
-    }).catch(error => {
-      console.log(error.message);
-    });
-  }
-  makeList(items){
-    return (<ul>
-      {
-        items.map((item, i) => this.listItem(item))
-      }
-    </ul>);
-  }
 
-  listItem(value){
-    return (<li>
-    {value[0]} <br/>
-    <button onClick={() => this.handleLeave(value[1])}>Leave Workspace</button>
-    <button onClick={() => this.handleDelete(value[1])}>Delete Workspace</button>
-    </li>);
-  }
   getNames(){
     let ids = this.state.works;
     let length = ids.length;
@@ -85,7 +43,6 @@ export default class Workspace extends React.Component {
           this.setState({
             names: [...this.state.names, [res.data.name, id]]
           });
-          console.log(this.state.names);
         }
       }).catch(error => {
         console.log(error);
@@ -129,20 +86,10 @@ export default class Workspace extends React.Component {
         <h2>Workspaces</h2>
         	<div class="Total">
         	<div class="Left">
-        		<strong>Workspaces you are enrolled in</strong>
-            {this.state.names[0][0] != '' ?
-              this.makeList(this.state.names)
-              : <ul>None</ul>
-            }
-            <strong>List of pending invitations</strong>
-        		<ul>
-        			<li>Workspace D<br /><button>Accept Invitation</button></li>
-        			<li>Workspace E<br /><button>Accept Invitation</button></li>
-        		</ul>
-        		<button>Accept All</button>
+        		<DisplayWorkspaceComponent getInfo={()=>{this.getInfo()}} names = {this.state.names} user_id = {this.state.userID}/>
         	</div>
         	<div class="Right">
-        		<AddWorkspaceComponent/>
+        		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
         		<ul>List of your Workspaces
         			<li>Workspace A<br /><button>Remove Workspace</button></li>
         			<li>Workspace B<br /><button>Remove Workspace</button></li>

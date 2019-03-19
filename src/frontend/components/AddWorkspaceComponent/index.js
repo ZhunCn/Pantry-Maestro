@@ -3,7 +3,7 @@ import './styles.scss';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'
-
+import { Form, Input, Button, Icon, Modal } from 'semantic-ui-react'
 
 export default class AddWorkspaceComponent extends React.Component {
   componentDidMount(){
@@ -60,27 +60,27 @@ export default class AddWorkspaceComponent extends React.Component {
             'Content-Type': 'application/json' }
           }).then(res => {
               toast("Successfully added user to workspace", {type: "success"})
+              this.props.getInfo();
               console.log(res.data);
           }).catch(error => {
             toast("Failed to add user to workspace", {type: "error"})
             console.log(error);
           })
         })
-        location.reload();
     }
 
     render() {
         return (
             <div>
                 <ToastContainer autoClose={3000} />
-                <h3>Create a workspace!</h3>
-                <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Name:
-                        <input type="text" class="workspaceTextInput" value={this.state.newWorkspaceName} onChange={this.handleChange} />
-                    </label>
-                    <input type="submit" value="Submit" />
-                </form>
+                <strong>Create a workspace</strong>
+                <Form onSubmit={this.handleSubmit}>
+                  <Form.Field>
+                    <label>Name:</label>
+                    <input type="text" class="workspaceTextInput" value={this.state.newWorkspaceName} onChange={this.handleChange} />
+                  </Form.Field>
+                  <Button type="submit">Submit </Button>
+                </Form>
             </div>
         )
 
