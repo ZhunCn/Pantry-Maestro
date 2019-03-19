@@ -10,10 +10,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
   constructor(props) {
       super(props);
       this.state = {
-          workspaces: this.props.names,
           user_id: this.props.user_id,
           open1: false,
-          open2: false
+          open2: false,
+          works: ['','']
       };
   }
   handleLeave(id){
@@ -78,6 +78,9 @@ export default class DisplayWorkspaceComponent extends React.Component {
     localStorage.setItem("currWorkspaceID", id);
     this.setState({state: this.state});
   }
+  refreshModal(value){
+    this.setState({works: value});
+  }
   listItem(value){
     var name = value[0];
     let workspaceID = localStorage.getItem("currWorkspaceID");
@@ -92,29 +95,29 @@ export default class DisplayWorkspaceComponent extends React.Component {
       <Button onClick={() => this.setCurrentWorkspace(value[1])}>setWorkspace</Button>
     }
     <br/>
-    <Modal style = {{margin:20}}
+    <Modal
         open={this.state.open1}
         onOpen={this.open1}
         onClose={this.close1}
         size="small"
-        trigger={<Button>Leave Workspace</Button>}>
+        trigger={<Button onClick={()=>this.refreshModal(value)}>Leave Workspace</Button>}>
         <Modal.Header>Leave Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
-        <strong>Are you sure you want to leave {value[0]}?</strong><br/>
-        <Button onClick={() => this.handleLeave(value[1])}>Leave Workspace</Button>
+        <strong>Are you sure you want to leave {this.state.works[0]}?</strong><br/>
+        <Button onClick={() => this.handleLeave(this.state.works[1])}>Leave Workspace</Button>
         <Button onClick={this.close1}>Do not leave Workspace</Button>
         </div>
     </Modal>
-    <Modal style = {{margin:20}}
+    <Modal
         open={this.state.open2}
         onOpen={this.open2}
         onClose={this.close2}
         size="small"
-        trigger={<Button>Delete Workspace</Button>}>
+        trigger={<Button onClick={()=>this.refreshModal(value)}>Delete Workspace</Button>}>
         <Modal.Header>Delete Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
-        <strong>Are you sure you want to delete {value[0]}?</strong><br/>
-        <Button onClick={() => this.handleDelete(value[1])}>Delete Workspace</Button>
+        <strong>Are you sure you want to delete {this.state.works[0]}?</strong><br/>
+        <Button onClick={() => this.handleDelete(this.state.works[1])}>Delete Workspace</Button>
         <Button onClick={this.close2}>Do not delete Workspace</Button>
         </div>
     </Modal>
