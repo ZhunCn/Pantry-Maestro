@@ -107,9 +107,15 @@ module.exports = function(router) {
         return;
       }
 
-      workspace.invites = workspace.invites.filter(invite => {
-        return invite != req.params.invite_id;
+      let invites = [];
+
+      workspace.invites.forEach(invite => {
+        if (invite != req.params.invite_id) {
+          invites.push(invite);
+        }
       });
+
+      workspace.invites = invites;
 
       workspace.save(err => {
         if (err) {
