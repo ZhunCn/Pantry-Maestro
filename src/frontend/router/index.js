@@ -19,9 +19,9 @@ const Router = () => {
         <Route exact path="/" component={Home} />
         <Route path="/about" component={About} />
         <Route path="/analytics" component={Analytics} />
-        <Route path="/login" component={Login} />
+        <Route path="/login/:inviteToken?" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/invite" component={Invite} />
+        <Route path="/join/:token" component={Invite} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/settings" component={Settings} />
         <Route path="/workspace" component={Workspace} />
