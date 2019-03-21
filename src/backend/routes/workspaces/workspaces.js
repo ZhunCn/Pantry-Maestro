@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {complete, authorize} = require('utils');
+const {authorize, complete} = require('utils');
 const {Workspace, Inventory} = require('models');
 const c = require('const');
 
@@ -44,58 +44,60 @@ module.exports = function(router) {
    */
   router.post('/api/workspaces/', (req, res) => {
     // Add authorization and add user to workspace
+    authorize(req).then(decoded => {
+      let fields = [
+        'name'
+      ];
 
-    let fields = [
-      'name'
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
-      return;
-    }
-
-    Workspace.findOne({'name': req.body.name}).exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
-        return;
-      }
-      else if (workspace) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that name already exists'});
+      // Check if request contains necessary fields
+      if (fields && !complete(req.body, fields)) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
         return;
       }
 
-      let inventory = new Inventory({
-        'items': []
-      });
-
-      inventory.save((err, inventory) => {
+      Workspace.findOne({'name': req.body.name}).exec((err, workspace) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
           return;
         }
+        else if (workspace && !workspace.deleted) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that name already exists'});
+          return;
+        }
 
-        let workspace = new Workspace({
-          'name': req.body.name,
-          'inventory': inventory['_id'],
-          'users': []
+        let inventory = new Inventory({
+          'items': []
         });
 
-        workspace.save((err, workspace) => {
+        inventory.save((err, inventory) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
             return;
           }
 
-          res.status(c.status.OK).json({
-            'message': 'Successfully created the workspace',
-            'workspace_id': workspace['_id']
+          workspace.name = req.body.name;
+          workspace.inventory = inventory._id;
+          workspace.users = [{
+            account: decoded.user_id,
+            roles: [c.roles.OWNER, c.roles.ADMIN]
+          }];
+          workspace.deleted = false;
+
+          workspace.save((err, workspace) => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
+              return;
+            }
+            res.status(c.status.OK).json({
+              'message': 'Successfully created the workspace',
+              'workspace_id': workspace['_id']
+            });
           });
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error creating the workspace: ' + err});
     });
-
-    // res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not finished'});
   });
 
   /*
@@ -104,7 +106,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id', (req, res) => {
     // Authorize
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -users -deleted').exec((err, workspace) => {
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -users -invites -deleted').exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;
@@ -124,10 +126,7 @@ module.exports = function(router) {
   router.put('/api/workspaces/:workspace_id', (req, res) => {
     authorize(req, {
       'workspace_id': req.params.workspace_id,
-      'roles': [
-        c.roles.OWNER,
-        c.roles.ADMIN
-      ]
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
     }).then(decoded => {
       let fields = [
       ];
@@ -150,35 +149,41 @@ module.exports = function(router) {
    */
   router.delete('/api/workspaces/:workspace_id', (req, res) => {
     // Authenticate and check role
+    authorize(req, {
+      workspace_id: req.params.workspace_id,
+      roles: [c.roles.OWNER]
+    }).then(decoded => {
+      let fields = [
+      ];
 
-    let fields = [
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
-      return;
-    }
-
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
+      // Check if request contains necessary fields
+      if (fields && !complete(req.body, fields)) {
+        res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
         return;
       }
 
-      workspace.set({deleted: true});
-      workspace.save((err) => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
           return;
         }
+        else if (!workspace) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
+          return;
+        }
 
-        res.status(c.status.OK).json({'message': 'Successfully deleted database'});
+        workspace.set({deleted: true});
+        workspace.save((err) => {
+          if (err) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
+            return;
+          }
+
+          res.status(c.status.OK).json({'message': 'Successfully deleted database'});
+        });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error deleting the workspace: ' + err});
     });
   });
 }

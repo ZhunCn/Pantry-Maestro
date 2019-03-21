@@ -6,6 +6,6 @@ module.exports = function(router) {
   require('./analytics.js')(router);
   require('./users.js')(router);
   require('./invites.js')(router);
-
+  require('./analytics.js')(router);
   return router;
 }

@@ -6,6 +6,11 @@ var ItemSchema = new Schema({
     type: String,
     required: true
   },
+  total: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   quantities: {
     type: Object,
     required: true
@@ -18,15 +23,28 @@ var ItemSchema = new Schema({
   collection: 'items'
 });
 
-ItemSchema.virtual('quantities.total').get(() => {
-  return Object.values(this.expirations).reduce((a, b) => a + b);
+ItemSchema.pre('save', function(next) {
+  const item = this;
+
+  var sum = 0;
+  for (date in item.quantities) {
+    sum += item.quantities[date];
+  }
+
+  item.total = sum;
+
+  next();
 });
 
-ItemSchema.virtual('expirations').get(() => {
-  return this.quantities.keys();
-}, {
-  collection: 'items',
-  versionKey: false
+ItemSchema.virtual('expirations').get(function() {
+  const item = this;
+  let keys = [];
+
+  for (key in item.quantities) {
+    keys.push(key);
+  }
+
+  return keys;
 });
 
 module.exports = mongoose.model('Item', ItemSchema);
