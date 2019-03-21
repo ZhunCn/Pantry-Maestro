@@ -78,7 +78,6 @@ export default class Login extends React.Component {
     console.log('Inputted password (loginProcedure): ', this.state.password);
     console.log("Possible token: \"" + this.props.match.params.inviteToken +"\"");
 
-
     this.verifyUser(this.state.username);
     this.verifyPass(this.state.password);
 
@@ -95,13 +94,13 @@ export default class Login extends React.Component {
           'password': this.state.password
         }).then(res => {
           console.log(res.data);
-          if (res.data.error == "Invalid credentials") {
+          if (res.data.error) {
             this.setState({ passwordError: true });
             this.setState({ usernameError: true });
             toast("Username/Password is incorrect. Please try again.", { type: "error" });
           } else {
             localStorage.setItem('loginToken', res.data.token);
-            
+
             if (this.props.match.params.inviteToken) {
               this.props.history.push('/join/' + this.props.match.params.inviteToken);
 
