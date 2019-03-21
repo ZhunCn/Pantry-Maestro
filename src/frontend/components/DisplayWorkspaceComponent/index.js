@@ -13,13 +13,14 @@ export default class DisplayWorkspaceComponent extends React.Component {
           user_id: this.props.user_id,
           open1: false,
           open2: false,
-          works: ['','']
+          works: ['',''],
+          noCurr: false
       };
   }
   handleLeave(id){
     console.log("LEAVE ID: "+ id);
     if(id ==localStorage.getItem("currWorkspaceID")){
-      localStorage.setItem("currWorkspaceID", null);
+      localStorage.setItem("currWorkspaceID", "");
     }
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post('/api/account/leave',
@@ -40,7 +41,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
   handleDelete(id){
     console.log("DELETE ID: "+ id);
     if(id ==localStorage.getItem("currWorkspaceID")){
-      localStorage.setItem("currWorkspaceID", null);
+      localStorage.setItem("currWorkspaceID", "");
     }
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post('/api/account/leave',
@@ -84,7 +85,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
   listItem(value){
     var name = value[0];
     let workspaceID = localStorage.getItem("currWorkspaceID");
-    var isCurr = value[1]==workspaceID
+    var isCurr = value[1]==workspaceID;
     if (isCurr){
       name = (<strong>{value[0]} (current workspace)</strong>);
     }
@@ -92,7 +93,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
     {name}
     {isCurr?
       null:
-      <Button onClick={() => this.setCurrentWorkspace(value[1])}>setWorkspace</Button>
+      <Button style={{marginLeft:5}}size='small' onClick={() => this.setCurrentWorkspace(value[1])}>setWorkspace</Button>
     }
     <br/>
     <Modal
@@ -100,7 +101,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         onOpen={this.open1}
         onClose={this.close1}
         size="small"
-        trigger={<Button onClick={()=>this.refreshModal(value)}>Leave Workspace</Button>}>
+        trigger={<Button size='small' onClick={()=>this.refreshModal(value)}>Leave Workspace</Button>}>
         <Modal.Header>Leave Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to leave {this.state.works[0]}?</strong><br/>
@@ -113,7 +114,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         onOpen={this.open2}
         onClose={this.close2}
         size="small"
-        trigger={<Button onClick={()=>this.refreshModal(value)}>Delete Workspace</Button>}>
+        trigger={<Button size='small' onClick={()=>this.refreshModal(value)}>Delete Workspace</Button>}>
         <Modal.Header>Delete Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to delete {this.state.works[0]}?</strong><br/>

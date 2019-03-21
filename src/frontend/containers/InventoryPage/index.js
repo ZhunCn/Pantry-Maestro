@@ -111,9 +111,28 @@ export default class Inventory extends React.Component {
 
     componentDidMount() {
         // Get the items from the server when the table first loads
-        this.fetchData();
+        this.getCurrWorkspace().then(()=>{
+          this.fetchData();
+        });
     }
-
+    getCurrWorkspace(){
+      let userLoginToken = localStorage.getItem("loginToken");
+      return axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res=>{
+        var workspaces = res.data.workspaces;
+        var curWorkID = localStorage.getItem("currWorkspaceID");
+        var hasCurr = false;
+        if(!curWorkID){
+          localStorage.setItem("currWorkspaceID", workspaces[0]);
+          return;
+        }
+        else{
+          var ind = workspaces.indexOf(curWorkID);
+          if(ind==-1){
+            localStorage.setItem("currWorkspaceID", workspaces[0]);
+          }
+        }
+      });
+    }
     // Get data from server and update state
     fetchData() {
         workspaceID = localStorage.getItem("currWorkspaceID");

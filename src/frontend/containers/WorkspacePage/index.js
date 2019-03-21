@@ -19,12 +19,15 @@ export default class Workspace extends React.Component {
     this.state = {
       userID: '',
       works: [''],
-      names: [['','']],
+      names: [['','']]
     };
   }
 
   getNames(){
     let ids = this.state.works;
+    if(!ids){
+      return;
+    }
     let length = ids.length;
     let userLoginToken = localStorage.getItem("loginToken");
     var i;
@@ -50,7 +53,22 @@ export default class Workspace extends React.Component {
       })
     }
   }
-
+  checkHasCurr(){
+    var workspaces = this.state.works;
+    var curWorkID = localStorage.getItem("currWorkspaceID");
+    var i;
+    var hasCurr = false;
+    if(!curWorkID&&workspaces[0]!=''){
+      localStorage.setItem("currWorkspaceID", workspaces[0]);
+      return;
+    }
+    else{
+      var ind = workspaces.indexOf(curWorkID);
+      if(ind==-1){
+        localStorage.setItem("currWorkspaceID", workspaces[0]);
+      }
+    }
+  }
   componentDidMount(){
     this.getInfo();
   }
@@ -68,6 +86,7 @@ export default class Workspace extends React.Component {
         });
         console.log(res.data);
     }).then(()=>{
+      this.checkHasCurr();
       this.getNames();
     }).then(()=>{
       console.log(this.state);
