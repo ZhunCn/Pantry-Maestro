@@ -1,5 +1,4 @@
 const HtmlPlugin = require('html-webpack-plugin');
-const BrotliPlugin = require('brotli-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
 const path = require('path');
