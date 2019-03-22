@@ -121,9 +121,9 @@ export default class Invite extends React.Component {
               document.getElementById("successParagraph").textContent = "Successfully registered and logged in!";
               document.getElementById("successParagraph").style = "color:green;";
 
-              getCurrentUsername();
+              self.getCurrentUsername();
 
-              confirmProcedure();
+              self.confirmProcedure();
             })
               .catch((error) => {
                 console.log(error.data);
@@ -162,7 +162,7 @@ export default class Invite extends React.Component {
         return;
       }
       else {
-        this.props.history.push('/inventory');
+        self.props.history.push('/inventory');
       }
     });
   }
