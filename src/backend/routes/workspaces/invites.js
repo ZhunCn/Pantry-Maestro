@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {Workspace, Invite} = require('models');
+const {Workspace, Invite, User} = require('models');
 const {complete} = require('utils');
 const c = require('const');
 
@@ -249,7 +249,7 @@ module.exports = function(router) {
     }
 
     Invite.findOne({'token': req.body.invite}).exec((err, invite) => {
-      if (err) {
+      if (err || !invite) {
         res.json({'error': 'There was an error joining the workspace: ' + err});
         return;
       }
