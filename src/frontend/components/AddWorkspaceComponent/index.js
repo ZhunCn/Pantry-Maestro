@@ -34,9 +34,13 @@ export default class AddWorkspaceComponent extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
+        let userLoginToken = localStorage.getItem("loginToken");
         axios.post("/api/workspaces", {
             name: this.state.newWorkspaceName
-        }).then(res => {
+          }, { headers: { "Authorization": `${userLoginToken}`,
+          'Accept' : 'application/json',
+          'Content-Type': 'application/json' }
+          }).then(res => {
             if (res.status === 200) {
                 toast("The workspace has been successfully created!", { type: "success" });
                 console.log(res.data.workspace_id);
@@ -47,7 +51,6 @@ export default class AddWorkspaceComponent extends React.Component {
                 toast("A workspace with that name already exists!", { type: "error" });
             }
         }).then(()=>{
-          let userLoginToken = localStorage.getItem("loginToken");
           let workspaceID = localStorage.getItem("currWorkspaceID");
           let workSpJson = {
   	          "user_id": this.state.user_id,
