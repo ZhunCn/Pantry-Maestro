@@ -25,7 +25,9 @@ var InviteSchema = new Schema({
     unique: true
   },
   expires: {
-    type: Date
+    type: Date,
+    required: true,
+    default: new Date(Date.now() + 7 * 24 * 3600 * 1000)
   }
 }, {
   collection: 'invites'

@@ -110,12 +110,14 @@ export default class Invite extends React.Component {
 
             // Log into the newly made account, then procede to add account to workspace
 
+            let self = this;
             axios.post('/api/auth/login', {
               'username': username,
               'password': password
             }).then(res => {
               console.log(res.data);
               localStorage.setItem('loginToken', res.data.token);
+              self.setState({'loginToken': res.data.token});
               document.getElementById("successParagraph").textContent = "Successfully registered and logged in!";
               document.getElementById("successParagraph").style = "color:green;";
 
@@ -144,7 +146,26 @@ export default class Invite extends React.Component {
 
   confirmProcedure() {
     // TODO: Implement add to workplace
-    console.log("Hi");
+    console.log('Invite: ' + this.state.inviteToken);
+    console.log('Id: ' + localStorage.getItem("userId"));
+
+    let self = this;
+    axios.post("/api/workspaces/invites/join", {
+      'invite': self.state.inviteToken,
+      'user_id': localStorage.getItem("userId")
+    }).then(res => {
+      console.log(res);
+      if (res.data.err) {
+        toast("There was an error joining the workspace", { type: "error" });
+        return;
+      }
+      else {
+        this.props.history.push('/inventory');
+      }
+    });
+  }
+
+  denyProcedure() {
 
   }
 
@@ -157,11 +178,13 @@ export default class Invite extends React.Component {
   getCurrentUsername() {
     console.log("Grabbing current Username!");
     let userLoginToken = localStorage.getItem("loginToken");
+    let self = this;
     axios.get("/api/account", { headers: { "Authorization": `${userLoginToken}` } })
       .then(res => {
         console.log(res.data.username);
-        var username = res.data.username;
-        document.getElementById("currentUser").textContent = username;
+        localStorage.setItem("userId", res.data._id);
+        self.setState({'userId': res.data._id});
+        document.getElementById("currentUser").textContent = res.data.username;
       });
   }
 
@@ -169,7 +192,8 @@ export default class Invite extends React.Component {
     if (authorize()) {
       this.getCurrentUsername();
     }
-    var inviteToken = this.props.match.params.token;
+
+    this.setState({'inviteToken': this.props.match.params.token});
   }
 
   render() {
@@ -185,7 +209,7 @@ export default class Invite extends React.Component {
 
               <p>Would you like to join the pantry?</p>
               <p><button id="confirmButton" class="button" onClick={(e) => this.confirmProcedure()}>Accept</button>
-                <button id="cancelButton" class="button" onClick={(e) => <Redirect to="/" />}>Decline</button></p>
+                <button id="cancelButton" class="button" onClick={(e) => this.denyProcedure()}>Decline</button></p>
             </center>
             <div class="Footer"></div>
             <div class="Flex">

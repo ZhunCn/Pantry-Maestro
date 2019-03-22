@@ -1,4 +1,4 @@
-const {User, Workspace} = require('models');
+const {Invite, User, Workspace} = require('models');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 

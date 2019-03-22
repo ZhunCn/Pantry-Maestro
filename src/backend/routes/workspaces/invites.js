@@ -76,7 +76,7 @@ module.exports = function(router) {
             return;
           }
 
-          res.status(c.status.OK).json({'error': 'Successfully created invite', 'invite_id': invite['_id']});
+          res.status(c.status.OK).json({'invite_id': invite['_id']});
         });
       });
     });
@@ -138,30 +138,160 @@ module.exports = function(router) {
   /*
    * Confirm an invitation
    */
-  // router.post('/api/workspaces/:workspace_id/invites/confirm', (req, res) => {
-  //   // Authorize
-  //
-  //   let fields = [
-  //     'token'
-  //   ];
-  //
-  //   // Check if request contains necessary fields
-  //   if (fields && !complete(req.body, fields)) {
-  //     res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
-  //     return;
-  //   }
-  //
-  //   Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v').populate('invites').exec((err, workspace) => {
-  //     if (err) {
-  //       res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-  //       return;
-  //     }
-  //     else if (!workspace) {
-  //       res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
-  //       return;
-  //     }
-  //
-  //
-  //   });
-  // });
+  router.post('/api/workspaces/:workspace_id/invites/validate', (req, res) => {
+    // Authorize
+
+    let fields = [
+      'invite'
+    ];
+
+    // Check if request contains necessary fields
+    if (fields && !complete(req.body, fields)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      return;
+    }
+
+    Invite.findOne({'token': req.body.invite}).exec((err, invite) => {
+      if (err) {
+        res.json({'error': 'There was an error validating: ' + invite});
+        return;
+      }
+      else if (!invite) {
+        res.json({'error': 'Token doesn\'t exist'});
+        return;
+      }
+
+      res.json({'message': 'Token is valid'});
+    });
+  });
+
+  /*
+   * Confirm an invitation
+   */
+  router.post('/api/workspaces/:workspace_id/invites/invalidate', (req, res) => {
+    // Authorize
+
+    let fields = [
+      'invite'
+    ];
+
+    // Check if request contains necessary fields
+    if (fields && !complete(req.body, fields)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      return;
+    }
+
+    Invite.findOneAndDelete({'token': req.body.invite}).exec((err, invite) => {
+      if (err) {
+        res.json({'error': 'There was an error validating: ' + invite});
+        return;
+      }
+      else if (!invite) {
+        res.json({'error': 'Token doesn\'t exist'});
+        return;
+      }
+
+      Workspace.findOne({'_id': invite.workspace, 'deleted': false}).exec((err, workspace) => {
+        if (err || !workspace) {
+          res.json({'error': 'There was an error invalidating: ' + invite});
+          return;
+        }
+
+        let invites = [];
+
+        workspace.invites.forEach(invite => {
+          if (invite != invite._id) {
+            invites.push(invite);
+          }
+        });
+
+        workspace.invites = invites;
+        workspace.save(err => {
+          if (err) {
+            res.json({'error': 'There was an error invalidating: ' + err});
+            return;
+          }
+
+          res.json({'message': 'Successfully invalidated the token'});
+        });
+      });
+    });
+  });
+
+  /*
+   * Confirm an invitation
+   */
+  router.post('/api/workspaces/invites/join', (req, res) => {
+    // Authorize
+
+    let fields = [
+      'invite',
+      'user_id'
+    ];
+
+    // Check if request contains necessary fields
+    if (fields && !complete(req.body, fields)) {
+      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+      return;
+    }
+
+    Invite.findOne({'token': req.body.invite}).exec((err, invite) => {
+      if (err) {
+        res.json({'error': 'There was an error joining the workspace: ' + err});
+        return;
+      }
+
+      Workspace.findOne({'_id': invite.workspace, 'deleted': false}).select('-__v').populate('invites').exec((err, workspace) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
+          return;
+        }
+        else if (workspace.users.includes(req.body.user_id)) {
+          res.json({'error': 'You are already a part of this workspace'});
+          return;
+        }
+
+        workspace.users.push({
+          account: req.body.user_id,
+          roles: c.roles.MEMBER
+        });
+
+        workspace.save((err) => {
+          if (err) {
+            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+            return;
+          }
+
+          User.findOne({'_id': req.body.user_id}).exec((err, user) => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error accepting invitation ' + err});
+              return;
+            }
+
+            user.workspaces.push(workspace._id);
+
+            user.save(err => {
+              if (err) {
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error accepting invitation: ' + err});
+                return;
+              }
+
+              Invite.deleteOne({'token': req.body.invite}).exec(err => {
+                if (err) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error accepting invitation: ' + err});
+                  return;
+                }
+
+                res.json({'message': 'Successfully joined workspace'});
+              });
+            });
+          });
+        });
+      });
+    });
+  });
 }

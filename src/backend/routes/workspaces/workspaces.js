@@ -75,13 +75,22 @@ module.exports = function(router) {
             return;
           }
 
-          workspace.name = req.body.name;
-          workspace.inventory = inventory._id;
-          workspace.users = [{
-            account: decoded.user_id,
-            roles: [c.roles.OWNER, c.roles.ADMIN]
-          }];
-          workspace.deleted = false;
+          if (!workspace) {
+            workspace = new Workspace({
+              'name': req.body.name,
+              'inventory': inventory['_id'],
+              'users': []
+            });
+          }
+          else {
+            workspace.name = req.body.name;
+            workspace.inventory = inventory._id;
+            workspace.users = [{
+              account: decoded.user_id,
+              roles: [c.roles.OWNER, c.roles.ADMIN]
+            }];
+            workspace.deleted = false;
+          }
 
           workspace.save((err, workspace) => {
             if (err) {
