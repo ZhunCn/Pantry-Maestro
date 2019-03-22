@@ -152,7 +152,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <Modal.Header>Leave Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to leave {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.checkAndLeave(this.state.works[1])}>Leave Workspace</Button>
+        <Button onClick={() => this.checkLeave(this.state.works[1])}>Leave Workspace</Button>
         <Button onClick={this.closeAll}>Do not leave Workspace</Button>
         </div>
     </Modal>
