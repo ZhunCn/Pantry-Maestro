@@ -124,6 +124,10 @@ module.exports = function(router) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with this given id'});
           return;
         }
+        else if (workspace.users.length === 1) {
+          res.json({'error': 'You can\'t leave the workspace if you\'re the last member in it'});
+          return;
+        }
 
         workspace.hasUser(decoded.user_id, (has, user) => {
           if (!has) {
@@ -150,7 +154,6 @@ module.exports = function(router) {
         });
       });
     }).catch(err => {
-      console.log(err);
       res.json({'error': 'There was an error leaving this workspace: ' + err});
     });
   });
