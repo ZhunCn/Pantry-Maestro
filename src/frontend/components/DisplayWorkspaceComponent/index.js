@@ -14,18 +14,19 @@ export default class DisplayWorkspaceComponent extends React.Component {
           open1: false,
           open2: false,
           works: ['',''],
-          noCurr: false
+          noCurr: false,
+          field: 0
       };
   }
   checkAndLeave(id){
+    console.log("ID"+id);
     let userLoginToken = localStorage.getItem("loginToken");
     return axios.get(`api/workspaces/${id}/users`,
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
       'Content-Type': 'application/json' }}).then(res=>{
-        console.log("length: "+res.data.user.length);
-        if(res.data.users.length>1){
-          this.handleLeave();
+        if(res.data.users.length>2){
+          this.checkLeave();
         }
         else{
           this.closeAll();
@@ -50,7 +51,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
       toast("User has left the workspace", { type: "success" });
       this.props.getInfo();
     }).catch(error => {
-      console.log(error.message);
       toast(error.message, { type: "error" });
       this.props.getInfo();
     });
@@ -86,6 +86,26 @@ export default class DisplayWorkspaceComponent extends React.Component {
     });
     this.closeAll();
   }
+  checkDelete(id){
+    if(this.props.names.length==1&&this.props.names[0][0]!=''){
+      console.log("This is your last workspace.");
+      this.closeAll();
+      this.setState({field:0, open4:true});
+    }
+    else{
+      this.handleDelete(id);
+    }
+  }
+  checkLeave(id){
+    if(this.props.names.length==1&&this.props.names[0][0]!=''){
+      console.log("This is your last workspace.");
+      this.closeAll();
+      this.setState({field:0, open4:true});
+    }
+    else{
+      this.handleLeave(id);
+    }
+  }
   makeList(items){
     return (<ul>
       {
@@ -93,13 +113,15 @@ export default class DisplayWorkspaceComponent extends React.Component {
       }
     </ul>);
   }
-  closeAll = () => this.setState({open1: false, open2:false, open3:false})
+  closeAll = () => this.setState({open1: false, open2:false, open3:false, open4:false})
   open1 = () => this.setState({ open1: true })
   close1 = () => this.setState({ open1: false })
   open2 = () => this.setState({ open2: true })
   close2 = () => this.setState({ open2: false })
   open3 = () => this.setState({ open3: true })
   close3 = () => this.setState({ open3: false })
+  open4 = () => this.setState({ open3: true })
+  close4 = () => this.setState({ open3: false })
   setCurrentWorkspace(id){
     localStorage.setItem("currWorkspaceID", id);
     this.setState({state: this.state});
@@ -130,7 +152,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <Modal.Header>Leave Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to leave {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.handleLeave(this.state.works[1])}>Leave Workspace</Button>
+        <Button onClick={() => this.checkAndLeave(this.state.works[1])}>Leave Workspace</Button>
         <Button onClick={this.closeAll}>Do not leave Workspace</Button>
         </div>
     </Modal>
@@ -143,7 +165,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <Modal.Header>Delete Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to delete {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.handleDelete(this.state.works[1])}>Delete Workspace</Button>
+        <Button onClick={() => this.checkDelete(this.state.works[1])}>Delete Workspace</Button>
         <Button onClick={this.closeAll}>Do not delete Workspace</Button>
         </div>
     </Modal>
@@ -157,7 +179,21 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <strong>You are the only user in the workspace.<br/>
         If you leave, this workspace will be deleted.<br/>
         Are you sure you want to leave {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.handleDelete(this.state.works[1])}>Delete Workspace</Button>
+        <Button onClick={() => this.checkDelete(this.state.works[1])}>Delete Workspace</Button>
+        <Button onClick={this.closeAll}>Do not delete Workspace</Button>
+        </div>
+    </Modal>
+    <Modal
+        open={this.state.open4}
+        onOpen={this.open4}
+        onClose={this.closeAll}
+        size="tiny">
+        <Modal.Header>Leave last Workspace?</Modal.Header>
+        <div class="contain" style = {{margin:20}}>
+        <strong>This is your only workspace.<br/>
+        If you {this.state.field ? "leave" : "delete"} this workspace, you will not have any workspaces left.<br/>
+        Are you sure you want to {this.state.field ? "leave" : "delete"} {this.state.works[0]}?</strong><br/>
+        <Button onClick={() => this.state.field ? this.handleLeave(this.state.works[1]): this.handleDelete(this.state.works[1])}>Delete Workspace</Button>
         <Button onClick={this.closeAll}>Do not delete Workspace</Button>
         </div>
     </Modal>
