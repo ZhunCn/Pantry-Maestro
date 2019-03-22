@@ -47,7 +47,13 @@ module.exports = function(router) {
       return;
     }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v').populate('invites').exec((err, workspace) => {
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v')
+    .populate('invites')
+    .populate({
+      path: 'users.account',
+      select: '-__v -workspaces -salt -hash'
+    })
+    .exec((err, workspace) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
         return;
@@ -55,6 +61,13 @@ module.exports = function(router) {
       else if (!workspace) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
         return;
+      }
+
+      for (let i = 0; i < workspace.users.length; i++) {
+        if (workspace.users[i].account.email == req.body.email) {
+          res.json({'error': 'A user with this email is already in this workspace'});
+          return;
+        }
       }
 
       let invite = new Invite({
