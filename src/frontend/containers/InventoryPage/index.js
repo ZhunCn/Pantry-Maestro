@@ -111,27 +111,27 @@ export default class Inventory extends React.Component {
 
     componentDidMount() {
         // Get the items from the server when the table first loads
-        this.getCurrWorkspace().then(()=>{
-          this.fetchData();
+        this.getCurrWorkspace().then(() => {
+            this.fetchData();
         });
     }
-    getCurrWorkspace(){
-      let userLoginToken = localStorage.getItem("loginToken");
-      return axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res=>{
-        var workspaces = res.data.workspaces;
-        var curWorkID = localStorage.getItem("currWorkspaceID");
-        var hasCurr = false;
-        if(!curWorkID){
-          localStorage.setItem("currWorkspaceID", workspaces[0]);
-          return;
-        }
-        else{
-          var ind = workspaces.indexOf(curWorkID);
-          if(ind==-1){
-            localStorage.setItem("currWorkspaceID", workspaces[0]);
-          }
-        }
-      });
+    getCurrWorkspace() {
+        let userLoginToken = localStorage.getItem("loginToken");
+        return axios.get("/api/account", { headers: { "Authorization": `${userLoginToken}` } }).then(res => {
+            var workspaces = res.data.workspaces;
+            var curWorkID = localStorage.getItem("currWorkspaceID");
+            var hasCurr = false;
+            if (!curWorkID) {
+                localStorage.setItem("currWorkspaceID", workspaces[0]);
+                return;
+            }
+            else {
+                var ind = workspaces.indexOf(curWorkID);
+                if (ind == -1) {
+                    localStorage.setItem("currWorkspaceID", workspaces[0]);
+                }
+            }
+        });
     }
     // Get data from server and update state
     fetchData() {
@@ -276,8 +276,8 @@ export default class Inventory extends React.Component {
                     return a.toLowerCase() > b.toLowerCase()
                         ? 1
                         : b.toLowerCase() > a.toLowerCase()
-                        ? -1
-                        : 0;
+                            ? -1
+                            : 0;
                 },
                 filterMethod: (filter, row) => {
                     return (
@@ -598,13 +598,17 @@ export default class Inventory extends React.Component {
                             }}
                         />
                         <Modal
+                            style={{
+                                marginTop: '0px !important',
+                                marginLeft: 'auto',
+                                marginRight: 'auto'
+                            }}
                             trigger={
                                 <Button icon labelPosition="left" size="small">
                                     <Icon name="add" />
                                     Add new item
                                 </Button>
-                            }
-                            centered={false}>
+                            }>
                             <Modal.Header>Add a new item</Modal.Header>
                             <AddChangeItemComponent
                                 fetchData={() => {
