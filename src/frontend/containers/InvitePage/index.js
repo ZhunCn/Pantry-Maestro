@@ -121,6 +121,8 @@ export default class Invite extends React.Component {
               document.getElementById("successParagraph").textContent = "Successfully registered and logged in!";
               document.getElementById("successParagraph").style = "color:green;";
 
+              getCurrentUsername();
+
               confirmProcedure();
             })
               .catch((error) => {
@@ -166,7 +168,7 @@ export default class Invite extends React.Component {
   }
 
   denyProcedure() {
-
+    this.props.history.push('/inventory');  
   }
 
   onInputChange(event) {
@@ -196,15 +198,17 @@ export default class Invite extends React.Component {
     this.setState({'inviteToken': this.props.match.params.token});
   }
 
-  render() {
-    if (authorize()) {
+  
 
+  render() {
+    
+    if (authorize()) {
       return (
 
         <div class="invitePage">
           <div class="Content">
             <center>
-              <h2>You have been invited to the pantry workplace: <span id="workspaceLbl"></span></h2>
+              <h2>You have been invited to a Pantry Workplace!<span id="workspaceLbl"></span></h2>
               <p>You are already signed in as: <span id="currentUser"></span></p>
 
               <p>Would you like to join the pantry?</p>
@@ -224,7 +228,7 @@ export default class Invite extends React.Component {
         <div class="invitePage">
           <div class="Content">
             <center>
-              <h2>You have been invited to the pantry workplace: <span id="workspaceLbl"></span></h2>
+              <h2>You have been invited to a Pantry Workplace!<span id="workspaceLbl"></span></h2>
 
               <p>Not already a member in Pantry Maestro? Sign up here!</p>
               <ToastContainer autoClose={3000} />

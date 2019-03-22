@@ -64,6 +64,30 @@ function verifyPass(password){
 }
 
 class Popup extends React.Component {
+
+  constructor() {
+    super();
+    this.state = {
+      user: "currentUsername",
+      name: "Firstname Lastname",
+      email: "email@email.com"
+    };
+  }
+
+  refreshData(){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get("/api/account", { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        this.setState({
+          user: res.data.username,
+          email: res.data.email
+        });
+        console.log(res.data);
+    });
+  }
+  componentDidMount(){
+    this.refreshData();
+  }
+
   render() {
     //Popup for username change
     if(this.props.text=="username"){
@@ -72,7 +96,7 @@ class Popup extends React.Component {
           <div className='popup_inner'>
             <h1>Change your username</h1>
             <p>Current Username:</p>
-            <p><i>username here</i></p>
+            <p><i>{this.state.user}</i></p>
             <form>
             <p>New Username:</p>
             <input type="text" id="usernameInput" name="username" placeholder="Username"/>
@@ -90,7 +114,7 @@ class Popup extends React.Component {
           <div className='popup_inner'>
             <h1>Change your name</h1>
             <p>Current name:</p>
-            <p><i>name here</i></p>
+            <p><i>{this.state.name}</i></p>
             <form>
             <p>First Name:</p>
             <input type="text" id="firstnameInput" name="firstname" placeholder="First name"/>
@@ -110,7 +134,7 @@ class Popup extends React.Component {
           <div className='popup_inner'>
             <h1>Change your email</h1>
             <p>Current Email:</p>
-            <p><i>email here</i></p>
+            <p><i>{this.state.email}</i></p>
             <form>
             <p>New Email:</p>
             <input type="text" id="emailInput" name="email" placeholder="email"/>
@@ -300,10 +324,10 @@ export default class Settings extends React.Component {
       'Accept' : 'application/json',
       'Content-Type': 'application/json' }
     }).then(res => {
-        toast("Successfully updated email", {type: "success"})
+        toast("Successfully updated username", {type: "success"})
         console.log(res.data);
     }).catch(error => {
-      toast("Failed to update email", {type: "error"})
+      toast("Failed to update username", {type: "error"})
       console.log(error);
     })
   }
