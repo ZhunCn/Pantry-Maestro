@@ -383,15 +383,10 @@ export default class Settings extends React.Component {
 	        <div class="col">
             <p><strong>Username: </strong><i>{this.state.user}</i></p>
             <button onClick={() => {this.togglePopup("username")}}>Change Username</button>
-            <p><strong>Name: </strong><i>{this.state.name}</i></p>
-            <button onClick={() => {this.togglePopup("name")}}>Change Name</button>
             <p><strong>Email: </strong><i>{this.state.email}</i></p>
             <button onClick={() => {this.togglePopup("email")}}>Change Email</button>
 	        </div>
 	        <div class="col">
-            <p><strong>Workspace Information: </strong></p>
-		        <p><i>{this.state.curWorkspace}</i></p>
-  			    <button onClick={() => {this.togglePopup("leave")}}>Leave Workspace</button>
 			      <p><strong>Change Password:</strong></p>
             <button onClick={() => {this.togglePopup("password")}}>Change Password</button><br />
             <button onClick={() => {this.togglePopup("logout")}}>Log out</button>

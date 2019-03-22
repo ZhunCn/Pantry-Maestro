@@ -1,6 +1,9 @@
 @charset "UTF-8";
 
 .workspacePage {
+  * {
+    box-sizing: border-box;
+  }
   display:flex;
   .Content {
     flex: 1;
@@ -8,12 +11,8 @@
     margin-top: 24px;
   }
   .Total {
-      column-count: 2;
-      column-rule-style: solid;
-      column-rule-width: 1px;
-      display: block;
-  	margin-top: 0px;
-  	margin-bottom: 70px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   }
   .Total .Left {
   	vertical-align: top;

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import {Link, Redirect} from "react-router-dom";
 import axios from 'axios';
 import {authorize} from '@/utils';
-
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import './styles.scss';
 import AddWorkspaceComponent from "../../components/AddWorkspaceComponent";
@@ -111,10 +110,6 @@ export default class Workspace extends React.Component {
         	<div class="Right">
         		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
         		<InviteVolunteerComponent />
-        		<ul>
-        			<li>Bob Smith<br /><button>Make Admin</button><button>Remove Volunteer</button></li>
-        			<li>John Bob<br /><button>Make Admin</button><button>Remove Volunteer</button></li>
-        		</ul>
         		</div>
         	</div>
         </div>
