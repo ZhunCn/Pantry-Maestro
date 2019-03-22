@@ -23,6 +23,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
       'Content-Type': 'application/json' }}).then(res=>{
+        console.log("length: "+res.data.user.length);
         if(res.data.users.length>1){
           this.handleLeave();
         }
@@ -61,6 +62,17 @@ export default class DisplayWorkspaceComponent extends React.Component {
       localStorage.setItem("currWorkspaceID", "");
     }
     let userLoginToken = localStorage.getItem("loginToken");
+    axios.delete(`/api/workspaces/${id}`,
+      { headers: { "Authorization": `${userLoginToken}`,
+      'Accept' : 'application/json',
+      'Content-Type': 'application/json' }
+    }).then(()=>{
+      toast("The workspace has been successfully deleted", { type: "success" });
+      this.props.getInfo();
+    }).catch(error => {
+      toast(error.message, { type: "error" });
+      console.log(error.message);
+    });
     axios.post('/api/account/leave',
     {
       "workspace_id": `${id}`
@@ -71,15 +83,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
     }).catch(error => {
       console.log(error.message);
       toast(error.message, { type: "error" });
-    });
-    axios.delete(`/api/workspaces/${id}`,
-    { headers: { "Authorization": `${userLoginToken}`}
-    }).then(()=>{
-      toast("The workspace has been successfully deleted", { type: "success" });
-      this.props.getInfo();
-    }).catch(error => {
-      toast(error.message, { type: "error" });
-      console.log(error.message);
     });
     this.closeAll();
   }

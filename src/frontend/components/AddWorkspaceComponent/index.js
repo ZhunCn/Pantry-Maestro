@@ -69,7 +69,7 @@ export default class AddWorkspaceComponent extends React.Component {
             toast("Failed to add user to workspace", {type: "error"})
             console.log(error);
           })
-        })
+        });
     }
 
     render() {
