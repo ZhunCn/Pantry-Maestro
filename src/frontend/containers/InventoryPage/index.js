@@ -11,9 +11,9 @@ import "react-datepicker/dist/react-datepicker.css";
 import { sum, authorize } from "@/utils";
 
 import AddChangeItemComponent from "@/components/AddChangeItemComponent";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
-import { Button, Icon, Modal } from "semantic-ui-react";
+import { Button, Icon, Modal, Form } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
@@ -107,6 +107,7 @@ export default class Inventory extends React.Component {
             dateRangeStart: undefined,
             dateRangeEnd: undefined,
         };
+        this.editNameInput = React.createRef();
     }
 
     componentDidMount() {
@@ -257,8 +258,23 @@ export default class Inventory extends React.Component {
         // toast that item has been deleted
     }
 
-    handleEditName(item) {
-        // console.log(item);
+    handleEditNameButton(row) {
+        workspaceID = localStorage.getItem("currWorkspaceID");
+        let itemID = row.subRows[0]._original.id;
+        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
+            data: { name: this.editNameInput.current.value }
+        }).then(res => {
+            if (res.status === 200) {
+                console.log("Updated name");
+                toast("Updated name successfully", { type: "success" });
+                this.fetchData();
+            }
+        }).catch(error => {
+            console.log(error.response);
+            toast(`There was error updating the name of this item. ${error}`, {
+                type: "error",
+            });
+        });
     }
 
     render() {
@@ -285,25 +301,51 @@ export default class Inventory extends React.Component {
                             .toLowerCase()
                             .indexOf(filter.value.toLowerCase()) !== -1
                     );
+                }
+            },
+            {
+                Header: "",
+                id: "editName",
+                aggregate: vals => {
+                    // Don't delete plz
                 },
-                PivotValue: row => {
-                    console.log(row);
-                    return (
-                        <div style={{ display: "inline" }}>
-                            <label>{row.row.name}</label>
-                            <div style={editButtonStyle}>
-                                <Button
-                                    compact
-                                    style={{ padding: "6px 7px 6px 7px" }}
-                                    onClick={() =>
-                                        this.handleEditName(row.row)
-                                    }>
-                                    Edit Name
-                                </Button>
-                            </div>
-                        </div>
-                    );
+                Cell: row => {
+                    if (!row.original) {
+                        return (
+                            <Modal trigger={<Button
+                                compact
+                                fluid
+                                style={{
+                                    padding:
+                                        "6px 7px 6px 7px",
+                                }}
+                                style={{ padding: "10px" }}>Edit Name</Button>}>
+                                <Modal.Header>Edit Name</Modal.Header>
+                                <Modal.Content>
+                                    <Form style={{ padding: "10px" }}>
+                                        <label>Enter a new name:</label>
+                                        <input
+                                            type="text"
+                                            ref={this.editNameInput} />
+                                        <Button
+                                            style={{ marginTop: "10px" }}
+                                            floated='right'
+                                            positive
+                                            onClick={() => this.handleEditNameButton(row)}>Submit</Button>
+                                    </Form>
+                                </Modal.Content>
+                            </Modal>
+                        )
+                    } else {
+                        return (
+                            <label></label> // empty cell
+                        )
+                    }
                 },
+                sortable: false,
+                filterable: false,
+                resizable: false,
+                width: 90,
             },
             {
                 Header: "Earliest Expiration Date",
@@ -582,6 +624,7 @@ export default class Inventory extends React.Component {
 
         return (
             <div class="inventoryPage">
+                <ToastContainer autoClose={3000} />
                 <GenericNavigationBar />
                 <div class="Content" style={{ position: "relative" }}>
                     <div
