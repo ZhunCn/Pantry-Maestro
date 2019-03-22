@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {authorize, complete} = require('utils');
-const {Workspace, Inventory} = require('models');
+const {Workspace, Inventory, User} = require('models');
 const c = require('const');
 
 module.exports = function(router) {
@@ -100,9 +100,26 @@ module.exports = function(router) {
               res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error adding the workspace'});
               return;
             }
-            res.status(c.status.OK).json({
-              'message': 'Successfully created the workspace',
-              'workspace_id': workspace['_id']
+
+            User.findOne({'_id': decoded.user_id}).exec((err, user) => {
+              if (err || !user) {
+                res.json({'error': 'There was an error adding you to the workspace: ' + err});
+                return;
+              }
+
+              user.workspaces.push(workspace._id);
+
+              user.save(err => {
+                if (err) {
+                  res.json({'error': 'There was an error adding the workspace'});
+                  return;
+                }
+
+                res.status(c.status.OK).json({
+                  'message': 'Successfully created the workspace',
+                  'workspace_id': workspace['_id']
+                });
+              });
             });
           });
         });
