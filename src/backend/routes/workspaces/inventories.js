@@ -14,7 +14,7 @@ module.exports = function(router) {
       select: '-_id  -__v',
       populate: {
         path: 'items',
-        select: ' -__v -inventory',
+        select: ' -__v -inventory -expired',
         match: {name: new RegExp(req.body.name)}
       }
     }).exec((err, inventory) => {
@@ -105,7 +105,7 @@ module.exports = function(router) {
    * Sends information on a specific item
    */
   router.get('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    Item.findById(req.params.item_id).select('-_id -__v').exec((err, item) => {
+    Item.findById(req.params.item_id).select('-_id -__v -expired').exec((err, item) => {
       if (err) {
         res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
         return;

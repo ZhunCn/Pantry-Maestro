@@ -11,6 +11,10 @@ var ItemSchema = new Schema({
     required: true,
     default: 0
   },
+  expired: {
+    type: Number,
+    default: 0
+  },
   quantities: {
     type: Object,
     required: true
