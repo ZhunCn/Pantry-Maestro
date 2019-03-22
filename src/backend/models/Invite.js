@@ -5,8 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const Schema = mongoose.Schema;
 const tokenLength = 64;
-const defaultSubject = "Invitation to join Pantry Maestro"
-const {sendEmail} = require('utils');
+const defaultSubject = "Invitation to join Pantry Maestro";
 
 var InviteSchema = new Schema({
   workspace: {
@@ -27,7 +26,7 @@ var InviteSchema = new Schema({
   expires: {
     type: Date,
     required: true,
-    default: new Date(Date.now() + 7 * 24 * 3600 * 1000)
+    default: () => Date.now() + 7 * 24 * 3600 * 1000
   }
 }, {
   collection: 'invites'
@@ -53,7 +52,21 @@ InviteSchema.pre('save', function(next) {
       cid: 'logo'
     }];
 
-    sendEmail(invite.email, defaultSubject, html, attachments, (err, info) => {
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    });
+
+    transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: invite.email,
+      subject: defaultSubject,
+      html: html,
+      attachments: attachments
+    }, (err, info) => {
       next(err);
     });
 

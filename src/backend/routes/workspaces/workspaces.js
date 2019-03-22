@@ -79,7 +79,10 @@ module.exports = function(router) {
             workspace = new Workspace({
               'name': req.body.name,
               'inventory': inventory['_id'],
-              'users': []
+              'users': [{
+                account: decoded.user_id,
+                roles: [c.roles.OWNER, c.roles.ADMIN]
+              }]
             });
           }
           else {
@@ -191,7 +194,8 @@ module.exports = function(router) {
           res.status(c.status.OK).json({'message': 'Successfully deleted database'});
         });
       });
-    }).catch(err => {
+    })
+    .catch(err => {
       res.json({'error': 'There was an error deleting the workspace: ' + err});
     });
   });
