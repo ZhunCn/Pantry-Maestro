@@ -29,9 +29,6 @@ function parseData(serverData) {
     let parsedData = [];
     let dataLength = Object.entries(serverData.inventory.items).length;
     for (let i = 0; i < dataLength; i++) {
-        console.log(
-            "quantities" in Object.entries(serverData.inventory.items)[i][1]
-        );
         if ("quantities" in Object.entries(serverData.inventory.items)[i][1]) {
             for (
                 let j = 0;
@@ -141,6 +138,7 @@ export default class Inventory extends React.Component {
             // Add functionality to see if the last modified item is the same as the local last modified item.
             // Only refresh i.e. setState when the last modified items are different
             let serverData = parseData(res.data);
+            console.log(res.data);
             this.setState({ data: serverData });
             localStorage.setItem("inventory", JSON.stringify(serverData));
         });
@@ -261,9 +259,12 @@ export default class Inventory extends React.Component {
     handleEditNameButton(row) {
         workspaceID = localStorage.getItem("currWorkspaceID");
         let itemID = row.subRows[0]._original.id;
-        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
-            data: { name: this.editNameInput.current.value }
-        }).then(res => {
+        let newName = this.editNameInput.current.value;
+        let updateJSON = {
+            "name": newName
+        }
+
+        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON).then(res => {
             if (res.status === 200) {
                 console.log("Updated name");
                 toast("Updated name successfully", { type: "success" });
@@ -378,7 +379,7 @@ export default class Inventory extends React.Component {
                 filterMethod: (filter, row) => {
                     var currDate = new Date();
                     var rowDate = new Date(Date.parse(row.expiration.join("")));
-                    console.log(rowDate);
+                    // console.log(rowDate);
                     // Terrible, *TERRIBLE* code. Very copypasted.
                     // I'll refactor it when I have time later
                     // Right now, functionality is paramount
@@ -429,8 +430,8 @@ export default class Inventory extends React.Component {
                         }
                     }
 
-                    console.log(row);
-                    console.log(filter);
+                    // console.log(row);
+                    // console.log(filter);
                 },
                 Filter: ({ filter, onChange }) => (
                     <select
@@ -567,7 +568,7 @@ export default class Inventory extends React.Component {
                     return <span>{row.value} (Total)</span>;
                 },
                 Cell: row => {
-                    console.log(row);
+                    // console.log(row);
                     return (
                         <div>
                             <label>{row.row.quantity}</label>
