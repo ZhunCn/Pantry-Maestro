@@ -14,11 +14,16 @@ import './styles.scss';
 export default class Analytics extends React.Component {
 
   componentWillMount(){
-    this.getExpChartData();
-    this.getDemoChartData();
-    this.getPopChartData();
-    this.getQuantChartData();
-
+    let workspaceID = localStorage.getItem("currWorkspaceID");
+    if (workspaceID == "null") {
+      console.log("gotem");
+      this.getDemoChartData();
+    }else{
+      console.log(workspaceID);
+      this.getExpChartData();
+      this.getPopChartData();
+      this.getQuantChartData();
+    }
   }
   getPopChartData(){
     let userLoginToken = localStorage.getItem("loginToken");
@@ -321,7 +326,7 @@ export default class Analytics extends React.Component {
   getDemoChartData(){
     // Ajax calls here
     this.setState({
-      chartDemoData:{
+      chartExpData:{
         labels: ['Ramen', 'Frozen Pizza', 'Milk', 'Macaroni & Cheese', 'Rice', 'Ice Cream', 'Chocolate Ice Cream'],
         datasets:[
           {
@@ -346,7 +351,61 @@ export default class Analytics extends React.Component {
             ]
           }
         ]
-      }
+      },
+
+        chartQuantData:{
+          labels: ['Ramen', 'Frozen Pizza', 'Milk', 'Macaroni & Cheese', 'Rice', 'Ice Cream', 'Chocolate Ice Cream'],
+          datasets:[
+            {
+              label:'Food Item',
+              data:[
+                617,
+                181,
+                153,
+                105,
+                109,
+                80,
+                1000
+              ],
+              backgroundColor:[
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+                'rgba(139, 69, 19, 0.6)'
+              ]
+            }
+          ]
+        },
+
+          chartPopData:{
+            labels: ['Ramen', 'Frozen Pizza', 'Milk', 'Macaroni & Cheese', 'Rice', 'Ice Cream', 'Chocolate Ice Cream'],
+            datasets:[
+              {
+                label:'This is a demo',
+                data:[
+                  617,
+                  181,
+                  153,
+                  105,
+                  109,
+                  80,
+                  1000
+                ],
+                backgroundColor:[
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)'
+                ]
+              }
+            ]
+          }
     });
   }
 
