@@ -16,7 +16,7 @@ export default class Analytics extends React.Component {
   componentWillMount(){
     this.getDemoChartData();
     this.getPopChartData();
-    //this.getQuantChartData();
+    this.getQuantChartData();
     //this.getExpChartData();
   }
   getPopChartData(){
@@ -54,6 +54,129 @@ export default class Analytics extends React.Component {
           }
         });
       }
+    });
+  }
+
+  getQuantChartData(){
+    let userLoginToken = localStorage.getItem("loginToken");
+    let workspaceID = localStorage.getItem("currWorkspaceID");
+    axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
+        console.log(workspaceID);
+        console.log(userLoginToken);
+        //console.log(res.analytics);
+        console.log("hi");
+        var labellist = [];
+        var qval = [];
+        for (let i = 0; i<res.data.inventory.items.length; i++) {
+          labellist[i] = res.data.inventory.items[i].name;
+          qval[i] = res.data.inventory.items[i].total;
+        }
+        //[res.data.analytics.inventory.items[0].name,res.data.analytics.inventory.items[1].name,res.data.analytics.inventory.items[2].name];
+        //[res.data.analytics.inventory.items[0].total,res.data.analytics.inventory.items[1].total,res.data.analytics.inventory.items[2].total];
+        this.setState({
+          chartQuantData:{
+            labels: labellist,
+            datasets:[
+              {
+                label: 'Food Item',
+                data: qval,
+                backgroundColor:[
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)',
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+                  'rgba(75, 192, 192, 0.6)',
+                  'rgba(153, 102, 255, 0.6)',
+                  'rgba(255, 159, 64, 0.6)',
+                  'rgba(139, 69, 19, 0.6)'
+                ]
+              }
+            ]
+          }
+        });
     });
   }
 
@@ -108,15 +231,15 @@ export default class Analytics extends React.Component {
             What?<br/>
             Your Milk is evolving!<br/>
             Congratulations! Your Milk has evolved into Expired Milk!
-            <ExpirationChart chartData={this.state.chartDemoData} pantry="/Insert Workspace Name Here/" legendPosition="bottom"/>
+            <ExpirationChart chartData={this.state.chartDemoData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
             <em>Why?</em> Because Quantity over Quality.
-            <QuantityChart chartData={this.state.chartDemoData} pantry="/Insert Workspace Name Here/" legendPosition="bottom"/>
+            <QuantityChart chartData={this.state.chartQuantData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
             Was gonna make a joke about AnalYtics.. but maybe not..<br/>
-            <PopularityChart chartData={this.state.chartPopData} pantry="/Insert Workspace Name Here/" legendPosition="bottom"/>
+            <PopularityChart chartData={this.state.chartPopData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
 
         </Tabs>
