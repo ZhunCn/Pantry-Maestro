@@ -25,7 +25,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
       'Content-Type': 'application/json' }}).then(res=>{
-        if(res.data.users.length>2){
+        if(res.data.users.length>1){
           this.checkLeave();
         }
         else{
