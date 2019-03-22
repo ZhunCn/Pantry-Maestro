@@ -167,6 +167,10 @@ export default class Invite extends React.Component {
     });
   }
 
+  register() {
+    this.props.history.push("/register/" + this.props.match.params.token);
+  }
+
   denyProcedure() {
     this.props.history.push('/inventory');  
   }
@@ -230,7 +234,22 @@ export default class Invite extends React.Component {
             <center>
               <h2>You have been invited to a Pantry Workplace!<span id="workspaceLbl"></span></h2>
 
-              <p>Not already a member in Pantry Maestro? Sign up here!</p>
+              <p><button id="confirmButton" class="button" onClick={(e) => this.register()}>Accept</button>
+                <button id="cancelButton" class="button" onClick={(e) => this.denyProcedure()}>Decline</button></p>
+            </center>
+          </div>
+
+        </div>
+      );
+    }
+
+
+  }
+};
+
+
+/*
+ <p>Not already a member in Pantry Maestro? Sign up here!</p>
               <ToastContainer autoClose={3000} />
               <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle' className='middle aligned'>
                 <Grid.Column style={{ maxWidth: 450 }}>
@@ -302,14 +321,4 @@ export default class Invite extends React.Component {
                   </Message>
                 </Grid.Column>
               </Grid>
-
-            </center>
-          </div>
-
-        </div>
-      );
-    }
-
-
-  }
-};
+              */
