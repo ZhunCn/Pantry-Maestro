@@ -25,14 +25,18 @@ export default class Analytics extends React.Component {
     axios.get(`/api/workspaces/${workspaceID}/analytics/quantities/top`, { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
         console.log(workspaceID);
         console.log(userLoginToken);
-        //console.log(res.analytics);
-      if(res.data.analytics.inventory.items.length != 3){
-        console.log("hi0");
-        console.log(res.data.analytics.inventory.items);
-      }else{
+        //console.log(res.analytics[0].name);
+        console.log(res.data);
+
+
+      //if(res.data.analytics.length != 3){
+      //  console.log("hi0");
+      //  console.log(res.data.analytics);
+      //}else{
         console.log("hi");
-        var labellist = [res.data.analytics.inventory.items[0].name,res.data.analytics.inventory.items[1].name,res.data.analytics.inventory.items[2].name];
-        var qval = [res.data.analytics.inventory.items[0].total,res.data.analytics.inventory.items[1].total,res.data.analytics.inventory.items[2].total];
+        console.log(res.data.analytics);
+        var labellist = [res.data.analytics[0].name,res.data.analytics[1].name,res.data.analytics[2].name];
+        var qval = [res.data.analytics[0].total,res.data.analytics[1].total,res.data.analytics[2].total];
         this.setState({
           chartPopData:{
             labels: labellist,
@@ -53,7 +57,7 @@ export default class Analytics extends React.Component {
             ]
           }
         });
-      }
+      //}
     });
   }
 
@@ -228,17 +232,12 @@ export default class Analytics extends React.Component {
           </TabList>
 
           <TabPanel>
-            What?<br/>
-            Your Milk is evolving!<br/>
-            Congratulations! Your Milk has evolved into Expired Milk!
             <ExpirationChart chartData={this.state.chartDemoData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
-            <em>Why?</em> Because Quantity over Quality.
             <QuantityChart chartData={this.state.chartQuantData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
           <TabPanel>
-            Was gonna make a joke about AnalYtics.. but maybe not..<br/>
             <PopularityChart chartData={this.state.chartPopData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
 
