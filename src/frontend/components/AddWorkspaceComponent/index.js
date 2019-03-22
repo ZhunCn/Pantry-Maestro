@@ -45,30 +45,12 @@ export default class AddWorkspaceComponent extends React.Component {
                 toast("The workspace has been successfully created!", { type: "success" });
                 console.log(res.data.workspace_id);
                 localStorage.setItem("currWorkspaceID", res.data.workspace_id);
+                this.props.getInfo();
             }
         }).catch(error => {
             if (error.response.data.error === "A workspace with that name already exists") {
                 toast("A workspace with that name already exists!", { type: "error" });
             }
-        }).then(()=>{
-          let workspaceID = localStorage.getItem("currWorkspaceID");
-          let workSpJson = {
-  	          "user_id": this.state.user_id,
-  	          "roles": "coordinator"
-          }
-          axios.post(`/api/workspaces/${workspaceID}/users`,
-            workSpJson,
-          { headers: { "Authorization": `${userLoginToken}`,
-            'Accept' : 'application/json',
-            'Content-Type': 'application/json' }
-          }).then(res => {
-              toast("Successfully added user to workspace", {type: "success"})
-              this.props.getInfo();
-              console.log(res.data);
-          }).catch(error => {
-            toast("Failed to add user to workspace", {type: "error"})
-            console.log(error);
-          })
         });
     }
 
