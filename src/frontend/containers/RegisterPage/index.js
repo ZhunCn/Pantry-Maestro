@@ -83,27 +83,6 @@ export default class Register extends React.Component {
   //   }
   // }
 
-  confirmProcedure() {
-    // TODO: Implement add to workplace
-    console.log('Invite: ' + this.state.match.params.invToken);
-    console.log('Id: ' + localStorage.getItem("userId"));
-
-    let self = this;
-    axios.post("/api/workspaces/invites/join", {
-      'invite': self.state.match.params.invToken,
-      'user_id': localStorage.getItem("userId")
-    }).then(res => {
-      console.log(res);
-      if (res.data.err) {
-        toast("There was an error joining the workspace", { type: "error" });
-        return;
-      }
-      else {
-        this.props.history.push('/inventory');
-      }
-    });
-  }
-
   handleSubmit = (e) => {
     e.preventDefault();
     let error = false;
@@ -118,7 +97,6 @@ export default class Register extends React.Component {
     console.log('Inputted email (signUpProcedure): ', email);
     console.log('Inputted password (signUpProcedure): ', password);
     console.log('Inputted password #2 (signUpProcedure): ', confirmPassword);
-    console.log("Possible token: \"" + this.props.match.params.invToken +"\"");
 
     // this.verifyUser(this.state.username);
     if (username.length == 0 || username.length > 32) {
@@ -175,42 +153,7 @@ export default class Register extends React.Component {
               'password': password
             }).then(res => {
               console.log(res.data);
-
-              // Check if we have an invite token
-              if (this.props.match.params.invToken) {
-                // Login immediately and accept invitation
-                axios.post('/api/auth/login', {
-                  'username': username,
-                  'password': password
-                }).then(res => {
-                  console.log(res.data);
-                  if (res.data.error) {
-                    this.setState({ passwordError: true });
-                    this.setState({ usernameError: true });
-                    toast("Username/Password is incorrect. Please try again.", { type: "error" });
-                  } else {
-                    localStorage.setItem('loginToken', res.data.token);
-                  }
-                }).catch((error) => {
-                  console.log(error);
-                  this.setState({ passwordError: true });
-                  this.setState({ usernameError: true });
-                  toast("Username/Password is incorrect. Please try again.", { type: "error" });
-                });
-                let userLoginToken = localStorage.getItem("loginToken");
-                let self = this;
-                axios.get("/api/account", { headers: { "Authorization": `${userLoginToken}` } })
-                .then(res => {
-                  console.log(res.data.username);
-                  localStorage.setItem("userId", res.data._id);
-                  self.setState({'userId': res.data._id});
-                });
-
-                confirmProcedure();
-
-              } else {
-                this.props.history.push('/login');
-              }
+              this.props.history.push('/login');
             })
               .catch((error) => {
                 console.log(error.data);

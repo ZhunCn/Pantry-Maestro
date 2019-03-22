@@ -18,7 +18,7 @@ const Router = () => {
       <Switch>
         <Route path="/analytics" component={Analytics} />
         <Route path="/login/:inviteToken?" component={Login} />
-        <Route path="/register/:invToken?" component={Register} />
+        <Route path="/register" component={Register} />
         <Route path="/join/:token" component={Invite} />
         <Route path="/inventory" component={Inventory} />
         <Route path="/settings" component={Settings} />
