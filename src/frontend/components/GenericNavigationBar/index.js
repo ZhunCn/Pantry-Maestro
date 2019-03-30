@@ -13,6 +13,7 @@ export default class GenericNavigationBar extends React.Component {
           <p class="italic">Firstname Lastname</p>
           </Link>
           <Link to="/analytics">Analytics</Link>
+          <Link to="/checkout">Check Out</Link>
           <Link to="/inventory">Inventory</Link>
           <Link to="/workspace">Workspaces</Link>
           <Link to="/settings">Settings</Link>
