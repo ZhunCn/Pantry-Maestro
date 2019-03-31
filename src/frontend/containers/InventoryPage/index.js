@@ -13,7 +13,7 @@ import { sum, authorize } from "@/utils";
 import AddChangeItemComponent from "@/components/AddChangeItemComponent";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Button, Icon, Modal, Form } from "semantic-ui-react";
+import { Button, Icon, Modal, Form, Confirm } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
@@ -103,6 +103,8 @@ export default class Inventory extends React.Component {
             ],
             dateRangeStart: undefined,
             dateRangeEnd: undefined,
+            deleteItemShow: false,
+            itemToDelete: {}
         };
         this.editNameInput = React.createRef();
     }
@@ -230,14 +232,28 @@ export default class Inventory extends React.Component {
             });
     }
 
-    handleDeleteItemButton(item) {
-        console.log("Removing item: " + item.expiration);
+
+    openDeleteConfirm = () => {
+        this.setState({ deleteItemShow: true })
+
+    }
+    handleCancelDeleteItem = () => {
+        this.setState({ deleteItemShow: false })
+    }
+    handleConfirmDeleteItem = () => {
+        this.setState({ deleteItemShow: false })
+        this.handleDeleteItemButton();
+    }
+
+    handleDeleteItemButton() {
+
+        console.log("Removing item: " + this.state.itemToDelete.expiration);
         // use axios.delete here
         workspaceID = localStorage.getItem("currWorkspaceID");
-        let itemID = item.id;
+        let itemID = this.state.itemToDelete.id;
         axios
             .delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
-                data: { expiration: item.expiration },
+                data: { expiration: this.state.itemToDelete.expiration },
             })
             .then(res => {
                 if (res.status === 200) {
@@ -263,7 +279,6 @@ export default class Inventory extends React.Component {
         let updateJSON = {
             "name": newName
         }
-
         axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON).then(res => {
             if (res.status === 200) {
                 console.log("Updated name");
@@ -609,12 +624,14 @@ export default class Inventory extends React.Component {
                         <button
                             className="ui fluid compact negative button"
                             style={{ padding: "6px 7px 6px 7px" }}
-                            onClick={() =>
-                                this.handleDeleteItemButton(row.row._original)
-                            }>
+                            onClick={() => {
+                                this.openDeleteConfirm();
+                                this.setState({ itemToDelete: row.row._original })
+                            }}>
                             Delete
                         </button>
-                    </div>
+                        <Confirm open={this.state.deleteItemShow} onCancel={() => { this.handleCancelDeleteItem() }} onConfirm={() => { this.handleConfirmDeleteItem() }} />
+                    </div >
                 ),
                 sortable: false,
                 filterable: false,
@@ -624,7 +641,7 @@ export default class Inventory extends React.Component {
         ];
 
         return (
-            <div class="inventoryPage">
+            <div class="inventoryPage" >
                 <ToastContainer autoClose={3000} />
                 <GenericNavigationBar />
                 <div class="Content" style={{ position: "relative" }}>
