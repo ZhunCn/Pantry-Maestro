@@ -47,9 +47,15 @@ export default class DisplayWorkspaceComponent extends React.Component {
     { headers: { "Authorization": `${userLoginToken}`,
     'Accept' : 'application/json',
     'Content-Type': 'application/json' }
-    }).then(()=>{
-      toast("User has left the workspace", { type: "success" });
-      this.props.getInfo();
+  }).then(res=>{
+      if(res.data.error=="You can't leave the workspace if you're the last member in it"){
+        toast(res.data.error +". Try deleting the workspace instead.", {type:"warning"});
+      }
+      else{
+        console.log(res.data);
+        toast("User has left the workspace", { type: "success" });
+        this.props.getInfo();
+      }
     }).catch(error => {
       toast(error.message, { type: "error" });
       this.props.getInfo();
@@ -100,7 +106,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
     if(this.props.names.length==1&&this.props.names[0][0]!=''){
       console.log("This is your last workspace.");
       this.closeAll();
-      this.setState({field:0, open4:true});
+      this.setState({field:1, open4:true});
     }
     else{
       this.handleLeave(id);

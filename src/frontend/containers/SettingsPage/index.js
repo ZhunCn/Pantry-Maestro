@@ -65,12 +65,13 @@ function verifyPass(password){
 
 class Popup extends React.Component {
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       user: "currentUsername",
       name: "Firstname Lastname",
-      email: "email@email.com"
+      email: "email@email.com",
+      curVal: this.props.curVal
     };
   }
 
@@ -96,32 +97,12 @@ class Popup extends React.Component {
           <div className='popup_inner'>
             <h1>Change your username</h1>
             <p>Current Username:</p>
-            <p><i>{this.state.user}</i></p>
+            <p><i>{this.props.curVal}</i></p>
             <form>
             <p>New Username:</p>
             <input type="text" id="usernameInput" name="username" placeholder="Username"/>
             </form>
           <button onClick={()=>this.processUsername(document.getElementById("usernameInput").value)}>Save</button>
-          <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
-          </div>
-        </div>
-      );
-    }
-    //Popup for name change
-    else if(this.props.text=="name"){
-      return (
-        <div className='popup'>
-          <div className='popup_inner'>
-            <h1>Change your name</h1>
-            <p>Current name:</p>
-            <p><i>{this.state.name}</i></p>
-            <form>
-            <p>First Name:</p>
-            <input type="text" id="firstnameInput" name="firstname" placeholder="First name"/>
-            <p>Last Name:</p>
-            <input type="text" id="lastnameInput" name="lastname" placeholder="Last name"/>
-            </form>
-          <button onClick={()=>this.processName([document.getElementById("firstnameInput").value, document.getElementById("lastnameInput").value])}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
           </div>
         </div>
@@ -134,28 +115,13 @@ class Popup extends React.Component {
           <div className='popup_inner'>
             <h1>Change your email</h1>
             <p>Current Email:</p>
-            <p><i>{this.state.email}</i></p>
+            <p><i>{this.props.curVal}</i></p>
             <form>
             <p>New Email:</p>
             <input type="text" id="emailInput" name="email" placeholder="email"/>
             </form>
           <button onClick={()=>this.processEmail(document.getElementById("emailInput").value)}>Save</button>
           <button onClick={()=>this.props.closePopup()}>Discard Changes</button>
-          </div>
-        </div>
-      );
-    }
-    //Popup for leaving workspace
-    else if(this.props.text=="leave"){
-      return (
-        <div className='popup'>
-          <div className='popup_inner'>
-            <h1>Leave the Workspace</h1>
-            <p>Workspace:</p>
-            <p><i>workspace here</i><br /></p>
-            <p>Are you sure you want to leave this workspace?</p>
-          <button onClick={()=>this.ret("leave", "leave")}>Yes, leave this workspace</button>
-          <button onClick={()=>this.props.closePopup()}>No, don't leave this workspace</button>
           </div>
         </div>
       );
@@ -196,31 +162,28 @@ class Popup extends React.Component {
   }
   //function to verify username
   processUsername = (username) =>{
-    if(verifyUser(username)===true){
+    if(username==this.props.curVal){
+      toast("Current and new usernames are the same, username not updated", {type: "warning"})
+      console.log("Username equal");
+    }
+    else if(verifyUser(username)===true){
       this.ret(username, "username");
     }
     else{
-      console.log("invalid");
-    }
-  }
-  //function to verify name
-  processName = (name) =>{
-    const first=name[0];
-    const last=name[1];
-    if(verifyUser(first)===true&&verifyUser(last)===true){
-      this.ret(name, "name");
-    }
-    else{
-      console.log("invalid");
+      toast("Invalid username, failed to update username", {type: "error"})
     }
   }
   //function to verify email
   processEmail = (email) =>{
-    if(verifyEmail(email)===true){
+    if(email==this.props.curVal){
+      toast("Current and new emails are the same, email not updated", {type: "warning"})
+      console.log("Email equal");
+    }
+    else if(verifyEmail(email)===true){
       this.ret(email, "email");
     }
     else{
-      console.log("invalid");
+      toast("Invalid email, failed to update email", {type: "error"})
     }
   }
   //function to verify password
@@ -228,11 +191,14 @@ class Popup extends React.Component {
     const pass1=password[0];
     const pass2=password[1];
     const pass3=password[2];
-    if(pass2!==pass3){
-      console.log("passwords do not match");
+    if(pass1===pass2){
+      toast("Current and new passwords are the same, password not updated", {type: "warning"})
+    }
+    else if(pass2!==pass3){
+      toast("Your passwords do not match, failed to update password", {type: "error"})
     }
     else if(verifyPass(pass2)!==true){
-      console.log("invalid password");
+      toast("Invalid password, failed to update password", {type: "error"})
     }
     else{
       this.ret(password, "password");
@@ -256,15 +222,13 @@ export default class Settings extends React.Component {
       showPopup: false,
       user: "currentUsername",
       name: "Firstname Lastname",
-      email: "email@email.com",
-      curWorkspace: "currentWorkspace"
+      email: "email@email.com"
     };
   }
   //function to log the user out and redirect to the login page
   logoutProcedure(){
     localStorage.removeItem('loginToken');
     this.props.history.push('/login');
-    console.log("Logged out");
   }
   //function to enable popup when disabled and vice versa
   togglePopup(value) {
@@ -289,7 +253,7 @@ export default class Settings extends React.Component {
         toast("Successfully updated password", {type: "success"})
         console.log(res.data);
     }).catch(error => {
-      toast("Failed to update password", {type: "error"})
+      toast("Error updating password: Incorrect current password", {type: "error"})
       console.log(error);
     })
   }
@@ -398,6 +362,7 @@ export default class Settings extends React.Component {
         text={this.state.value}
         closePopup={this.togglePopup.bind(this)}
         callBack={this.callbackFunction}
+        curVal={(this.state.value=="email") ? this.state.email : this.state.user}
       />
       : null
       }
