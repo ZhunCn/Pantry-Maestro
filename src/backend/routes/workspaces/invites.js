@@ -285,6 +285,7 @@ module.exports = function(router) {
               return;
             }
 
+            
             user.workspaces.push(workspace._id);
 
             user.save(err => {
@@ -299,7 +300,7 @@ module.exports = function(router) {
                   return;
                 }
 
-                res.json({'message': 'Successfully joined workspace'});
+                res.json({'message': 'Successfully joined workspace', 'workspace': workspace._id});
               });
             });
           });

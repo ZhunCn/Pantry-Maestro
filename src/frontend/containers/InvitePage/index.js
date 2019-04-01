@@ -146,13 +146,14 @@ export default class Invite extends React.Component {
         return;
       }
       else {
+        localStorage.setItem("currWorkspaceID", res.data.workspace);
         self.props.history.push('/inventory');
       }
     });
   }
 
   denyProcedure() {
-    this.props.history.push('/inventory');  
+    this.props.history.push('/inventory');
   }
 
   onInputChange(event) {
@@ -169,8 +170,7 @@ export default class Invite extends React.Component {
       .then(res => {
         console.log(res.data.username);
         localStorage.setItem("userId", res.data._id);
-        self.setState({'userId': res.data._id});
-        document.getElementById("currentUser").textContent = res.data.username;
+        self.setState({ 'userId': res.data._id, 'username': res.data.username });
       });
   }
 
@@ -179,26 +179,32 @@ export default class Invite extends React.Component {
       this.getCurrentUsername();
     }
 
-    this.setState({'inviteToken': this.props.match.params.token});
+    this.setState({ 'inviteToken': this.props.match.params.token });
   }
 
-  
+
 
   render() {
-    
+
     if (authorize()) {
       return (
 
         <div class="invitePage">
           <div class="Content">
-            <center>
-              <h2>You have been invited to a Pantry Workplace!<span id="workspaceLbl"></span></h2>
-              <p>You are already signed in as: <span id="currentUser"></span></p>
+            <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle' className='middle aligned'>
+              <Grid.Column style={{ maxWidth: 450 }}>
+                <Header as='h2' color='black' textAlign='center'>
+                  You have been invited to a Pantry Workplace!
+              </Header>
+                <p>You are already signed in as: {this.state.username}</p>
 
-              <p>Would you like to join the pantry?</p>
-              <p><button id="confirmButton" class="button" onClick={(e) => this.confirmProcedure()}>Accept</button>
-                <button id="cancelButton" class="button" onClick={(e) => this.denyProcedure()}>Decline</button></p>
-            </center>
+                <p>Would you like to join the pantry?</p>
+                <Message>
+                  <Button id="confirmButton" onClick={(e) => this.confirmProcedure()}>Accept</Button>
+                  <Button id="cancelButton" onClick={(e) => this.denyProcedure()}>Decline</Button>
+                </Message>
+              </Grid.Column>
+            </Grid>
             <div class="Footer"></div>
             <div class="Flex">
             </div>
@@ -212,12 +218,16 @@ export default class Invite extends React.Component {
         <div class="invitePage">
           <div class="Content">
             <center>
-              <h2>You have been invited to a Pantry Workplace!<span id="workspaceLbl"></span></h2>
 
-              <p>Not already a member in Pantry Maestro? Sign up here!</p>
               <ToastContainer autoClose={3000} />
               <Grid textAlign='center' style={{ height: '100%' }} verticalAlign='middle' className='middle aligned'>
                 <Grid.Column style={{ maxWidth: 450 }}>
+
+                  <Header as='h2' color='black' textAlign='center'>
+                    You have been invited to a Pantry Workplace!
+              </Header>
+                  <p>Not already a member in Pantry Maestro? Sign up here!</p>
+
                   <Form size='large' onSubmit={(e) => { this.handleSubmit(e) }} error={this.state.createUserError}>
                     <Segment stacked>
                       <Form.Field>
