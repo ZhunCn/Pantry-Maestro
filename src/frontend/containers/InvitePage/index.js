@@ -96,12 +96,15 @@ export default class Invite extends React.Component {
           if (!this.state.passwordError) {
             console.log('Valid password!');
             // Connect with backend to register account
+            let self = this;
             axios.post('/api/auth/register', {
               'email': email,
               'username': username,
               'password': password
             }).then(res => {
               console.log(res.data);
+
+              self.props.history.push("/login/" + self.props.match.params.token);
             })
               .catch((error) => {
                 console.log(error.data);
@@ -109,25 +112,6 @@ export default class Invite extends React.Component {
               });
 
             // Log into the newly made account, then procede to add account to workspace
-
-            let self = this;
-            axios.post('/api/auth/login', {
-              'username': username,
-              'password': password
-            }).then(res => {
-              console.log(res.data);
-              localStorage.setItem('loginToken', res.data.token);
-              self.setState({'loginToken': res.data.token});
-              document.getElementById("successParagraph").textContent = "Successfully registered and logged in!";
-              document.getElementById("successParagraph").style = "color:green;";
-
-              self.getCurrentUsername();
-
-              self.confirmProcedure();
-            })
-              .catch((error) => {
-                console.log(error.data);
-              });
 
           } else {
             console.log('Invalid password! Make sure your password contains at least 1 number and is longer than 6 characters');
