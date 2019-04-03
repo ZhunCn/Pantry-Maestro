@@ -11,7 +11,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id/users', (req, res) => {
     // Authorize
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -name -deleted').populate({
+    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -name -deleted -invites').populate({
       path: 'users.account',
       select: '-__v -workspaces -email -salt -hash'
     }).exec((err, workspace) => {
@@ -51,31 +51,31 @@ module.exports = function(router) {
         return;
       }
 
-      workspace.users.push({'account': req.body.user_id, 'roles': req.body.roles});
-
-      workspace.save((err) => {
+      User.findById(req.body.user_id).exec((err, user) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
           return;
         }
+        else if (!user) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
+          return;
+        }
 
-        User.findById(req.body.user_id).exec((err, user) => {
+        // Fixes bug where user.workspaces contains a null value
+        user.workspaces = user.workspaces.filter(workspace => {
+          return workspace != null;
+        });
+
+        user.workspaces.push(req.params.workspace_id);
+        user.save((err) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
             return;
           }
-          else if (!user) {
-            res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
-            return;
-          }
 
-          // Fixes bug where user.workspaces contains a null value
-          user.workspaces = user.workspaces.filter(workspace => {
-            return workspace != null;
-          });
+          workspace.users.push({'account': req.body.user_id, 'roles': req.body.roles});
 
-          user.workspaces.push(req.params.workspace_id);
-          user.save((err) => {
+          workspace.save((err) => {
             if (err) {
               res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
               return;

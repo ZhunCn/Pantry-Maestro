@@ -45,7 +45,7 @@ module.exports = function(router) {
         }
 
         res.status(c.status.OK).json({
-          'message': 'Added user to workspace',
+          'message': 'Successfully registered user',
           'user_id': user['_id']
         });
       });

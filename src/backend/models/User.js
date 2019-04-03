@@ -96,7 +96,7 @@ UserSchema.methods.removeWorkspace = function(workspace_id, cb) {
   let removed = false;
 
   user.workspaces.forEach(workspace => {
-    if (workspace.toString() !== workspace_id) {
+    if (workspace && workspace.toString() !== workspace_id) {
       workspaces.push(workspace);
     }
     else {

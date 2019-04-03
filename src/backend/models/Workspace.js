@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const c = require('const');
 
 const User = require('./User');
 const Invite = require('./Invite');
@@ -41,7 +42,7 @@ WorkspaceSchema.methods.hasUser = function(user_id, cb) {
   const workspace = this;
 
   for (let i = 0; i < workspace.users.length; i++) {
-    if (workspace.users[i].account && workspace.users[i].account.toString() === user_id) {
+    if (workspace.users[i].account && workspace.users[i].account._id == user_id) {
       User.findOne({'_id': user_id}).exec((err, user) => {
         cb(true, user);
       });
@@ -81,6 +82,19 @@ WorkspaceSchema.methods.removeUser = function(user_id, cb) {
 
     cb(true);
   });
+}
+
+WorkspaceSchema.methods.isOwner = function(user_id, cb) {
+  const workspace = this;
+
+  for (let i = 0; i < workspace.users.length; i++) {
+    if (workspace.users[i].account && workspace.users[i].account._id == user_id) {
+      cb(workspace.users[i].roles.includes(c.roles.OWNER));
+      return;
+    }
+  }
+
+  cb(false);
 }
 
 module.exports = mongoose.model('Workspace', WorkspaceSchema);

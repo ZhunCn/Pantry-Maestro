@@ -2,6 +2,11 @@ const express = require('express');
 const {authorize, complete} = require('utils');
 const {User, Workspace} = require('models');
 const c = require('const');
+const joi = require('joi');
+
+const leaveWorkspaceSchema = joi.object().keys({
+  workspace_id: joi.string().alphanum().required()
+});
 
 module.exports = function(router) {
   router.get('/api/account', (req, res) => {
@@ -29,7 +34,6 @@ module.exports = function(router) {
       return;
     }
 
-    // In the future, add functionality to change item's name
     let fields = [
       'email',
       'username'
@@ -104,13 +108,8 @@ module.exports = function(router) {
   });
 
   router.post('/api/account/leave', (req, res) => {
-    let fields = [
-      'workspace_id'
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+    if (joi.validate(req.body, leaveWorkspaceSchema).error !== null) {
+      res.status(c.status.OK).json({'error': 'Invalid fields'});
       return;
     }
 
@@ -135,20 +134,27 @@ module.exports = function(router) {
             return;
           }
 
-          workspace.removeUser(decoded.user_id, (removed) => {
-            if (!removed) {
-              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing user from the workspace'});
+          workspace.isOwner(decoded.user_id, (owner) => {
+            if (owner) {
+              res.json({'error': 'You cannot leave a workspace if you are the owner'});
               return;
             }
 
-            user.removeWorkspace(req.body.workspace_id, (removed) => {
+            workspace.removeUser(decoded.user_id, (removed) => {
               if (!removed) {
                 res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing user from the workspace'});
                 return;
               }
 
-              res.status(c.status.OK).json({'message': 'Removed the user from the workspace'});
-              return;
+              user.removeWorkspace(req.body.workspace_id, (removed) => {
+                if (!removed) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'There was an error removing user from the workspace'});
+                  return;
+                }
+
+                res.status(c.status.OK).json({'message': 'Removed the user from the workspace'});
+                return;
+              });
             });
           });
         });

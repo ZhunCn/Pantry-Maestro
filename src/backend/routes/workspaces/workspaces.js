@@ -43,7 +43,6 @@ module.exports = function(router) {
    * Creates a new workspace
    */
   router.post('/api/workspaces/', (req, res) => {
-    // Add authorization and add user to workspace
     authorize(req).then(decoded => {
       let fields = [
         'name'
