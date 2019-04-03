@@ -21,15 +21,8 @@ export default class Workspace extends React.Component {
       <div class="CheckoutPage">
         <GenericNavigationBar/>
         <div class="Content">
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-
-        <h1>Check Out</h1>
-        <h4>What Items Would You Like To Check Out Today?</h4>
-
+          <h1>Check Out</h1>
+          <h4>What Items Would You Like To Check Out Today?</h4>
         </div>
       </div>
     );

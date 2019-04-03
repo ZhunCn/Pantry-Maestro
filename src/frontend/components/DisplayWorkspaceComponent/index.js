@@ -13,20 +13,33 @@ export default class DisplayWorkspaceComponent extends React.Component {
           user_id: this.props.user_id,
           open1: false,
           open2: false,
+          open3: false,
+          open4: false,
           works: ['',''],
-          noCurr: false,
           field: 0
       };
   }
   checkAndLeave(id){
     console.log("ID"+id);
     let userLoginToken = localStorage.getItem("loginToken");
-    return axios.get(`api/workspaces/${id}/users`,
+    let userID = this.props.user_id;
+    axios.get(`api/workspaces/${id}/users`,
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
       'Content-Type': 'application/json' }}).then(res=>{
         if(res.data.users.length>1){
-          this.checkLeave();
+          axios.get(`/api/workspaces/${id}/users/${userID}`,
+            { headers: { "Authorization": `${userLoginToken}`,
+            'Accept' : 'application/json',
+            'Content-Type': 'application/json' }}).then(res=>{
+              if(res.data.roles[0]=="owner"){
+                toast("You are the owner of this workspace. You must transfer your ownership before leaving.", {type:"warning"});
+              }
+              else{
+                this.handleLeave(id);
+              }
+          });
+          this.closeAll();
         }
         else{
           this.closeAll();
@@ -68,27 +81,27 @@ export default class DisplayWorkspaceComponent extends React.Component {
       localStorage.setItem("currWorkspaceID", "");
     }
     let userLoginToken = localStorage.getItem("loginToken");
-    axios.delete(`/api/workspaces/${id}`,
+    let userID = this.props.user_id;
+    axios.get(`/api/workspaces/${id}/users/${userID}`,
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
-      'Content-Type': 'application/json' }
-    }).then(()=>{
-      toast("The workspace has been successfully deleted", { type: "success" });
-      this.props.getInfo();
-    }).catch(error => {
-      toast(error.message, { type: "error" });
-      console.log(error.message);
-    });
-    axios.post('/api/account/leave',
-    {
-      "workspace_id": `${id}`
-    },
-    { headers: { "Authorization": `${userLoginToken}`,
-    'Accept' : 'application/json',
-    'Content-Type': 'application/json' }
-    }).catch(error => {
-      console.log(error.message);
-      toast(error.message, { type: "error" });
+      'Content-Type': 'application/json' }}).then(res=>{
+        if(res.data.roles[0]!="owner"){
+          toast("You are not the owner of this workspace. Only the owner of the workspace may delete this workspace.", {type:"error"});
+        }
+        else{
+          axios.delete(`/api/workspaces/${id}`,
+            { headers: { "Authorization": `${userLoginToken}`,
+            'Accept' : 'application/json',
+            'Content-Type': 'application/json' }
+          }).then(()=>{
+            toast("The workspace has been successfully deleted", { type: "success" });
+            this.props.getInfo();
+          }).catch(error => {
+            toast(error.message, { type: "error" });
+            console.log(error.message);
+          });
+        }
     });
     this.closeAll();
   }
@@ -158,7 +171,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <Modal.Header>Leave Workspace?</Modal.Header>
         <div class="contain" style = {{margin:20}}>
         <strong>Are you sure you want to leave {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.checkLeave(this.state.works[1])}>Leave Workspace</Button>
+        <Button onClick={() => this.checkAndLeave(this.state.works[1])}>Leave Workspace</Button>
         <Button onClick={this.closeAll}>Do not leave Workspace</Button>
         </div>
     </Modal>
@@ -199,8 +212,8 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <strong>This is your only workspace.<br/>
         If you {this.state.field ? "leave" : "delete"} this workspace, you will not have any workspaces left.<br/>
         Are you sure you want to {this.state.field ? "leave" : "delete"} {this.state.works[0]}?</strong><br/>
-        <Button onClick={() => this.state.field ? this.handleLeave(this.state.works[1]): this.handleDelete(this.state.works[1])}>Delete Workspace</Button>
-        <Button onClick={this.closeAll}>Do not delete Workspace</Button>
+        <Button onClick={() => this.state.field ? this.handleLeave(this.state.works[1]): this.handleDelete(this.state.works[1])}>{this.state.field ? "Leave" : "Delete"} Workspace</Button>
+        <Button onClick={this.closeAll}>Do not {this.state.field ? "leave" : "delete"} Workspace</Button>
         </div>
     </Modal>
     </li>);
