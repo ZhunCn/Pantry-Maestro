@@ -82,26 +82,21 @@ export default class DisplayWorkspaceComponent extends React.Component {
     }
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
-    axios.get(`/api/workspaces/${id}/users/${userID}`,
+    axios.delete(`/api/workspaces/${id}`,
       { headers: { "Authorization": `${userLoginToken}`,
       'Accept' : 'application/json',
-      'Content-Type': 'application/json' }}).then(res=>{
-        if(res.data.roles[0]!="owner"){
-          toast("You are not the owner of this workspace. Only the owner of the workspace may delete this workspace.", {type:"error"});
-        }
-        else{
-          axios.delete(`/api/workspaces/${id}`,
-            { headers: { "Authorization": `${userLoginToken}`,
-            'Accept' : 'application/json',
-            'Content-Type': 'application/json' }
-          }).then(()=>{
-            toast("The workspace has been successfully deleted", { type: "success" });
-            this.props.getInfo();
-          }).catch(error => {
-            toast(error.message, { type: "error" });
-            console.log(error.message);
-          });
-        }
+      'Content-Type': 'application/json' }
+    }).then(res=>{
+      if(res.data.error === "There was an error deleting the workspace: Insufficient permissions"){
+        toast("The workspace was not deleted. Only the owner may delete the workspace", {type:"error"});
+      }
+      else{
+        toast("The workspace has been successfully deleted", { type: "success" });
+        this.props.getInfo();
+      }
+    }).catch(error => {
+      toast(error.message, { type: "error" });
+      console.log(error.message);
     });
     this.closeAll();
   }
