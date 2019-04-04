@@ -72,8 +72,9 @@ export default class AddChangeItemComponent extends React.Component {
         if (!emptyFlag) {
             console.log(parsedData);
             workspaceID = localStorage.getItem("currWorkspaceID");
+            let userLoginToken = localStorage.getItem("loginToken");
             axios
-                .post(`/api/workspaces/${workspaceID}/inventory`, parsedData)
+                .post(`/api/workspaces/${workspaceID}/inventory`, parsedData, { headers: { "Authorization": `${userLoginToken}` } })
                 .then(res => {
                     // HTTP status 200 OK
                     if (res.status === 200) {
@@ -92,10 +93,12 @@ export default class AddChangeItemComponent extends React.Component {
                     ) {
                         let itemID = error.response.data.item_id;
                         console.log(itemID);
+                        let userLoginToken = localStorage.getItem("loginToken");
                         axios
                             .put(
                                 `/api/workspaces/${workspaceID}/inventory/${itemID}`,
-                                { quantities: parsedData.quantities }
+                                { quantities: parsedData.quantities },
+                                { headers: { "Authorization": `${userLoginToken}` } }
                             )
                             .then(res => {
                                 // HTTP status 200 OK

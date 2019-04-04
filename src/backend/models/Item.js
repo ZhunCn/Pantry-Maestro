@@ -22,6 +22,10 @@ var ItemSchema = new Schema({
   inventory: {
     type: Schema.Types.ObjectId,
     ref: 'Inventory'
+  },
+  note: {
+    type: String,
+    default: ''
   }
 }, {
   collection: 'items'

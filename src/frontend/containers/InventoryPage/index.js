@@ -136,7 +136,8 @@ export default class Inventory extends React.Component {
     // Get data from server and update state
     fetchData() {
         workspaceID = localStorage.getItem("currWorkspaceID");
-        axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
+        let userLoginToken = localStorage.getItem("loginToken");
+        axios.get(`/api/workspaces/${workspaceID}/inventory`, { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
             // Add functionality to see if the last modified item is the same as the local last modified item.
             // Only refresh i.e. setState when the last modified items are different
             let serverData = parseData(res.data);
@@ -160,22 +161,24 @@ export default class Inventory extends React.Component {
         workspaceID = localStorage.getItem("currWorkspaceID");
         let itemID = item.id;
         let newDate = new Date(date).toLocaleDateString();
+        let userLoginToken = localStorage.getItem("loginToken");
         let updatedJSON = {
             quantities: {
                 [newDate]: item.quantity,
-            },
+            }
         };
         axios
             .delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
                 data: { expiration: item.expiration },
+                headers: { "Authorization" : `${userLoginToken}` }
             })
             .then(res => {
-                // console.log(res.data);
                 if (res.status === 200) {
                     axios
                         .put(
                             `/api/workspaces/${workspaceID}/inventory/${itemID}`,
-                            updatedJSON
+                            updatedJSON,
+                            { headers: { "Authorization" : `${userLoginToken}` }}
                         )
                         .then(res => {
                             // HTTP status 200 OK
@@ -203,18 +206,20 @@ export default class Inventory extends React.Component {
     handleEditQuantityButton(item, updown) {
         console.log("Updating quantity of " + item.id + " by " + updown);
 
+        let userLoginToken = localStorage.getItem("loginToken");
         // JSON to send to server with the associated expiration date and +1/-1 quantity
         let updatedQuantity = {
             quantities: {
                 [item.expiration]: updown,
-            },
+            }
         };
         workspaceID = localStorage.getItem("currWorkspaceID");
         let itemID = item.id;
         axios
             .put(
                 `/api/workspaces/${workspaceID}/inventory/${itemID}`,
-                updatedQuantity
+                updatedQuantity,
+                { headers: { "Authorization" : `${userLoginToken}` } }
             )
             .then(res => {
                 // HTTP status 200 OK
@@ -249,13 +254,16 @@ export default class Inventory extends React.Component {
 
         console.log("Removing item: " + this.state.itemToDelete.expiration);
         // use axios.delete here
-        workspaceID = localStorage.getItem("currWorkspaceID");
+        let workspaceID = localStorage.getItem("currWorkspaceID");
+        let userLoginToken = localStorage.getItem("loginToken");
         let itemID = this.state.itemToDelete.id;
         axios
             .delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
                 data: { expiration: this.state.itemToDelete.expiration },
+                headers: { "Authorization" : `${userLoginToken}` }
             })
             .then(res => {
+              console.log(res);
                 if (res.status === 200) {
                     console.log("Deleted item");
                     toast("Deleted item successfully!", { type: "success" });
@@ -273,13 +281,14 @@ export default class Inventory extends React.Component {
     }
 
     handleEditNameButton(row) {
+        let userLoginToken = localStorage.getItem("loginToken");
         workspaceID = localStorage.getItem("currWorkspaceID");
         let itemID = row.subRows[0]._original.id;
         let newName = this.editNameInput.current.value;
         let updateJSON = {
-            "name": newName
+          "name": newName
         }
-        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON).then(res => {
+        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON, { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
             if (res.status === 200) {
                 console.log("Updated name");
                 toast("Updated name successfully", { type: "success" });

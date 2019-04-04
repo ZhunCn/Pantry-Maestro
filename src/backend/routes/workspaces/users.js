@@ -1,26 +1,37 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {Workspace, User} = require('models');
-const {complete} = require('utils');
+const {authorize, complete} = require('utils');
 const c = require('const');
+const joi = require('joi');
+
+const addUserSchema = joi.object().keys({
+  user_id: joi.string().alphanum().required(),
+  roles: joi.array().items(joi.string()).required()
+});
 
 module.exports = function(router) {
   /*
    * Get the users for a workspace
    */
   router.get('/api/workspaces/:workspace_id/users', (req, res) => {
-    // Authorize
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -name -deleted -invites').populate({
+        path: 'users.account',
+        select: '-__v -workspaces -email -salt -hash'
+      }).exec((err, workspace) => {
+        if (err || !workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -name -deleted -invites').populate({
-      path: 'users.account',
-      select: '-__v -workspaces -email -salt -hash'
-    }).exec((err, workspace) => {
-      if (err || !workspace) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-        return;
-      }
-
-      res.status(c.status.OK).json(workspace);
+        res.status(c.status.OK).json(workspace);
+      });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
     });
   });
 
@@ -28,63 +39,62 @@ module.exports = function(router) {
    * Add a user to a workspace
    */
   router.post('/api/workspaces/:workspace_id/users/', (req, res) => {
-    // Authorize
-
-    let fields = [
-      'user_id',
-      'roles'
-    ];
-
-    // Check if request contains necessary fields
-    if (fields && !complete(req.body, fields)) {
-      res.status(c.status.BAD_REQUEST).json({'error': 'Missing fields'});
+    if (joi.validate(req.body, addUserSchema).error !== null) {
+      res.status(c.status.OK).json({'error': 'Invalid fields'});
       return;
     }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'No workspace exists with the specified id'});
-        return;
-      }
-
-      User.findById(req.body.user_id).exec((err, user) => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
           return;
         }
-        else if (!user) {
-          res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
+        else if (!workspace) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'No workspace exists with the specified id'});
           return;
         }
 
-        // Fixes bug where user.workspaces contains a null value
-        user.workspaces = user.workspaces.filter(workspace => {
-          return workspace != null;
-        });
-
-        user.workspaces.push(req.params.workspace_id);
-        user.save((err) => {
+        User.findById(req.body.user_id).exec((err, user) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
             return;
           }
+          else if (!user) {
+            res.status(c.status.BAD_REQUEST).json({'error': 'A user with that id does not exist'});
+            return;
+          }
 
-          workspace.users.push({'account': req.body.user_id, 'roles': req.body.roles});
+          // Fixes bug where user.workspaces contains a null value
+          user.workspaces = user.workspaces.filter(workspace => {
+            return workspace != null;
+          });
 
-          workspace.save((err) => {
+          user.workspaces.push(req.params.workspace_id);
+          user.save((err) => {
             if (err) {
               res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
               return;
             }
 
-            res.status(c.status.OK).json({'message': 'Added user to workspace'});
+            workspace.users.push({'account': req.body.user_id, 'roles': req.body.roles});
+
+            workspace.save((err) => {
+              if (err) {
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error adding user to workspace: ' + err});
+                return;
+              }
+
+              res.status(c.status.OK).json({'message': 'Added user to workspace'});
+            });
           });
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
     });
   });
 
