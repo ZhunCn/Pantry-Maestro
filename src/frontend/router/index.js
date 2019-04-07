@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Switch, Route, BrowserRouter, Redirect} from 'react-router-dom'
+import { Switch, Route, BrowserRouter, Redirect } from 'react-router-dom'
 
 import Home from '@/containers/HomePage'
 import About from '@/containers/AboutPage'
@@ -12,6 +12,7 @@ import Invite from '@/containers/InvitePage'
 import Inventory from '@/containers/InventoryPage'
 import Settings from "@/containers/SettingsPage";
 import Workspace from "@/containers/WorkspacePage";
+import Changes from "@/containers/ChangesPage"
 
 const Router = () => {
   return (
@@ -23,9 +24,10 @@ const Router = () => {
         <Route path="/register" component={Register} />
         <Route path="/join/:token" component={Invite} />
         <Route path="/inventory" component={Inventory} />
+        <Route path="/changes" component={Changes} />
         <Route path="/settings" component={Settings} />
         <Route path="/workspace" component={Workspace} />
-        <Route path="*" render={() => (<Redirect to="/inventory"/>)} />
+        <Route path="*" render={() => (<Redirect to="/inventory" />)} />
       </Switch>
     </BrowserRouter>
   )
