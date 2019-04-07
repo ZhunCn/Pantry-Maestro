@@ -1,10 +1,15 @@
 @charset "UTF-8";
 
+body {
+	background-color:#ECF6EC;
+}
+
 .CheckoutPage {
   display:flex;
   .Content {
     flex: 1;
     margin-left: 108px;
     margin-top: 24px;
+    margin-bottom: cover;
   }
 }
