@@ -255,61 +255,7 @@ export default class Analytics extends React.Component {
                   'rgba(255, 159, 64, 0.6)',
                   'rgba(139, 69, 19, 0.6)',
                   'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)',
-                  'rgba(255, 99, 132, 0.6)',
-                  'rgba(54, 162, 235, 0.6)',
-                  'rgba(255, 206, 86, 0.6)',
-                  'rgba(75, 192, 192, 0.6)',
-                  'rgba(153, 102, 255, 0.6)',
-                  'rgba(255, 159, 64, 0.6)',
-                  'rgba(139, 69, 19, 0.6)'
+                  'rgba(54, 162, 235, 0.6)'
                 ]
               }
             ]
@@ -359,11 +305,20 @@ export default class Analytics extends React.Component {
         <h1>Analytics</h1>
         <Tabs>
           <TabList>
+            <Tab><font face="Futura" size="4" color="grey"><b>About Analytics</b></font></Tab>
             <Tab><font face="Futura" size="4" color="grey"><b>Expiration Analytics</b></font></Tab>
             <Tab><font face="Futura" size="4" color="grey"><b>Quantity Analytics</b></font></Tab>
             <Tab><font face="Futura" size="4" color="grey"><b>Popularity Analytics</b></font></Tab>
           </TabList>
 
+          <TabPanel>
+            <div className="about">
+              <h3>About Analytics</h3>
+              <p>The Expiration Analytics Tab contains Analytics reflecting the state of expired goods</p>
+              <p>The Quantity Analytics Tab contains Analytics reflecting the quantities of all the goods</p>
+              <p>The Popularity Analytics Tab contains Analytics reflecting the popularity of all the goods goods</p>
+            </div>
+          </TabPanel>
           <TabPanel>
             <ExpirationChart chartData={this.state.chartExpData} pantry="The Pantry" legendPosition="bottom"/>
           </TabPanel>
