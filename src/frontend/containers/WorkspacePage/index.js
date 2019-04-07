@@ -8,6 +8,8 @@ import './styles.scss';
 import AddWorkspaceComponent from "../../components/AddWorkspaceComponent";
 import DisplayWorkspaceComponent from "../../components/DisplayWorkspaceComponent";
 import InviteVolunteerComponent from "../../components/InviteVolunteerComponent";
+import DisplayVolunteerComponent from "../../components/DisplayVolunteerComponent";
+
 
 export default class Workspace extends React.Component {
   //works: 2D array of [workspaceID]
@@ -110,6 +112,7 @@ export default class Workspace extends React.Component {
         	<div class="Right">
         		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
         		<InviteVolunteerComponent />
+            <DisplayVolunteerComponent />
         		</div>
         	</div>
         </div>
