@@ -158,6 +158,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
     }
     <br/>
     <Modal
+        style={{ height: 200 }}
         open={this.state.open1}
         onOpen={this.open1}
         onClose={this.closeAll}
@@ -171,6 +172,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         </div>
     </Modal>
     <Modal
+        style={{ height: 200 }}
         open={this.state.open2}
         onOpen={this.open2}
         onClose={this.closeAll}
@@ -184,6 +186,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         </div>
     </Modal>
     <Modal
+        style={{ height: 200 }}
         open={this.state.open3}
         onOpen={this.open3}
         onClose={this.closeAll}
@@ -198,6 +201,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         </div>
     </Modal>
     <Modal
+        style={{ height: 200 }}
         open={this.state.open4}
         onOpen={this.open4}
         onClose={this.closeAll}

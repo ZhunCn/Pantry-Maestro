@@ -137,7 +137,7 @@ export default class Inventory extends React.Component {
     fetchData() {
         workspaceID = localStorage.getItem("currWorkspaceID");
         let userLoginToken = localStorage.getItem("loginToken");
-        axios.get(`/api/workspaces/${workspaceID}/inventory`, { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        axios.get(`/api/workspaces/${workspaceID}/inventory`, { headers: { "Authorization": `${userLoginToken}` } }).then(res => {
             // Add functionality to see if the last modified item is the same as the local last modified item.
             // Only refresh i.e. setState when the last modified items are different
             let serverData = parseData(res.data);
@@ -170,7 +170,7 @@ export default class Inventory extends React.Component {
         axios
             .delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
                 data: { expiration: item.expiration },
-                headers: { "Authorization" : `${userLoginToken}` }
+                headers: { "Authorization": `${userLoginToken}` }
             })
             .then(res => {
                 if (res.status === 200) {
@@ -178,7 +178,7 @@ export default class Inventory extends React.Component {
                         .put(
                             `/api/workspaces/${workspaceID}/inventory/${itemID}`,
                             updatedJSON,
-                            { headers: { "Authorization" : `${userLoginToken}` }}
+                            { headers: { "Authorization": `${userLoginToken}` } }
                         )
                         .then(res => {
                             // HTTP status 200 OK
@@ -219,7 +219,7 @@ export default class Inventory extends React.Component {
             .put(
                 `/api/workspaces/${workspaceID}/inventory/${itemID}`,
                 updatedQuantity,
-                { headers: { "Authorization" : `${userLoginToken}` } }
+                { headers: { "Authorization": `${userLoginToken}` } }
             )
             .then(res => {
                 // HTTP status 200 OK
@@ -260,10 +260,10 @@ export default class Inventory extends React.Component {
         axios
             .delete(`/api/workspaces/${workspaceID}/inventory/${itemID}`, {
                 data: { expiration: this.state.itemToDelete.expiration },
-                headers: { "Authorization" : `${userLoginToken}` }
+                headers: { "Authorization": `${userLoginToken}` }
             })
             .then(res => {
-              console.log(res);
+                console.log(res);
                 if (res.status === 200) {
                     console.log("Deleted item");
                     toast("Deleted item successfully!", { type: "success" });
@@ -286,9 +286,9 @@ export default class Inventory extends React.Component {
         let itemID = row.subRows[0]._original.id;
         let newName = this.editNameInput.current.value;
         let updateJSON = {
-          "name": newName
+            "name": newName
         }
-        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON, { headers: { "Authorization" : `${userLoginToken}` } }).then(res => {
+        axios.put(`/api/workspaces/${workspaceID}/inventory/${itemID}`, updateJSON, { headers: { "Authorization": `${userLoginToken}` } }).then(res => {
             if (res.status === 200) {
                 console.log("Updated name");
                 toast("Updated name successfully", { type: "success" });
@@ -337,14 +337,17 @@ export default class Inventory extends React.Component {
                 Cell: row => {
                     if (!row.original) {
                         return (
-                            <Modal trigger={<Button
-                                compact
-                                fluid
-                                style={{
-                                    padding:
-                                        "6px 7px 6px 7px",
-                                }}
-                                style={{ padding: "10px" }}>Edit Name</Button>}>
+                            <Modal
+                                style={{ height: 280 }}
+                                trigger={<Button
+                                    compact
+                                    fluid
+                                    style={{
+                                        padding:
+                                            "6px 7px 6px 7px",
+                                    }}
+                                    style={{ padding: "10px" }}>Edit Name</Button>}
+                            >
                                 <Modal.Header>Edit Name</Modal.Header>
                                 <Modal.Content>
                                     <Form style={{ padding: "10px" }}>
@@ -653,7 +656,7 @@ export default class Inventory extends React.Component {
             <div class="inventoryPage" >
                 <ToastContainer autoClose={3000} />
                 <GenericNavigationBar />
-                <div class="Content" style={{ position: "relative" }}>
+                <div class="Content">
                     <div
                         class="InventoryTopBar"
                         style={{ display: "inline-block" }}>
@@ -668,11 +671,7 @@ export default class Inventory extends React.Component {
                             }}
                         />
                         <Modal
-                            style={{
-                                marginTop: '0px !important',
-                                marginLeft: 'auto',
-                                marginRight: 'auto'
-                            }}
+                            style={{ height: "70%" }}
                             trigger={
                                 <Button icon labelPosition="left" size="small">
                                     <Icon name="add" />
@@ -680,11 +679,15 @@ export default class Inventory extends React.Component {
                                 </Button>
                             }>
                             <Modal.Header>Add a new item</Modal.Header>
-                            <AddChangeItemComponent
-                                fetchData={() => {
-                                    this.fetchData();
-                                }}
-                            />
+                            <Modal.Content
+                                scrolling>
+                                <AddChangeItemComponent
+                                    fetchData={() => {
+                                        this.fetchData();
+                                    }}
+                                />
+                            </Modal.Content>
+
                         </Modal>
                     </div>
                     <ReactTable
