@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Button, Form } from "semantic-ui-react";
+import { Button, Form, Input } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 export default class AddChangeItemComponent extends React.Component {
@@ -151,10 +151,11 @@ export default class AddChangeItemComponent extends React.Component {
             <div style={{ margin: "15px" }}>
                 <ToastContainer autoClose={3000} />
                 <Form>
-                    <Form.Field inline={true}>
+                    <Form.Field inline={true} autoComplete="off">
                         <label htmlFor="name">Name:</label>
-                        <input
+                        <Input
                             type="text"
+                            autoComplete="off"
                             name="name"
                             id="name"
                             value={name}
@@ -173,15 +174,16 @@ export default class AddChangeItemComponent extends React.Component {
                         return (
                             <div key={idx} class="dateQuantityInputs">
                                 <Form>
-                                    <Form.Group widths="equal">
-                                        <Form.Field>
+                                    <Form.Group widths="equal" autoComplete="off">
+                                        <Form.Field autoComplete="off">
                                             <label
                                                 class="expirationLabel"
                                                 htmlFor={
                                                     dateId
                                                 }>{`Expiration #${idx +
-                                                1}:  `}</label>
+                                                    1}:  `}</label>
                                             <DatePicker
+                                                autoComplete="off"
                                                 onChange={date =>
                                                     this.handleCalendarChange(
                                                         date,
@@ -197,6 +199,7 @@ export default class AddChangeItemComponent extends React.Component {
                                                 showMonthDropdown
                                                 showYearDropdown
                                                 dropdownMode="select"
+                                                popperPlacement="auto-right"
                                             />
                                         </Form.Field>
                                         <Form.Field>
