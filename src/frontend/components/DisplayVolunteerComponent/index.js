@@ -16,7 +16,9 @@ export default class DisplayVolunteerComponent extends React.Component {
       open3: false,
       volunteers: [''],
       curWorkspace: "",
-      isOwner: false
+      isOwner: false,
+      curVolun: '',
+      curID:''
     };
   }
   getID(token){
@@ -60,6 +62,9 @@ export default class DisplayVolunteerComponent extends React.Component {
       }).catch(error => {
         console.log(error);
       });
+  }
+  refreshModal(value){
+    this.setState({curVolun: value});
   }
   checkOwner(id){
     console.log("Check Ownership of:" + this.state.userID);
@@ -143,13 +148,14 @@ export default class DisplayVolunteerComponent extends React.Component {
     toast("Nothing happened because this wasn't implemented yet", { type: "warning" });
     this.closeAll();
   }
-  refreshModal(value) {
-    this.setState({ state: this.state });
+  refreshModal(name, id) {
+    this.setState({ curVolun: name, curID: id });
   }
   listItem(value) {
     var name = value.account.username;
     let workspaceID = localStorage.getItem("currWorkspaceID");
-    if(this.state.isOwner){
+    let isSelf = value.account._id == this.state.userID;
+    if(this.state.isOwner && !isSelf){
     return (<li>
       {name}
       <br />
@@ -159,11 +165,11 @@ export default class DisplayVolunteerComponent extends React.Component {
         onOpen={this.open1}
         onClose={this.closeAll}
         size="small"
-        trigger={<Button size='small' onClick={() => this.refreshModal(value)}>Remove from Workspace</Button>}>
-        <Modal.Header>Remove {name} from {this.state.curWorkspace}?</Modal.Header>
+        trigger={<Button size='small' onClick={() => this.refreshModal(name, value.account._id)}>Remove from Workspace</Button>}>
+        <Modal.Header>Remove {this.state.curVolun} from {this.state.curWorkspace}?</Modal.Header>
         <div class="contain" style={{ margin: 20 }}>
-          <strong>Are you sure you want to remove <i>{name}</i> from <i>{this.state.curWorkspace}</i>?</strong><br />
-          <Button onClick={() => this.handleRemove(value.account._id)}>Remove from workspace</Button>
+          <strong>Are you sure you want to remove <i>{this.state.curVolun}</i> from <i>{this.state.curWorkspace}</i>?</strong><br />
+          <Button onClick={() => this.handleRemove(this.state.curID)}>Remove from workspace</Button>
           <Button onClick={this.closeAll}>Do not remove from Workspace</Button>
         </div>
       </Modal>
@@ -173,11 +179,11 @@ export default class DisplayVolunteerComponent extends React.Component {
         onOpen={this.open2}
         onClose={this.closeAll}
         size="small"
-        trigger={<Button size='small' onClick={() => this.refreshModal(value)}>Make Admin</Button>}>
+        trigger={<Button size='small' onClick={() => this.refreshModal(name, value.account._id)}>Make Admin</Button>}>
         <Modal.Header>Make Admin?</Modal.Header>
         <div class="contain" style={{ margin: 20 }}>
-          <strong>Are you sure you want to make <i>{name}</i> an administrator of <i>{this.state.curWorkspace}</i>?</strong><br />
-          <Button onClick={() => this.handleMakeAdmin(value.account._id)}>Make admin</Button>
+          <strong>Are you sure you want to make <i>{this.state.curVolun}</i> an administrator of <i>{this.state.curWorkspace}</i>?</strong><br />
+          <Button onClick={() => this.handleMakeAdmin(this.state.curID)}>Make admin</Button>
           <Button onClick={this.closeAll}>Do not make admin</Button>
         </div>
       </Modal>
@@ -187,11 +193,11 @@ export default class DisplayVolunteerComponent extends React.Component {
         onOpen={this.open3}
         onClose={this.closeAll}
         size="small"
-        trigger={<Button size='small' onClick={() => this.refreshModal(value)}>Transfer ownership</Button>}>
+        trigger={<Button size='small' onClick={() => this.refreshModal(name, value.account._id)}>Transfer ownership</Button>}>
         <Modal.Header>Transfer Ownership?</Modal.Header>
         <div class="contain" style={{ margin: 20 }}>
-          <strong>Are you sure you want to make <i>{name}</i> the owner of <i>{this.state.curWorkspace}</i>?</strong><br />
-          <Button onClick={() => this.handleTransfer(value.account._id)}>Transfer Ownership</Button>
+          <strong>Are you sure you want to make <i>{this.state.curVolun}</i> the owner of <i>{this.state.curWorkspace}</i>?</strong><br />
+          <Button onClick={() => this.handleTransfer(this.state.curID)}>Transfer Ownership</Button>
           <Button onClick={this.closeAll}>Do not transfer ownership</Button>
         </div>
       </Modal>
