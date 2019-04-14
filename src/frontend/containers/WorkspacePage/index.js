@@ -112,7 +112,7 @@ export default class Workspace extends React.Component {
         	<div class="Right">
         		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
         		<InviteVolunteerComponent />
-            <DisplayVolunteerComponent />
+            <DisplayVolunteerComponent getInfo={()=>{this.getInfo()}} userID={this.state.userID}/>
         		</div>
         	</div>
         </div>
