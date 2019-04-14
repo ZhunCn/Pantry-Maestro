@@ -198,7 +198,7 @@ export default class Inventory extends React.Component {
     return Math.round((second - first) / (1000 * 60 * 60 * 24));
   }
 
-  handleAddToCartButton(item, updown){
+  handleAddToCartButton(item, updown) {
     //NOT WORKING CORRECT RN
   }
 
@@ -595,7 +595,7 @@ export default class Inventory extends React.Component {
                 <Button
                   icon
                   compact
-                  style={{ padding: "6px 7px 6px 7px"}}
+                  style={{ padding: "6px 7px 6px 7px" }}
                   onClick={() =>
                     this.handleEditQuantityButton(row.row._original, -1)
                   }
@@ -614,11 +614,12 @@ export default class Inventory extends React.Component {
                 </Button>
               </Button.Group>
 
-              <Button positive
+              <Button
+                positive
                 floated="right"
                 icon
                 compact
-                style={{ padding: "6px 7px 6px 7px", marginRight: "10px"}}
+                style={{ padding: "6px 7px 6px 7px", marginRight: "10px" }}
                 onClick={() =>
                   this.handleAddToCartButton(row.row._original, -1)
                 }
@@ -644,6 +645,7 @@ export default class Inventory extends React.Component {
               Delete
             </button>
             <Confirm
+              style={{ height: "120px" }}
               open={this.state.deleteItemShow}
               onCancel={() => {
                 this.handleCancelDeleteItem();
@@ -663,7 +665,6 @@ export default class Inventory extends React.Component {
 
     return (
       <div class="inventoryPage">
-        <ToastContainer autoClose={3000} />
         <GenericNavigationBar />
         <div class="Content">
           <div class="InventoryTopBar" style={{ display: "inline-block" }}>

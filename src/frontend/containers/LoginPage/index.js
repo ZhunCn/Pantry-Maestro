@@ -167,7 +167,6 @@ export default class Login extends React.Component {
 
     return (
       <div className="login-form">
-        <ToastContainer autoClose={3000} />
         <Grid
           textAlign="center"
           style={{ height: "100%" }}
