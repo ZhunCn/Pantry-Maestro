@@ -144,6 +144,34 @@ export default class Inventory extends React.Component {
       });
   }
 
+  createFakeData() {
+    workspaceID = localStorage.getItem("currWorkspaceID");
+    let userLoginToken = localStorage.getItem("loginToken");
+    let startDate = new Date("01/01/2018");
+    let endDate = new Date("12/30/2022");
+
+    for (let i = 0; i < 100; i++) {
+      let randomName = Math.random()
+        .toString(36)
+        .substring(7);
+      let randomDateQuantity = {};
+      for (let j = 0; j < Math.floor(Math.random() * Math.floor(9)) + 1; j++) {
+        let randomDate = new Date(
+          +startDate + Math.random() * (endDate - startDate)
+        ).toLocaleDateString();
+        randomDateQuantity[randomDate] =
+          Math.floor(Math.random() * Math.floor(25)) + 1;
+      }
+      let randomData = {
+        name: randomName,
+        quantities: randomDateQuantity
+      };
+      axios.post(`/api/workspaces/${workspaceID}/inventory`, randomData, {
+        headers: { Authorization: `${userLoginToken}` }
+      });
+    }
+  }
+
   handleCalendarChangeStart(date) {
     let startDate = new Date(date);
     this.setState({ dateRangeStart: startDate });
@@ -202,7 +230,7 @@ export default class Inventory extends React.Component {
     let userLoginToken = localStorage.getItem("loginToken");
     let updatedQuantity = {
       items: {
-        [item.id]:{
+        [item.id]: {
           [item.expiration]: updown
         }
       }
@@ -210,11 +238,9 @@ export default class Inventory extends React.Component {
     workspaceID = localStorage.getItem("currWorkspaceID");
     let itemID = item.id;
     axios
-      .post(
-        `/api/workspaces/${workspaceID}/checkout`,
-        updatedQuantity,
-        { headers: { Authorization: `${userLoginToken}` } }
-      )
+      .post(`/api/workspaces/${workspaceID}/checkout`, updatedQuantity, {
+        headers: { Authorization: `${userLoginToken}` }
+      })
       .then(res => {
         // HTTP status 200 OK
         if (res.status === 200) {
@@ -651,9 +677,10 @@ export default class Inventory extends React.Component {
                 icon
                 compact
                 style={{ padding: "6px 7px 6px 7px", marginRight: "10px" }}
-                onClick={() =>
-                  //this.handleAddToCartButton(row.row._original, -1)
-                  this.handleEditQuantityButton(row.row._original, -1)//api path doesnt work rn so ill just remove for now
+                onClick={
+                  () =>
+                    //this.handleAddToCartButton(row.row._original, -1)
+                    this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
                 }
               >
                 Add To Cart
@@ -728,6 +755,14 @@ export default class Inventory extends React.Component {
                 />
               </Modal.Content>
             </Modal>
+            <Button
+              labelPosition="left"
+              content="DEV - Create 100 fake items"
+              size="small"
+              onClick={() => {
+                this.createFakeData();
+              }}
+            />
           </div>
           <ReactTable
             ref={refReactTable => {
