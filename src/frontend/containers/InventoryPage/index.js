@@ -198,6 +198,10 @@ export default class Inventory extends React.Component {
     return Math.round((second - first) / (1000 * 60 * 60 * 24));
   }
 
+  handleAddToCartButton(item, updown){
+    //NOT WORKING CORRECT RN
+  }
+
   // handles +/- button for items
   // updown is either +1 or -1 for adding 1 and removing 1
   handleEditQuantityButton(item, updown) {
@@ -591,7 +595,7 @@ export default class Inventory extends React.Component {
                 <Button
                   icon
                   compact
-                  style={{ padding: "6px 7px 6px 7px" }}
+                  style={{ padding: "6px 7px 6px 7px"}}
                   onClick={() =>
                     this.handleEditQuantityButton(row.row._original, -1)
                   }
@@ -609,6 +613,18 @@ export default class Inventory extends React.Component {
                   <Icon name="plus" />
                 </Button>
               </Button.Group>
+
+              <Button positive
+                floated="right"
+                icon
+                compact
+                style={{ padding: "6px 7px 6px 7px", marginRight: "10px"}}
+                onClick={() =>
+                  this.handleAddToCartButton(row.row._original, -1)
+                }
+              >
+                Add To Cart
+              </Button>
             </div>
           );
         }
