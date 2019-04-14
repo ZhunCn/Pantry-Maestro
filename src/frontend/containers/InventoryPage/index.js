@@ -199,6 +199,37 @@ export default class Inventory extends React.Component {
   }
 
   handleAddToCartButton(item, updown) {
+    let userLoginToken = localStorage.getItem("loginToken");
+    let updatedQuantity = {
+      items: {
+        [item.id]:{
+          [item.expiration]: updown
+        }
+      }
+    };
+    workspaceID = localStorage.getItem("currWorkspaceID");
+    let itemID = item.id;
+    axios
+      .post(
+        `/api/workspaces/${workspaceID}/checkout`,
+        updatedQuantity,
+        { headers: { Authorization: `${userLoginToken}` } }
+      )
+      .then(res => {
+        // HTTP status 200 OK
+        if (res.status === 200) {
+          console.log("checked out");
+        }
+        console.log(res.data);
+        this.fetchData();
+      })
+      .catch(error => {
+        console.log(error);
+        toast(`There was error adding to cart. ${error}`, {
+          type: "error"
+        });
+      });
+
     //NOT WORKING CORRECT RN
   }
 
@@ -621,7 +652,8 @@ export default class Inventory extends React.Component {
                 compact
                 style={{ padding: "6px 7px 6px 7px", marginRight: "10px" }}
                 onClick={() =>
-                  this.handleAddToCartButton(row.row._original, -1)
+                  //this.handleAddToCartButton(row.row._original, -1)
+                  this.handleEditQuantityButton(row.row._original, -1)//api path doesnt work rn so ill just remove for now
                 }
               >
                 Add To Cart
