@@ -650,7 +650,22 @@ export default class Inventory extends React.Component {
               <label>{row.row.quantity}</label>
               <Button.Group floated="right">
                 <Button
+                  animated
+                  size="tiny"
+                  compact
+                  style={{ padding: "6px auto 6px auto" }}
+                  onClick={() =>
+                    this.handleEditQuantityButton(row.row._original, -10)
+                  }
+                >
+                  <Button.Content visible>x10</Button.Content>
+                  <Button.Content hidden>
+                    <Icon name="minus" />
+                  </Button.Content>
+                </Button>
+                <Button
                   icon
+                  size="tiny"
                   compact
                   style={{ padding: "6px 7px 6px 7px" }}
                   onClick={() =>
@@ -661,6 +676,7 @@ export default class Inventory extends React.Component {
                 </Button>
                 <Button
                   icon
+                  size="tiny"
                   compact
                   style={{ padding: "6px 7px 6px 7px" }}
                   onClick={() =>
@@ -668,6 +684,20 @@ export default class Inventory extends React.Component {
                   }
                 >
                   <Icon name="plus" />
+                </Button>
+                <Button
+                  animated
+                  size="tiny"
+                  compact
+                  style={{ padding: "6px auto 6px auto" }}
+                  onClick={() =>
+                    this.handleEditQuantityButton(row.row._original, 10)
+                  }
+                >
+                  <Button.Content visible>x10</Button.Content>
+                  <Button.Content hidden>
+                    <Icon name="plus" />
+                  </Button.Content>
                 </Button>
               </Button.Group>
 
