@@ -15,6 +15,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authorize } from "@/utils";
+import logo from '@/assets/PantryMaestroLogo.png'
 
 import "./styles.scss";
 
@@ -216,6 +217,8 @@ export default class Register extends React.Component {
           className="middle aligned"
         >
           <Grid.Column style={{ maxWidth: 450 }}>
+            <img textAlign="center" src={logo} class="ui medium centered image"/>
+
             <Header as="h2" color="black" textAlign="center">
               Register for a new account
             </Header>

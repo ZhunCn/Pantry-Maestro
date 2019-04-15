@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Link, Redirect } from "react-router-dom";
 import axios from "axios";
+import logo from '@/assets/PantryMaestroLogo.png'
 
 import {
   Button,
@@ -217,6 +218,7 @@ export default class Invite extends React.Component {
               className="middle aligned"
             >
               <Grid.Column style={{ maxWidth: 450 }}>
+                <img textAlign="center" src={logo} class="ui medium centered image"/>
                 <Header as="h2" color="black" textAlign="center">
                   You have been invited to a Pantry Workplace!
                 </Header>
@@ -253,6 +255,7 @@ export default class Invite extends React.Component {
                 className="middle aligned"
               >
                 <Grid.Column style={{ maxWidth: 450 }}>
+                  <img textAlign="center" src={logo} class="ui medium centered image"/>
                   <Header as="h2" color="black" textAlign="center">
                     You have been invited to a Pantry Workplace!
                   </Header>

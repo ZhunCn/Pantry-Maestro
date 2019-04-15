@@ -14,6 +14,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authorize } from "@/utils";
+import logo from '@/assets/PantryMaestroLogo.png'
 
 import "./styles.scss";
 import { PromiseProvider } from "mongoose";
@@ -173,7 +174,9 @@ export default class Login extends React.Component {
           verticalAlign="middle"
           className="middle aligned"
         >
+        
           <Grid.Column style={{ maxWidth: 450 }}>
+          <img textAlign="center" src={logo} class="ui medium centered image"/>
             <Header as="h2" color="black" textAlign="center">
               Log in to your account
             </Header>
