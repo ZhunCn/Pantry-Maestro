@@ -68,13 +68,23 @@ export default class Workspace extends React.Component {
     var curWorkID = localStorage.getItem("currWorkspaceID");
     var i;
     var hasCurr = false;
-    if(!curWorkID||curWorkID=="null"){
-      localStorage.setItem("currWorkspaceID", workspaces[0]);
+    if(!curWorkID||curWorkID=="null"||curWorkID==''){
+      if(workspaces[0]){
+        localStorage.setItem("currWorkspaceID", workspaces[0]);
+      }
+      else if(workspaces[1]){
+        localStorage.setItem("currWorkspaceID", workspaces[1]);
+      }
     }
     else{
       var ind = workspaces.indexOf(curWorkID);
       if(ind==-1){
-        localStorage.setItem("currWorkspaceID", workspaces[0]);
+        if(workspaces[0]){
+          localStorage.setItem("currWorkspaceID", workspaces[0]);
+        }
+        else if(workspaces[1]){
+          localStorage.setItem("currWorkspaceID", workspaces[1]);
+        }
       }
     }
     return true;
@@ -155,7 +165,7 @@ export default class Workspace extends React.Component {
         "Content-Type": "application/json"
       }
     }).then(res => {
-      if (res.data.roles[0] == "owner") {
+      if (res.data.roles.includes("owner")) {
         console.log("Ownership check complete: true");
         this.setState({ isOwner: true });
       } else {

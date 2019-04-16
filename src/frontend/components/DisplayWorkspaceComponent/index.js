@@ -33,12 +33,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
             "Content-Type": "application/json"
           }
         }).then(res => {
-          if (res.data.roles[0] == "owner") {
-            toast("You are the owner of this workspace. You must transfer your ownership before leaving.", { type: "warning" });
-          }
-          else {
-            this.handleLeave(id);
-          }
+          this.handleLeave(id);
         });
         this.closeAll(id);
       } else {
@@ -49,9 +44,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
   }
   handleLeave(id) {
     console.log("LEAVE ID: " + id);
-    if (id == localStorage.getItem("currWorkspaceID")) {
-      localStorage.setItem("currWorkspaceID", "");
-    }
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post("/api/account/leave",
       {
@@ -63,23 +55,21 @@ export default class DisplayWorkspaceComponent extends React.Component {
           Accept: "application/json",
           "Content-Type": "application/json"
         }
-      }
-      )
-      .then(res => {
-        if (
-          res.data.error ==
-          "You can't leave the workspace if you're the last member in it"
-        ) {
-          toast(res.data.error + ". Try deleting the workspace instead.", {
-            type: "warning"
-          });
-        } else {
-          console.log(res.data);
+    }).then(res => {
+        if (res.data.error == "You can't leave the workspace if you're the last member in it") {
+          toast(res.data.error + ". Try deleting the workspace instead.", {type: "warning"});
+        }
+        else if(res.data.error == "You cannot leave a workspace if you are the owner"){
+          toast(res.data.error +". Transfer the ownership to another person first.", {type:"warning"});
+        }
+        else {
           toast("User has left the workspace", { type: "success" });
+          if (id == localStorage.getItem("currWorkspaceID")) {
+            localStorage.setItem("currWorkspaceID", "");
+          }
           this.props.getInfo();
         }
-      })
-      .catch(error => {
+    }).catch(error => {
         toast(error.message, { type: "error" });
         this.props.getInfo();
       });
@@ -87,35 +77,26 @@ export default class DisplayWorkspaceComponent extends React.Component {
   }
   handleDelete(id) {
     console.log("DELETE ID: " + id);
-    if (id == localStorage.getItem("currWorkspaceID")) {
-      localStorage.setItem("currWorkspaceID", "");
-    }
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
-    axios
-      .delete(`/api/workspaces/${id}`, {
+    axios.delete(`/api/workspaces/${id}`, {
         headers: {
           Authorization: `${userLoginToken}`,
           Accept: "application/json",
           "Content-Type": "application/json"
         }
       }).then(res => {
-        if (
-          res.data.error ===
-          "There was an error deleting the workspace: Insufficient permissions"
-        ) {
-          toast(
-            "The workspace was not deleted. Only the owner may delete the workspace",
-            { type: "error" }
-          );
-        } else {
-          toast("The workspace has been successfully deleted", {
-            type: "success"
-          });
+        if (res.data.error ==="There was an error deleting the workspace: Insufficient permissions") {
+          toast("The workspace was not deleted. Only the owner may delete the workspace",{ type: "error" });
+        }
+        else {
+          toast("The workspace has been successfully deleted", {type: "success"});
+          if (id == localStorage.getItem("currWorkspaceID")) {
+            localStorage.setItem("currWorkspaceID", "");
+          }
           this.props.getInfo();
         }
-      })
-      .catch(error => {
+      }).catch(error => {
         toast(error.message, { type: "error" });
         this.props.getInfo();
         console.log(error.message);

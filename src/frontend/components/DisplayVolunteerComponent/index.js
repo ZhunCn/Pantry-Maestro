@@ -47,16 +47,33 @@ export default class DisplayVolunteerComponent extends React.Component {
       if (res.data.message == "Successfully deleted user from workspace") {
         toast(res.data.message, { type: "success" });
       } else {
-        toast(res.data.message, { type: "error" });
+        toast(res.data.error, { type: "error" });
       }
       this.props.getInfo();
     });
     this.closeAll();
   }
   handleTransfer(id) {
-    console.log("Transfer: " + id);
-    console.log("This function hasn't been implemented yet");
-    toast("Nothing happened because this wasn't implemented yet", {type: "warning"});
+    console.log("Transfer to: " + id);
+    let workID = localStorage.getItem("currWorkspaceID");
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.post(`/api/workspaces/${workID}/transfer`, {
+      user_id: `${id}`
+    },
+    {
+      headers: {
+        Authorization: `${userLoginToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.data.message == "Successfully updated roles") {
+        toast(res.data.message, { type: "success" });
+      } else {
+        toast(res.data.error, { type: "error" });
+      }
+      this.props.getInfo();
+    });
     this.closeAll();
   }
   handleMakeAdmin(id) {
@@ -147,7 +164,7 @@ export default class DisplayVolunteerComponent extends React.Component {
             <div class="contain" style={{ margin: 20 }}>
               <strong>
                 Are you sure you want to make <i>{this.state.curVolun}</i> the
-                owner of <i>{this.props.name}</i>?
+                owner of <i>{this.props.name}</i>? This action cannot be undone on your end.
               </strong>
               <br />
               <Button onClick={() => this.handleTransfer(this.state.curID)}>
