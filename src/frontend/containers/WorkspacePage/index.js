@@ -56,9 +56,6 @@ export default class Workspace extends React.Component {
           });
         }
       }).catch(error => {
-        this.setState({
-          names:[['','']]
-        });
         console.log(error);
       })
     }
@@ -112,7 +109,7 @@ export default class Workspace extends React.Component {
           "Content-Type": "application/json"
         }
     }).then(res => {
-      if(res.data.volunteers){
+      if(res.data.users){
         this.setState({
           volunteers: res.data.users
         });
@@ -151,16 +148,12 @@ export default class Workspace extends React.Component {
       }
       else{
         this.setState({
-          names: [''],
           volunteers:[''],
-          works:['']
         });
       }
     }).catch(err=>{
       this.setState({
-        names: [''],
         volunteers:[''],
-        works:['']
       });
       console.log(err.message);
     });

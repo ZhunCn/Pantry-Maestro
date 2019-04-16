@@ -304,10 +304,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
     return (
       <div>
         <strong>Workspaces you are enrolled in</strong>
-        {this.props.names[0][0] != "" ? (
-          this.makeList(this.props.names)
-        ) : (
+        {(this.props.names.length==1 && !this.props.names[0][0]) ? (
           <ul>None</ul>
+        ) : (
+          this.makeList(this.props.names)
         )}
       </div>
     );
