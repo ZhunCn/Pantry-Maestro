@@ -9,105 +9,19 @@ export default class DisplayVolunteerComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      userID: "",
+      userID: this.props.userID,
       open1: false,
       open2: false,
       open3: false,
-      volunteers: [""],
+      volunteers: this.props.volunteers,
       curWorkspace: "",
-      isOwner: false,
+      isOwner: this.props.isOwner,
       curVolun: "",
       curID: ""
     };
   }
-  getID(token) {
-    return axios
-      .get("/api/account", {
-        headers: {
-          Authorization: `${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        this.setState({
-          userID: res.data._id
-        });
-        console.log("USER ID: " + this.state.userID);
-      });
-  }
-  componentDidMount() {
-    this.updateInfo();
-  }
-  updateInfo() {
-    let userLoginToken = localStorage.getItem("loginToken");
-    let curWorkID = localStorage.getItem("currWorkspaceID");
-    let userID = this.state.userID;
-    console.log("USER ID: " + userID);
-    axios
-      .get(`/api/workspaces/${curWorkID}`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        this.setState({
-          curWorkspace: res.data.name
-        });
-      })
-      .then(() => {
-        this.getID(userLoginToken).then(() => {
-          this.getVolunteers(curWorkID);
-          this.checkOwner(curWorkID);
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
   refreshModal(value) {
     this.setState({ curVolun: value });
-  }
-  checkOwner(id) {
-    console.log("Check Ownership of:" + this.state.userID);
-    let userLoginToken = localStorage.getItem("loginToken");
-    let userID = this.state.userID;
-    axios
-      .get(`/api/workspaces/${id}/users/${userID}`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        if (res.data.roles[0] == "owner") {
-          console.log("Ownership check complete: true");
-          this.setState({ isOwner: true });
-        } else {
-          console.log("Ownership check complete: False");
-          this.setState({ isOwner: false });
-        }
-      });
-  }
-  getVolunteers(id) {
-    console.log("ID" + id);
-    let userLoginToken = localStorage.getItem("loginToken");
-    axios
-      .get(`api/workspaces/${id}/users`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        this.setState({
-          volunteers: res.data.users
-        });
-      });
   }
   makeList(items) {
     return <ul>{items.map((item, i) => this.listItem(item))}</ul>;
@@ -123,38 +37,32 @@ export default class DisplayVolunteerComponent extends React.Component {
     console.log("Remove: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     let workID = localStorage.getItem("currWorkspaceID");
-    axios
-      .delete(`/api/workspaces/${workID}/users/${id}`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        if (res.data.message == "Successfully deleted user from workspace") {
-          toast(res.data.message, { type: "success" });
-        } else {
-          toast(res.data.message, { type: "error" });
-        }
-        this.updateInfo();
-      });
+    axios.delete(`/api/workspaces/${workID}/users/${id}`, {
+      headers: {
+        Authorization: `${userLoginToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.data.message == "Successfully deleted user from workspace") {
+        toast(res.data.message, { type: "success" });
+      } else {
+        toast(res.data.message, { type: "error" });
+      }
+      this.props.getInfo();
+    });
     this.closeAll();
   }
   handleTransfer(id) {
     console.log("Transfer: " + id);
     console.log("This function hasn't been implemented yet");
-    toast("Nothing happened because this wasn't implemented yet", {
-      type: "warning"
-    });
+    toast("Nothing happened because this wasn't implemented yet", {type: "warning"});
     this.closeAll();
   }
   handleMakeAdmin(id) {
     console.log("Make admin: " + id);
     console.log("This function hasn't been implemented yet");
-    toast("Nothing happened because this wasn't implemented yet", {
-      type: "warning"
-    });
+    toast("Nothing happened because this wasn't implemented yet", {type: "warning"});
     this.closeAll();
   }
   refreshModal(name, id) {
@@ -163,8 +71,8 @@ export default class DisplayVolunteerComponent extends React.Component {
   listItem(value) {
     var name = value.account.username;
     let workspaceID = localStorage.getItem("currWorkspaceID");
-    let isSelf = value.account._id == this.state.userID;
-    if (this.state.isOwner && !isSelf) {
+    let isSelf = value.account._id == this.props.userID;
+    if (this.props.isOwner && !isSelf) {
       return (
         <li>
           {name}
@@ -176,21 +84,18 @@ export default class DisplayVolunteerComponent extends React.Component {
             onClose={this.closeAll}
             size="small"
             trigger={
-              <Button
-                size="small"
-                onClick={() => this.refreshModal(name, value.account._id)}
-              >
+              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
                 Remove from Workspace
               </Button>
             }
           >
             <Modal.Header>
-              Remove {this.state.curVolun} from {this.state.curWorkspace}?
+              Remove from workspace?
             </Modal.Header>
             <div class="contain" style={{ margin: 20 }}>
               <strong>
                 Are you sure you want to remove <i>{this.state.curVolun}</i>{" "}
-                from <i>{this.state.curWorkspace}</i>?
+                from <i>{this.props.name}</i>?
               </strong>
               <br />
               <Button onClick={() => this.handleRemove(this.state.curID)}>
@@ -208,19 +113,16 @@ export default class DisplayVolunteerComponent extends React.Component {
             onClose={this.closeAll}
             size="small"
             trigger={
-              <Button
-                size="small"
-                onClick={() => this.refreshModal(name, value.account._id)}
-              >
+              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
                 Make Admin
               </Button>
             }
           >
-            <Modal.Header>Make Admin?</Modal.Header>
+            <Modal.Header>Make admin of workspace?</Modal.Header>
             <div class="contain" style={{ margin: 20 }}>
               <strong>
                 Are you sure you want to make <i>{this.state.curVolun}</i> an
-                administrator of <i>{this.state.curWorkspace}</i>?
+                administrator of <i>{this.props.name}</i>?
               </strong>
               <br />
               <Button onClick={() => this.handleMakeAdmin(this.state.curID)}>
@@ -236,19 +138,16 @@ export default class DisplayVolunteerComponent extends React.Component {
             onClose={this.closeAll}
             size="small"
             trigger={
-              <Button
-                size="small"
-                onClick={() => this.refreshModal(name, value.account._id)}
-              >
+              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
                 Transfer ownership
               </Button>
             }
           >
-            <Modal.Header>Transfer Ownership?</Modal.Header>
+            <Modal.Header>Transfer Ownership of workspace?</Modal.Header>
             <div class="contain" style={{ margin: 20 }}>
               <strong>
                 Are you sure you want to make <i>{this.state.curVolun}</i> the
-                owner of <i>{this.state.curWorkspace}</i>?
+                owner of <i>{this.props.name}</i>?
               </strong>
               <br />
               <Button onClick={() => this.handleTransfer(this.state.curID)}>
@@ -268,8 +167,8 @@ export default class DisplayVolunteerComponent extends React.Component {
     return (
       <div>
         <strong>Volunteers in current workspace</strong>
-        {this.state.volunteers[0] != "" ? (
-          this.makeList(this.state.volunteers)
+        {this.props.volunteers[0] != "" ? (
+          this.makeList(this.props.volunteers)
         ) : (
           <ul>None</ul>
         )}

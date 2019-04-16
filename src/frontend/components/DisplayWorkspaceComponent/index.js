@@ -10,10 +10,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
     super(props);
     this.state = {
       user_id: this.props.user_id,
-      open1: false,
-      open2: false,
-      open3: false,
-      open4: false,
       works: ["", ""],
       field: 0
     };
@@ -22,40 +18,34 @@ export default class DisplayWorkspaceComponent extends React.Component {
     console.log("ID" + id);
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
-    axios
-      .get(`api/workspaces/${id}/users`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => {
-        if (res.data.users.length > 1) {
-          axios
-            .get(`/api/workspaces/${id}/users/${userID}`, {
-              headers: {
-                Authorization: `${userLoginToken}`,
-                Accept: "application/json",
-                "Content-Type": "application/json"
-              }
-            })
-            .then(res => {
-              if (res.data.roles[0] == "owner") {
-                toast(
-                  "You are the owner of this workspace. You must transfer your ownership before leaving.",
-                  { type: "warning" }
-                );
-              } else {
-                this.handleLeave(id);
-              }
-            });
-          this.closeAll(id);
-        } else {
-          this.closeAll(id);
-          this.open3(id);
-        }
-      });
+    axios.get(`api/workspaces/${id}/users`, {
+      headers: {
+        Authorization: `${userLoginToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.data.users.length > 1) {
+        axios.get(`/api/workspaces/${id}/users/${userID}`, {
+          headers: {
+            Authorization: `${userLoginToken}`,
+            Accept: "application/json",
+            "Content-Type": "application/json"
+          }
+        }).then(res => {
+          if (res.data.roles[0] == "owner") {
+            toast("You are the owner of this workspace. You must transfer your ownership before leaving.", { type: "warning" });
+          }
+          else {
+            this.handleLeave(id);
+          }
+        });
+        this.closeAll(id);
+      } else {
+        this.closeAll(id);
+        this.open3(id);
+      }
+    });
   }
   handleLeave(id) {
     console.log("LEAVE ID: " + id);
@@ -63,19 +53,17 @@ export default class DisplayWorkspaceComponent extends React.Component {
       localStorage.setItem("currWorkspaceID", "");
     }
     let userLoginToken = localStorage.getItem("loginToken");
-    axios
-      .post(
-        "/api/account/leave",
-        {
-          workspace_id: `${id}`
-        },
-        {
-          headers: {
-            Authorization: `${userLoginToken}`,
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          }
+    axios.post("/api/account/leave",
+      {
+        workspace_id: `${id}`
+      },
+      {
+        headers: {
+          Authorization: `${userLoginToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json"
         }
+      }
       )
       .then(res => {
         if (
@@ -111,8 +99,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
           Accept: "application/json",
           "Content-Type": "application/json"
         }
-      })
-      .then(res => {
+      }).then(res => {
         if (
           res.data.error ===
           "There was an error deleting the workspace: Insufficient permissions"
@@ -130,6 +117,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
       })
       .catch(error => {
         toast(error.message, { type: "error" });
+        this.props.getInfo();
         console.log(error.message);
       });
     this.closeAll(id);
@@ -188,7 +176,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
   };
   setCurrentWorkspace(id) {
     localStorage.setItem("currWorkspaceID", id);
-    this.setState({ state: this.state });
+    this.props.getInfo();
   }
   refreshModal(value) {
     this.setState({ works: value });

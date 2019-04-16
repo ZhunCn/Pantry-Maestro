@@ -20,7 +20,10 @@ export default class Workspace extends React.Component {
     this.state = {
       userID: '',
       works: [''],
-      names: [['','']]
+      names: [['','']],
+      volunteers: [''],
+      isOwner: false,
+      curName: '',
     };
   }
 
@@ -32,7 +35,7 @@ export default class Workspace extends React.Component {
     let length = ids.length;
     let userLoginToken = localStorage.getItem("loginToken");
     var i;
-    for(i = 0; i<length; i++){
+    for(i = 1; i<length; i++){
       let id = ids[i];
       axios.get(`/api/workspaces/${id}`,
       { headers: { "Authorization": `${userLoginToken}`,
@@ -56,12 +59,14 @@ export default class Workspace extends React.Component {
   }
   checkHasCurr(){
     var workspaces = this.state.works;
+    if(workspaces.length==1){
+      return false;
+    }
     var curWorkID = localStorage.getItem("currWorkspaceID");
     var i;
     var hasCurr = false;
-    if(!curWorkID&&workspaces[0]!=''){
+    if(!curWorkID||curWorkID=="null"){
       localStorage.setItem("currWorkspaceID", workspaces[0]);
-      return;
     }
     else{
       var ind = workspaces.indexOf(curWorkID);
@@ -69,11 +74,38 @@ export default class Workspace extends React.Component {
         localStorage.setItem("currWorkspaceID", workspaces[0]);
       }
     }
+    return true;
   }
   componentDidMount(){
     this.getInfo();
   }
-
+  getVolunteers(id) {
+    console.log("ID" + id);
+    let userLoginToken = localStorage.getItem("loginToken");
+    if(id=="null"){
+      this.setState({
+        volunteers: ['']
+      });
+      return;
+    }
+    axios.get(`api/workspaces/${id}/users`, {
+        headers: {
+          Authorization: `${userLoginToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+    }).then(res => {
+      this.setState({
+        volunteers: res.data.users
+      });
+      console.log("Volunteers");
+      console.log(this.state.volunteers);
+    }).catch(()=>{
+      this.setState({
+        volunteers: ['']
+      });
+    });
+  }
   getInfo(){
     this.setState({
       works: [''],
@@ -85,15 +117,50 @@ export default class Workspace extends React.Component {
           works: res.data.workspaces,
           userID: res.data._id
         });
-        console.log(res.data);
     }).then(()=>{
-      this.checkHasCurr();
-      this.getNames();
-    }).then(()=>{
-      console.log(this.state);
+      if(this.checkHasCurr()){
+        var curWork = localStorage.getItem("currWorkspaceID");
+        this.getNames();
+        this.getVolunteers(curWork);
+        this.checkOwnership(curWork);
+        this.getCurName(curWork);
+      }
+    }).catch(err=>{
+      console.log(err.message);
     });
   }
-
+  getCurName(id){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get(`/api/workspaces/${id}`,
+    { headers: { "Authorization": `${userLoginToken}`,
+      'Accept' : 'application/json',
+      'Content-Type': 'application/json' }
+    }).then(res => {
+      this.setState({
+        curName: res.data.name
+      });
+    }).catch(error => {
+      console.log(error);
+    });
+  }
+  checkOwnership(id){
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.get(`/api/workspaces/${id}/users/${this.state.userID}`, {
+      headers: {
+        Authorization: `${userLoginToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.data.roles[0] == "owner") {
+        console.log("Ownership check complete: true");
+        this.setState({ isOwner: true });
+      } else {
+        console.log("Ownership check complete: False");
+        this.setState({ isOwner: false });
+      }
+    });
+  }
   render() {
     if (!authorize()) {
       return (
@@ -112,7 +179,7 @@ export default class Workspace extends React.Component {
         	<div class="Right">
         		<AddWorkspaceComponent getInfo={()=>{this.getInfo()}} />
         		<InviteVolunteerComponent />
-            <DisplayVolunteerComponent getInfo={()=>{this.getInfo()}} userID={this.state.userID}/>
+            <DisplayVolunteerComponent getInfo={()=>{this.getInfo()}} isOwner = {this.state.isOwner} volunteers = {this.state.volunteers} userID = {this.state.userID} name = {this.state.curName}/>
         		</div>
         	</div>
         </div>
