@@ -9,7 +9,10 @@ module.exports = function(router) {
    */
   router.get('/api/workspaces/:workspace_id/analytics/quantities/top', (req, res) => {
     // Authorize
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -invites -deleted').populate({
         path: 'inventory',
         select: '-_id  -__v',
@@ -42,7 +45,10 @@ module.exports = function(router) {
    */
   router.get('/api/workspaces/:workspace_id/analytics/quantities/bottom', (req, res) => {
     // Authorize
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -invites -deleted').populate({
         path: 'inventory',
         select: '-_id  -__v',
@@ -72,7 +78,10 @@ module.exports = function(router) {
 
   router.get('/api/workspaces/:workspace_id/analytics/expiration/expired', (req, res) => {
     // Authorize
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -invites -deleted').populate({
         path: 'inventory',
         select: '-_id  -__v',

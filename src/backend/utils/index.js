@@ -134,7 +134,7 @@ function authorize(req, params = {}) {
               }
             }
           }
-          return reject('User is not a member of this workspace');
+          return reject('You are not a member of this workspace');
         });
       }
       else {

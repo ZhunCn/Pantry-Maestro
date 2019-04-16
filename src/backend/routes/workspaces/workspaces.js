@@ -133,18 +133,24 @@ module.exports = function(router) {
    */
   router.get('/api/workspaces/:workspace_id', (req, res) => {
     // Authorize
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -users -invites -deleted').exec((err, workspace) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
+          return;
+        }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -inventory -users -invites -deleted').exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
-        return;
-      }
-
-      res.json(workspace);
+        res.json(workspace);
+      });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting the analytics: ' + err});
     });
   });
 

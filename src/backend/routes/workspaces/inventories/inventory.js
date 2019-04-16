@@ -14,7 +14,10 @@ module.exports = function(router) {
    * Sends information about the inventory of a workspace
    */
   router.get('/api/workspaces/:workspace_id/inventory', (req, res) => {
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -deleted').populate({
         path: 'inventory',
         select: '-_id  -__v',
@@ -53,7 +56,10 @@ module.exports = function(router) {
 
     sanitize(req.body, fields);
 
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       // Check if item exists
       Item.findOne({inventory: req.params.workspace_id, name: req.body.name}).exec((err, item) => {
         if (err) {
@@ -132,7 +138,10 @@ module.exports = function(router) {
    * Sends information on a specific item
    */
   router.get('/api/workspaces/:workspace_id/inventory/:item_id', (req, res) => {
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Item.findById(req.params.item_id).select('-_id -__v -expired').exec((err, item) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for item: ' + err});
@@ -171,7 +180,10 @@ module.exports = function(router) {
       }
     });
 
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Item.findById(req.params.item_id).exec((err, item) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error updating item(s): ' + err});
@@ -302,7 +314,10 @@ module.exports = function(router) {
       return;
     }
 
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
       Item.findById(req.params.item_id).exec((err, item) => {
         if (err) {
           res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error updating item(s): ' + err});
@@ -347,58 +362,6 @@ module.exports = function(router) {
 
             res.status(c.status.OK).json({'message': 'Successfully updated item'});
           });
-        });
-      });
-    }).catch(err => {
-      res.json({'error': 'There was an error getting your account information: ' + err});
-    });
-  });
-
-  router.get('/api/workspaces/:workspace_id/inventory/:item_id/note', (req, res) => {
-    authorize(req).then(decoded => {
-      Item.findOne({'_id': req.params.item_id}).exec((err, item) => {
-        if (err) {
-          res.json({'error': 'There was an error getting the note for this item: ' + err});
-          return;
-        }
-        else if (!item) {
-          res.json({'error': 'No item with this id exists'});
-          return;
-        }
-
-        res.json({'note': item.note});
-      });
-    }).catch(err => {
-      res.json({'error': 'There was an error getting your account information: ' + err});
-    });
-  });
-
-  router.put('/api/workspaces/:workspace_id/inventory/:item_id/note', (req, res) => {
-    if (joi.validate(req.body, updateNoteSchema).error !== null) {
-      res.status(c.status.OK).json({'error': 'Invalid fields'});
-      return;
-    }
-
-    authorize(req).then(decoded => {
-      Item.findOne({'_id': req.params.item_id}).exec((err, item) => {
-        if (err) {
-          res.json({'error': 'There was an error updating the note for this item: ' + err});
-          return;
-        }
-        else if (!item) {
-          res.json({'error': 'No item with this id exists'});
-          return;
-        }
-
-        item.note = req.body.content;
-
-        item.save((err) => {
-          if (err) {
-            res.json({'error': 'There was an error updating the note for this item: ' + err});
-            return;
-          }
-
-          res.json({'message': 'Successfully updated item'});
         });
       });
     }).catch(err => {

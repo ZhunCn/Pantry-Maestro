@@ -10,24 +10,30 @@ module.exports = function(router) {
    */
   router.get('/api/workspaces/:workspace_id/invites', (req, res) => {
     // Authorize
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false})
+      .select('-__v')
+      .populate({
+        path: 'invites',
+        select: '-__v'
+      })
+      .exec((err, workspace) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
+          return;
+        }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false})
-    .select('-__v')
-    .populate({
-      path: 'invites',
-      select: '-__v'
-    })
-    .exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
-        return;
-      }
-
-      res.status(c.status.OK).json({'invites': workspace.invites});
+        res.status(c.status.OK).json({'invites': workspace.invites});
+      });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting the analytics: ' + err});
     });
   });
 
@@ -47,51 +53,58 @@ module.exports = function(router) {
       return;
     }
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v')
-    .populate('invites')
-    .populate({
-      path: 'users.account',
-      select: '-__v -workspaces -salt -hash'
-    })
-    .exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
-        return;
-      }
-
-      for (let i = 0; i < workspace.users.length; i++) {
-        if (workspace.users[i].account.email == req.body.email) {
-          res.json({'error': 'A user with this email is already in this workspace'});
-          return;
-        }
-      }
-
-      let invite = new Invite({
-        'workspace': req.params.workspace_id,
-        'workspace_name': workspace.name,
-        'email': req.body.email
-      });
-
-      invite.save((err, invite) => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v')
+      .populate('invites')
+      .populate({
+        path: 'users.account',
+        select: '-__v -workspaces -salt -hash'
+      })
+      .exec((err, workspace) => {
         if (err) {
-          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error creating invitation: ' + err});
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
           return;
         }
 
-        workspace.invites.push(invite['_id']);
-        workspace.save((err, workspace) => {
+        for (let i = 0; i < workspace.users.length; i++) {
+          if (workspace.users[i].account.email == req.body.email) {
+            res.json({'error': 'A user with this email is already in this workspace'});
+            return;
+          }
+        }
+
+        let invite = new Invite({
+          'workspace': req.params.workspace_id,
+          'workspace_name': workspace.name,
+          'email': req.body.email
+        });
+
+        invite.save((err, invite) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error creating invitation: ' + err});
             return;
           }
 
-          res.status(c.status.OK).json({'invite_id': invite['_id']});
+          workspace.invites.push(invite['_id']);
+          workspace.save((err, workspace) => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error creating invitation: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'invite_id': invite['_id']});
+          });
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting the analytics: ' + err});
     });
   });
 
@@ -110,41 +123,48 @@ module.exports = function(router) {
   router.delete('/api/workspaces/:workspace_id/invites/:invite_id', (req, res) => {
     // Authorize
 
-    Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v').exec((err, workspace) => {
-      if (err) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
-        return;
-      }
-      else if (!workspace) {
-        res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
-        return;
-      }
-
-      let invites = [];
-
-      workspace.invites.forEach(invite => {
-        if (invite != req.params.invite_id) {
-          invites.push(invite);
-        }
-      });
-
-      workspace.invites = invites;
-
-      workspace.save(err => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-__v').exec((err, workspace) => {
         if (err) {
-          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting invite: ' + err});
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'No workspace exists with that id'});
           return;
         }
 
-        Invite.findOneAndDelete({'_id': req.params.invite_id}).exec(err => {
+        let invites = [];
+
+        workspace.invites.forEach(invite => {
+          if (invite != req.params.invite_id) {
+            invites.push(invite);
+          }
+        });
+
+        workspace.invites = invites;
+
+        workspace.save(err => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting invite: ' + err});
             return;
           }
 
-          res.status(c.status.OK).json({'message': 'Successfully deleted invite'});
+          Invite.findOneAndDelete({'_id': req.params.invite_id}).exec(err => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting invite: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'message': 'Successfully deleted invite'});
+          });
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting the analytics: ' + err});
     });
   });
 
@@ -285,7 +305,7 @@ module.exports = function(router) {
               return;
             }
 
-            
+
             user.workspaces.push(workspace._id);
 
             user.save(err => {

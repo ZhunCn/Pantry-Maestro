@@ -1,13 +1,13 @@
 const express = require('express');
 
 module.exports = function(router) {
-  require('./workspaces.js')(router);
-  require('./inventories.js')(router);
-  require('./analytics.js')(router);
-  require('./users.js')(router);
-  require('./invites.js')(router);
-  require('./analytics.js')(router);
-  require('./transfer.js')(router);
-  
+  require('./workspaces')(router);
+  require('./inventories')(router);
+  require('./analytics')(router);
+  require('./users')(router);
+  require('./invites')(router);
+  require('./analytics')(router);
+  require('./transfer')(router);
+
   return router;
 }

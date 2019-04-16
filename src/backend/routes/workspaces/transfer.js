@@ -20,7 +20,10 @@ module.exports = function(router) {
       return;
     }
 
-    authorize(req).then(decoded => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER]
+    }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false})
       .exec((err, workspace) => {
         if (err || !workspace) {

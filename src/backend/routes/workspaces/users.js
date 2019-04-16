@@ -165,7 +165,7 @@ module.exports = function(router) {
   router.delete('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
     authorize(req, {
       'workspace_id': req.params.workspace_id,
-      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
     }).then(decoded => {
       Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
         if (err) {
