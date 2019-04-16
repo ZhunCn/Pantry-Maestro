@@ -295,14 +295,20 @@ export default class Inventory extends React.Component {
       });
   }
 
-  openDeleteConfirm = () => {
-    this.setState({ deleteItemShow: true });
+  openDeleteConfirm = row => {
+    this.setState({
+      ["deleteItemShow" + row.original.name + row.original.expiration]: true
+    });
   };
-  handleCancelDeleteItem = () => {
-    this.setState({ deleteItemShow: false });
+  handleCancelDeleteItem = row => {
+    this.setState({
+      ["deleteItemShow" + row.original.name + row.original.expiration]: false
+    });
   };
-  handleConfirmDeleteItem = () => {
-    this.setState({ deleteItemShow: false });
+  handleConfirmDeleteItem = row => {
+    this.setState({
+      ["deleteItemShow" + row.original.name + row.original.expiration]: false
+    });
     this.handleDeleteItemButton();
   };
 
@@ -396,6 +402,7 @@ export default class Inventory extends React.Component {
           if (!row.original) {
             return (
               <Modal
+                closeIcon
                 style={{ height: 280 }}
                 trigger={
                   <Button
@@ -404,7 +411,6 @@ export default class Inventory extends React.Component {
                     style={{
                       padding: "6px 7px 6px 7px"
                     }}
-                    style={{ padding: "10px" }}
                   >
                     Edit Name
                   </Button>
@@ -573,7 +579,7 @@ export default class Inventory extends React.Component {
                         <Button
                           compact
                           style={{
-                            padding: "6px 7px 6px 7px"
+                            padding: "6px auto 6px auto"
                           }}
                           calendar={this._calendar}
                         >
@@ -605,7 +611,7 @@ export default class Inventory extends React.Component {
                         <Button
                           compact
                           style={{
-                            padding: "6px 7px 6px 7px"
+                            padding: "6px auto 6px auto"
                           }}
                           calendar={this._calendar}
                         >
@@ -651,9 +657,7 @@ export default class Inventory extends React.Component {
               <Button.Group floated="right">
                 <Button
                   animated
-                  size="tiny"
                   compact
-                  style={{ padding: "6px auto 6px auto" }}
                   onClick={() =>
                     this.handleEditQuantityButton(row.row._original, -10)
                   }
@@ -665,7 +669,6 @@ export default class Inventory extends React.Component {
                 </Button>
                 <Button
                   icon
-                  size="tiny"
                   compact
                   style={{ padding: "6px 7px 6px 7px" }}
                   onClick={() =>
@@ -676,7 +679,6 @@ export default class Inventory extends React.Component {
                 </Button>
                 <Button
                   icon
-                  size="tiny"
                   compact
                   style={{ padding: "6px 7px 6px 7px" }}
                   onClick={() =>
@@ -687,9 +689,7 @@ export default class Inventory extends React.Component {
                 </Button>
                 <Button
                   animated
-                  size="tiny"
                   compact
-                  style={{ padding: "6px auto 6px auto" }}
                   onClick={() =>
                     this.handleEditQuantityButton(row.row._original, 10)
                   }
@@ -706,7 +706,7 @@ export default class Inventory extends React.Component {
                 floated="right"
                 icon
                 compact
-                style={{ padding: "6px 7px 6px 7px", marginRight: "10px" }}
+                style={{ padding: "6px auto 6px auto", marginRight: "10px" }}
                 onClick={
                   () =>
                     //this.handleAddToCartButton(row.row._original, -1)
@@ -721,30 +721,39 @@ export default class Inventory extends React.Component {
       },
       {
         Header: "",
-        Cell: row => (
-          <div>
-            <button
-              className="ui fluid compact negative button"
-              style={{ padding: "6px 7px 6px 7px" }}
-              onClick={() => {
-                this.openDeleteConfirm();
-                this.setState({ itemToDelete: row.row._original });
-              }}
-            >
-              Delete
-            </button>
-            <Confirm
-              style={{ height: "120px" }}
-              open={this.state.deleteItemShow}
-              onCancel={() => {
-                this.handleCancelDeleteItem();
-              }}
-              onConfirm={() => {
-                this.handleConfirmDeleteItem();
-              }}
-            />
-          </div>
-        ),
+        Cell: row => {
+          let stateVar =
+            "deleteItemShow" + row.original.name + row.original.expiration;
+          console.log(this.state[stateVar]);
+          return (
+            <div>
+              <Button
+                id={row.original.id + row.original.expiration}
+                icon="trash"
+                negative
+                fluid
+                compact
+                style={{ padding: "6px auto 6px auto" }}
+                onClick={() => {
+                  this.openDeleteConfirm(row);
+                  this.setState({ itemToDelete: row.row._original });
+                }}
+              />
+              <Confirm
+                id={row.original.id + row.original.expiration}
+                closeIcon
+                style={{ height: "120px", position: "relative" }}
+                open={this.state[stateVar]}
+                onCancel={() => {
+                  this.handleCancelDeleteItem(row);
+                }}
+                onConfirm={() => {
+                  this.handleConfirmDeleteItem(row);
+                }}
+              />
+            </div>
+          );
+        },
         sortable: false,
         filterable: false,
         resizable: false,
@@ -768,6 +777,7 @@ export default class Inventory extends React.Component {
               }}
             />
             <Modal
+              closeIcon
               style={{ height: "70%" }}
               trigger={
                 <Button icon labelPosition="left" size="small">

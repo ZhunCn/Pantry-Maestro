@@ -180,7 +180,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
       name = <strong>{value[0]} (current workspace)</strong>;
     }
     return (
-      <li>
+      <li key={value[1]}>
         {name}
         {isCurr ? null : (
           <Button
@@ -193,6 +193,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         )}
         <br />
         <Modal
+          id={value[1]}
           style={{ height: 200 }}
           open={this.state.open1}
           onOpen={this.open1}
