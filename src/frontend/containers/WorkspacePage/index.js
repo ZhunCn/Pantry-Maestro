@@ -56,6 +56,9 @@ export default class Workspace extends React.Component {
           });
         }
       }).catch(error => {
+        this.setState({
+          names:[['','']]
+        });
         console.log(error);
       })
     }
@@ -63,6 +66,7 @@ export default class Workspace extends React.Component {
   checkHasCurr(){
     var workspaces = this.state.works;
     if(workspaces.length==1&&workspaces[0]==null){
+      localStorage.setItem("currWorkspaceID", "");
       return false;
     }
     var curWorkID = localStorage.getItem("currWorkspaceID");
@@ -108,9 +112,16 @@ export default class Workspace extends React.Component {
           "Content-Type": "application/json"
         }
     }).then(res => {
-      this.setState({
-        volunteers: res.data.users
-      });
+      if(res.data.volunteers){
+        this.setState({
+          volunteers: res.data.users
+        });
+      }
+      else{
+        this.setState({
+          volunteers: ['']
+        });
+      }
       console.log("Volunteers");
       console.log(this.state.volunteers);
     }).catch(()=>{
@@ -138,7 +149,19 @@ export default class Workspace extends React.Component {
         this.checkOwnership(curWork);
         this.getCurName(curWork);
       }
+      else{
+        this.setState({
+          names: [''],
+          volunteers:[''],
+          works:['']
+        });
+      }
     }).catch(err=>{
+      this.setState({
+        names: [''],
+        volunteers:[''],
+        works:['']
+      });
       console.log(err.message);
     });
   }
@@ -153,6 +176,9 @@ export default class Workspace extends React.Component {
         curName: res.data.name
       });
     }).catch(error => {
+      this.setState({
+        curName: ''
+      });
       console.log(error);
     });
   }
@@ -172,6 +198,11 @@ export default class Workspace extends React.Component {
         console.log("Ownership check complete: False");
         this.setState({ isOwner: false });
       }
+    }).catch(res=>{
+      this.setState({
+        isOwner: false
+      });
+      console.log("Error");
     });
   }
   render() {
