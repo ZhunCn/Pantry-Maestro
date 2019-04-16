@@ -8,8 +8,8 @@ const c = require('const');
 
 const registerSchema = joi.object().keys({
   email: joi.string().email().required(),
-  username: joi.string().alphanum().required(),
-  password: joi.string().alphanum().min(6).regex(/\d/).required()
+  username: joi.string().required(),
+  password: joi.string().min(6).regex(/\d/).required()
 });
 
 const loginSchema = joi.object().keys({

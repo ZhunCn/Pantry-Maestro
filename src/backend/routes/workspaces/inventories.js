@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {authorize, complete, sanitize} = require('utils');
-const {Inventory, Item, Workspace} = require('models');
+const {Change, Inventory, Item, Workspace} = require('models');
 const c = require('const');
 const joi = require('joi');
 
@@ -102,7 +102,21 @@ module.exports = function(router) {
                     return;
                   }
 
-                  res.status(c.status.OK).json({'message': 'Successfully added item to inventory'});
+                  // Create change
+                  let change = new Change({
+                    workspace: workspace._id,
+                    item: {
+                      _id: item._id,
+                      created: true
+                    }
+                  }).save((err) => {
+                    if (err) {
+                      res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item to inventory: ' + err});
+                      return;
+                    }
+
+                    res.status(c.status.OK).json({'message': 'Successfully added item to inventory'});
+                  });
                 });
               });
             });
@@ -168,13 +182,19 @@ module.exports = function(router) {
           return;
         }
 
+        let quantities = {};
+        let oldName = '';
+
         // Update quantities
         if (toUpdate['quantities']) {
           Object.keys(toUpdate['quantities']).forEach(quantity => {
+            quantities[quantity] = toUpdate['quantities'][quantity];
             if (item.quantities.hasOwnProperty(quantity)) {
+              quantities[quantity] = item.quantities[quantity];
               item.quantities[quantity] += toUpdate['quantities'][quantity];
             }
             else {
+              quantities[quantity] = 0;
               item.quantities[quantity] = toUpdate['quantities'][quantity];
             }
 
@@ -186,6 +206,7 @@ module.exports = function(router) {
         }
 
         if (toUpdate['name']) {
+          oldName = item.name;
           item.name = toUpdate['name'];
         }
 
@@ -195,7 +216,65 @@ module.exports = function(router) {
             return;
           }
 
-          res.status(c.status.OK).json({'message': 'Successfully updated item'});
+          // Create change for name and quantity
+          if (toUpdate['name']) {
+            let change = new Change({
+              workspace: req.params.workspace_id,
+              item: {
+                _id: req.params.item_id,
+                name: oldName,
+                renamed: true
+              }
+            }).save(err => {
+              if (err) {
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                return;
+              }
+
+              if (toUpdate['quantities']) {
+                let change = new Change({
+                  workspace: req.params.workspace_id,
+                  item: {
+                    _id: req.params.item_id,
+                    quantities: quantities,
+                    changed: toUpdate['quantities'],
+                    modified: true
+                  }
+                }).save(err => {
+                  if (err) {
+                    res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                    return;
+                  }
+
+                  res.status(c.status.OK).json({'message': 'Successfully updated item'});
+                });
+              }
+              else {
+                res.status(c.status.OK).json({'message': 'Successfully updated item'});
+              }
+            });
+          }
+          else if (toUpdate['quantities']) {
+            let change = new Change({
+              workspace: req.params.workspace_id,
+              item: {
+                _id: req.params.item_id,
+                quantities: quantities,
+                changed: toUpdate['quantities'],
+                modified: true
+              }
+            }).save(err => {
+              if (err) {
+                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                return;
+              }
+
+              res.status(c.status.OK).json({'message': 'Successfully updated item'});
+            });
+          }
+          else {
+            res.status(c.status.OK).json({'message': 'Successfully updated item'});
+          }
         });
       });
     }).catch(err => {
@@ -239,17 +318,35 @@ module.exports = function(router) {
           return;
         }
 
-console.log(item.quantities);
+        let quantity = {};
+        quantity[req.body.expiration] = item.quantities[req.body.expiration];
+        let changed = {};
+        changed[req.body.expiration] = 0;
         delete item.quantities[req.body.expiration];
         item.markModified('quantities');
-console.log(item.quantities);
+
         item.save((err, item) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
             return;
           }
 
-          res.status(c.status.OK).json({'message': 'Successfully updated item'});
+          let change = new Change({
+            workspace: req.params.workspace_id,
+            item: {
+              _id: req.params.item_id,
+              quantities: quantity,
+              changed: changed,
+              modified: true
+            }
+          }).save(err => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+              return;
+            }
+
+            res.status(c.status.OK).json({'message': 'Successfully updated item'});
+          });
         });
       });
     }).catch(err => {
