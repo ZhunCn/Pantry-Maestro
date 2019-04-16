@@ -29,50 +29,16 @@ export default class Inventory extends React.Component {
     super(props);
     this.state = {
       // Temporary data set
-      data: [
-        {
-          name: "TEST1",
-          expiration: "12/01/2019",
-          quantity: 20
-        },
-        {
-          name: "TEST1",
-          expiration: "02/15/2019",
-          quantity: 12
-        },
-        {
-          name: "TEST1",
-          expiration: "03/19/2019",
-          quantity: 23
-        },
-        {
-          name: "TEST2",
-          expiration: "01/07/2019",
-          quantity: 2
-        },
-        {
-          name: "TEST2",
-          expiration: "05/23/2019",
-          quantity: 11
-        },
-        {
-          name: "TEST2",
-          expiration: "06/24/2019",
-          quantity: 9
-        },
-        {
-          name: "TEST2",
-          expiration: "07/12/2019",
-          quantity: 14
-        }
-      ],
+      data: [],
       dateRangeStart: undefined,
       dateRangeEnd: undefined,
       deleteItemShow: false,
       itemToDelete: {},
-      listOfFood: []
+      listOfFood: [],
+      noDataText: ""
     };
     this.editNameInput = React.createRef();
+    this.refReactTable = React.createRef();
   }
 
   componentDidMount() {
@@ -82,10 +48,21 @@ export default class Inventory extends React.Component {
     });
   }
   getCurrWorkspace() {
+    if (localStorage.getItem("currWorkspaceID") === null) {
+      this.setState({ noDataText: "Please join a workspace!" });
+    }
     let userLoginToken = localStorage.getItem("loginToken");
     return axios
       .get("/api/account", { headers: { Authorization: `${userLoginToken}` } })
       .then(res => {
+        if (
+          res.data.error ===
+          "There was an error getting your account information: Invalid token"
+        ) {
+          localStorage.removeItem("loginToken");
+          return;
+        }
+        console.log(res);
         var workspaces = res.data.workspaces;
         var curWorkID = localStorage.getItem("currWorkspaceID");
         var hasCurr = false;
@@ -98,6 +75,9 @@ export default class Inventory extends React.Component {
             localStorage.setItem("currWorkspaceID", workspaces[0]);
           }
         }
+      })
+      .catch(err => {
+        console.log(err);
       });
   }
 
@@ -130,6 +110,15 @@ export default class Inventory extends React.Component {
   // Get data from server and update state
   fetchData() {
     workspaceID = localStorage.getItem("currWorkspaceID");
+    if (workspaceID === null) {
+      // there's no workspace ID, so tell the user to join on
+      this.setState({ noDataText: "Please join a workspace!" });
+      return;
+    }
+    if (localStorage.getItem("currWorkspaceID") === null) {
+      this.setState({ noDataText: "Please join a workspace!" });
+      return;
+    }
     let userLoginToken = localStorage.getItem("loginToken");
     axios
       .get(`/api/workspaces/${workspaceID}/inventory`, {
@@ -138,10 +127,31 @@ export default class Inventory extends React.Component {
       .then(res => {
         // Add functionality to see if the last modified item is the same as the local last modified item.
         // Only refresh i.e. setState when the last modified items are different
+        if (
+          res.data.error ===
+          "There was an error getting your account information: Invalid token"
+        ) {
+          localStorage.removeItem("loginToken");
+          return;
+        }
+        if (
+          res.data.error ===
+          "There was an error getting your account information: Invalid workspace_id"
+        ) {
+          localStorage.removeItem("currWorkspaceID");
+          this.setState({ noDataText: "Please join a workspace!" });
+          return;
+        }
         let serverData = this.parseData(res.data);
         this.setState({ data: serverData });
         localStorage.setItem("inventory", JSON.stringify(serverData));
+      })
+      .catch(err => {
+        console.log(err);
       });
+    this.setState({
+      noDataText: "Your inventory is empty. Please add some items."
+    });
   }
 
   createFakeData() {
@@ -805,8 +815,8 @@ export default class Inventory extends React.Component {
             />
           </div>
           <ReactTable
-            ref={refReactTable => {
-              this.refReactTable = refReactTable;
+            ref={r => {
+              this.refReactTable = r;
             }}
             data={data}
             columns={columns}
@@ -816,10 +826,12 @@ export default class Inventory extends React.Component {
             defaultFilterMethod={(filter, row) =>
               String(row[filter.id]) === filter.value
             }
+            defaultPageSize={10}
             collapseOnDataChange={false}
-            collapseOnSortingChange={false}
-            collapseOnPageChange={false}
+            collapseOnSortingChange={true}
+            collapseOnPageChange={true}
             style={{ marginRight: "10px" }}
+            noDataText={this.state.noDataText}
           />
         </div>
       </div>
