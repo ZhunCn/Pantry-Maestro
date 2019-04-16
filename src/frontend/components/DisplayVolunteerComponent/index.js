@@ -167,7 +167,7 @@ export default class DisplayVolunteerComponent extends React.Component {
     return (
       <div>
         <strong>Volunteers in current workspace</strong>
-        {this.props.volunteers[0] != "" ? (
+        {this.props.volunteers[0] != "" ||!this.props.volunteers? (
           this.makeList(this.props.volunteers)
         ) : (
           <ul>None</ul>

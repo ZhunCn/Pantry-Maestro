@@ -35,8 +35,11 @@ export default class Workspace extends React.Component {
     let length = ids.length;
     let userLoginToken = localStorage.getItem("loginToken");
     var i;
-    for(i = 1; i<length; i++){
+    for(i = 0; i<length; i++){
       let id = ids[i];
+      if(!id){
+        continue;
+      }
       axios.get(`/api/workspaces/${id}`,
       { headers: { "Authorization": `${userLoginToken}`,
         'Accept' : 'application/json',
@@ -59,7 +62,7 @@ export default class Workspace extends React.Component {
   }
   checkHasCurr(){
     var workspaces = this.state.works;
-    if(workspaces.length==1){
+    if(workspaces.length==1&&workspaces[0]==null){
       return false;
     }
     var curWorkID = localStorage.getItem("currWorkspaceID");
