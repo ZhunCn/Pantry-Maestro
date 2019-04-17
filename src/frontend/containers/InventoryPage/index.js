@@ -391,8 +391,8 @@ export default class Inventory extends React.Component {
           return a.toLowerCase() > b.toLowerCase()
             ? 1
             : b.toLowerCase() > a.toLowerCase()
-            ? -1
-            : 0;
+              ? -1
+              : 0;
         },
         filterMethod: (filter, row) => {
           return (
@@ -489,6 +489,7 @@ export default class Inventory extends React.Component {
         filterMethod: (filter, row) => {
           var currDate = new Date();
           var rowDate = new Date(Date.parse(row.expiration.join("")));
+          let dateDiff = this.dateDiff(currDate, rowDate);
           // console.log(rowDate);
           // Terrible, *TERRIBLE* code. Very copypasted.
           // I'll refactor it when I have time later
@@ -505,35 +506,35 @@ export default class Inventory extends React.Component {
             }
           }
           if (filter.value == "sevenDays") {
-            if (this.dateDiff(currDate, rowDate) <= 7) {
+            if (rowDate >= currDate && dateDiff <= 7) {
               return true;
             } else {
               return false;
             }
           }
           if (filter.value == "thirtyDays") {
-            if (this.dateDiff(currDate, rowDate) <= 30) {
+            if (rowDate >= currDate && dateDiff <= 30) {
               return true;
             } else {
               return false;
             }
           }
           if (filter.value == "sixtyDays") {
-            if (this.dateDiff(currDate, rowDate) <= 60) {
+            if (rowDate >= currDate && dateDiff <= 60) {
               return true;
             } else {
               return false;
             }
           }
           if (filter.value == "ninetyDays") {
-            if (this.dateDiff(currDate, rowDate) <= 90) {
+            if (rowDate >= currDate && dateDiff <= 90) {
               return true;
             } else {
               return false;
             }
           }
           if (filter.value == "later") {
-            if (this.dateDiff(currDate, rowDate) > 90) {
+            if (dateDiff > 90) {
               return true;
             } else {
               return false;
