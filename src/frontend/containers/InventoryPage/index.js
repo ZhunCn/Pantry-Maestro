@@ -13,7 +13,7 @@ import { sum, authorize } from "@/utils";
 import AddChangeItemComponent from "@/components/AddChangeItemComponent";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Button, Icon, Modal, Form, Confirm } from "semantic-ui-react";
+import { Button, Icon, Modal, Form, Confirm, Header } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
@@ -84,8 +84,10 @@ export default class Inventory extends React.Component {
   // Parses JSON from server into format that the table understands
   parseData(serverData) {
     let parsedData = [];
+    let listOfNames = {};
     let dataLength = Object.entries(serverData.inventory.items).length;
     let inventoryData = Object.entries(serverData.inventory.items);
+    this.setState({ listOfFood: [] });
     for (let i = 0; i < dataLength; i++) {
       if ("quantities" in inventoryData[i][1]) {
         let inventoryDataQuantities = Object.entries(
@@ -103,6 +105,15 @@ export default class Inventory extends React.Component {
       } else {
         ("Empty item");
       }
+      this.setState(
+        prevState => ({
+          listOfFood: [
+            ...prevState.listOfFood,
+            { name: inventoryData[i][1].name }
+          ]
+        }),
+        console.log(this.state)
+      );
     }
     return parsedData;
   }
@@ -413,7 +424,7 @@ export default class Inventory extends React.Component {
             return (
               <Modal
                 closeIcon
-                style={{ height: 280 }}
+                style={{ height: "250px" }}
                 trigger={
                   <Button
                     compact
@@ -738,8 +749,8 @@ export default class Inventory extends React.Component {
           return (
             <div>
               <Button
+                animated
                 id={row.original.id + row.original.expiration}
-                icon="trash"
                 negative
                 fluid
                 compact
@@ -748,19 +759,42 @@ export default class Inventory extends React.Component {
                   this.openDeleteConfirm(row);
                   this.setState({ itemToDelete: row.row._original });
                 }}
-              />
-              <Confirm
+              >
+                <Button.Content visible>
+                  <Icon style={{ marginLeft: "5px" }} name="trash" />
+                </Button.Content>
+                <Button.Content hidden>
+                  <Icon style={{ marginLeft: "5px" }} name="delete" />
+                </Button.Content>
+              </Button>
+              <Modal
                 id={row.original.id + row.original.expiration}
                 closeIcon
-                style={{ height: "120px", position: "relative" }}
+                style={{ height: "200px" }}
                 open={this.state[stateVar]}
-                onCancel={() => {
-                  this.handleCancelDeleteItem(row);
-                }}
-                onConfirm={() => {
-                  this.handleConfirmDeleteItem(row);
-                }}
-              />
+              >
+                <Header icon="trash" content="Delete Item" />
+                <Modal.Content>
+                  <p>Are you sure you want to delete this item?</p>
+                </Modal.Content>
+                <Modal.Actions>
+                  <Button
+                    onClick={() => {
+                      this.handleCancelDeleteItem(row);
+                    }}
+                  >
+                    Never mind
+                  </Button>
+                  <Button
+                    negative
+                    onClick={() => {
+                      this.handleConfirmDeleteItem(row);
+                    }}
+                  >
+                    Yes, delete
+                  </Button>
+                </Modal.Actions>
+              </Modal>
             </div>
           );
         },
@@ -788,7 +822,7 @@ export default class Inventory extends React.Component {
             />
             <Modal
               closeIcon
-              style={{ height: "70%" }}
+              style={{ height: "70%", width: "40%" }}
               trigger={
                 <Button icon labelPosition="left" size="small">
                   <Icon name="add" />
@@ -799,6 +833,7 @@ export default class Inventory extends React.Component {
               <Modal.Header>Add a new item</Modal.Header>
               <Modal.Content scrolling>
                 <AddChangeItemComponent
+                  namesOfFood={this.state.listOfFood}
                   fetchData={() => {
                     this.fetchData();
                   }}

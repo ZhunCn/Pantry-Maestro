@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Button, Form, Input } from "semantic-ui-react";
+import { Button, Form, Input, Search } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 export default class AddChangeItemComponent extends React.Component {
@@ -13,7 +13,11 @@ export default class AddChangeItemComponent extends React.Component {
     super(props);
     this.state = {
       name: "",
-      quantities: [{ date: "", quantity: undefined }]
+      quantities: [{ date: "", quantity: undefined }],
+      inputValue: "",
+      nameInputIsLoading: false,
+      nameInputResults: [],
+      namesOfFood: []
     };
     this.handleChange = this.handleChange.bind(this);
   }
@@ -115,6 +119,10 @@ export default class AddChangeItemComponent extends React.Component {
           }
         });
     }
+    this.setState({
+      name: "",
+      quantities: [{ date: "", quantity: "" }]
+    });
   };
 
   handleChange = e => {
@@ -131,6 +139,35 @@ export default class AddChangeItemComponent extends React.Component {
     }
   };
 
+  resetNameInput = () => {
+    this.setState({
+      nameInputIsLoading: false,
+      nameInputResults: [],
+      name: ""
+    });
+  };
+
+  handleNameSelect = (e, { result }) => {
+    this.setState({ name: result.name });
+  };
+
+  handleNameChange = (e, { value }) => {
+    this.setState({ nameInputIsLoading: true, name: value });
+
+    setTimeout(() => {
+      if (this.state.name.length < 1) {
+        return this.resetNameInput();
+      }
+      const re = new RegExp(this.state.name, "i");
+      this.setState({
+        nameInputIsLoading: false,
+        nameInputResults: this.props.namesOfFood.filter(word =>
+          word.name.match(re)
+        )
+      });
+    }, 300);
+  };
+
   handleCalendarChange(date, idx) {
     console.log(this.state.quantities[idx].date);
     let quantities = [...this.state.quantities];
@@ -141,18 +178,31 @@ export default class AddChangeItemComponent extends React.Component {
   render() {
     let { name, quantities } = this.state;
     return (
-      <div style={{ margin: "15px" }}>
+      <div style={{ margin: "15px", paddingBottom: "50px" }}>
         <Form>
           <Form.Field inline={true} autoComplete="off">
-            <label htmlFor="name">Name:</label>
+            <Search
+              input={{ icon: "add", iconPosition: "left" }}
+              onResultSelect={this.handleNameSelect}
+              onSearchChange={this.handleNameChange}
+              results={this.state.nameInputResults}
+              value={name}
+              loading={this.state.nameInputIsLoading}
+              resultRenderer={({ name }) => {
+                return <p>{name}</p>;
+              }}
+              {...this.props}
+            />
+            {/* <label htmlFor="name">Name:</label>
             <Input
+              fluid
               type="text"
               autoComplete="off"
               name="name"
               id="name"
               value={name}
               onChange={this.handleChange}
-            />
+            /> */}
           </Form.Field>
           <Button class="button addQuantityButton" onClick={this.addQuantity}>
             Click me to add more expiration dates/quantities!
@@ -182,7 +232,7 @@ export default class AddChangeItemComponent extends React.Component {
                         showMonthDropdown
                         showYearDropdown
                         dropdownMode="select"
-                        popperPlacement="auto-right"
+                        popperPlacement="right"
                       />
                     </Form.Field>
                     <Form.Field>
@@ -211,6 +261,8 @@ export default class AddChangeItemComponent extends React.Component {
             );
           })}
           <Button
+            positive
+            floated="right"
             content="Submit"
             icon="check"
             labelPosition="right"
