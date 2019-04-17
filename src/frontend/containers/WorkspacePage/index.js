@@ -45,15 +45,19 @@ export default class Workspace extends React.Component {
         'Accept' : 'application/json',
         'Content-Type': 'application/json' }
       }).then(res => {
-        if(this.state.names[0][0] == ''){
-          this.setState({
-            names:[[res.data.name, id]]
-          });
-        }
-        else{
-          this.setState({
-            names: [...this.state.names, [res.data.name, id]]
-          });
+        if(res.data.error !== "There was an error getting your account information: Invalid workspace_id"){
+          if(!(res.data.name===''||!res.data.name)){
+            if(this.state.names[0][0] === ''){
+              this.setState({
+                names:[[res.data.name, id]]
+              });
+            }
+            else{
+              this.setState({
+                names: [...this.state.names, [res.data.name, id]]
+              });
+            }
+          }
         }
       }).catch(error => {
         console.log(error);
