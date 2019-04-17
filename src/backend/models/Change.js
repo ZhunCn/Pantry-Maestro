@@ -27,11 +27,6 @@ var ChangeSchema = new Schema({
       required: true,
       default: false
     },
-    deleted: {
-      type: Boolean,
-      required: true,
-      default: false
-    },
     modified: {
       type: Boolean,
       required: true,

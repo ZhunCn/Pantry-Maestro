@@ -144,4 +144,10 @@ function authorize(req, params = {}) {
   });
 }
 
-module.exports = {complete, sanitize, isJSON, sendEmail, authorize};
+function getEmptyPromise() {
+  return new Promise((resolve, reject) => {
+    resolve();
+  });
+}
+
+module.exports = {complete, sanitize, isJSON, sendEmail, authorize, getEmptyPromise};
