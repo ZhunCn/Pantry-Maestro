@@ -44,7 +44,6 @@ export default class AddChangeItemComponent extends React.Component {
       return;
     }
     for (let i = 0; i < this.state.quantities.length; i++) {
-      console.log(this.state.quantities[i].date);
       if (
         this.state.quantities[i].date.toString() === "" ||
         this.state.quantities[i].date.toString() === "Invalid Date"
@@ -69,7 +68,6 @@ export default class AddChangeItemComponent extends React.Component {
       }
     }
     if (!emptyFlag) {
-      console.log(parsedData);
       workspaceID = localStorage.getItem("currWorkspaceID");
       let userLoginToken = localStorage.getItem("loginToken");
       axios
@@ -83,7 +81,6 @@ export default class AddChangeItemComponent extends React.Component {
               type: "success"
             });
           }
-          console.log(res.data);
           this.props.fetchData();
         })
         .catch(error => {
@@ -91,7 +88,6 @@ export default class AddChangeItemComponent extends React.Component {
             error.response.data.error === "Item with this name already exists"
           ) {
             let itemID = error.response.data.item_id;
-            console.log(itemID);
             let userLoginToken = localStorage.getItem("loginToken");
             axios
               .put(
@@ -133,7 +129,7 @@ export default class AddChangeItemComponent extends React.Component {
 
       let quantities = [...this.state.quantities];
       quantities[e.target.dataset.id][e.target.className] = newQuantity;
-      this.setState({ quantities }, () => console.log(this.state.quantities));
+      this.setState({ quantities });
     } else {
       this.setState({ [e.target.name]: e.target.value });
     }
@@ -165,14 +161,13 @@ export default class AddChangeItemComponent extends React.Component {
           word.name.match(re)
         )
       });
-    }, 300);
+    }, 100);
   };
 
   handleCalendarChange(date, idx) {
-    console.log(this.state.quantities[idx].date);
     let quantities = [...this.state.quantities];
     quantities[idx].date = date;
-    this.setState({ quantities }, () => console.log(this.state.quantities));
+    this.setState({ quantities });
   }
 
   render() {

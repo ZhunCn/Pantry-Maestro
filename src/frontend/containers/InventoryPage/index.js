@@ -62,7 +62,6 @@ export default class Inventory extends React.Component {
           localStorage.removeItem("loginToken");
           return;
         }
-        console.log(res);
         var workspaces = res.data.workspaces;
         var curWorkID = localStorage.getItem("currWorkspaceID");
         var hasCurr = false;
@@ -84,7 +83,7 @@ export default class Inventory extends React.Component {
   // Parses JSON from server into format that the table understands
   parseData(serverData) {
     let parsedData = [];
-    let listOfNames = {};
+    let listOfNames = [];
     let dataLength = Object.entries(serverData.inventory.items).length;
     let inventoryData = Object.entries(serverData.inventory.items);
     this.setState({ listOfFood: [] });
@@ -105,16 +104,9 @@ export default class Inventory extends React.Component {
       } else {
         ("Empty item");
       }
-      this.setState(
-        prevState => ({
-          listOfFood: [
-            ...prevState.listOfFood,
-            { name: inventoryData[i][1].name }
-          ]
-        }),
-        console.log(this.state)
-      );
+      listOfNames.push({ name: inventoryData[i][1].name });
     }
+    this.setState({ listOfFood: listOfNames });
     return parsedData;
   }
 
@@ -231,7 +223,6 @@ export default class Inventory extends React.Component {
               if (res.status === 200) {
                 console.log("updated date");
               }
-              console.log(res.data);
               this.fetchData();
             })
             .catch(error => {
@@ -267,7 +258,6 @@ export default class Inventory extends React.Component {
         if (res.status === 200) {
           console.log("checked out");
         }
-        console.log(res.data);
         this.fetchData();
       })
       .catch(error => {
@@ -283,8 +273,6 @@ export default class Inventory extends React.Component {
   // handles +/- button for items
   // updown is either +1 or -1 for adding 1 and removing 1
   handleEditQuantityButton(item, updown) {
-    console.log("Updating quantity of " + item.id + " by " + updown);
-
     let userLoginToken = localStorage.getItem("loginToken");
     // JSON to send to server with the associated expiration date and +1/-1 quantity
     let updatedQuantity = {
@@ -305,7 +293,6 @@ export default class Inventory extends React.Component {
         if (res.status === 200) {
           console.log("updated quantity");
         }
-        console.log(res.data);
         this.fetchData();
       })
       .catch(error => {
