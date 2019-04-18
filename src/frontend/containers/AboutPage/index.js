@@ -8,9 +8,9 @@ export default class About extends React.Component {
   render() {
     return (
       <div class="aboutPage">
-        <GenericNavigationBar/>
-        <div class="Content">
-        <p>About component!</p>
+        <GenericNavigationBar />
+        <div class="MainContent">
+          <p>About component!</p>
         </div>
       </div>
     );

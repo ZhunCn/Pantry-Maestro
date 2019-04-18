@@ -44,7 +44,7 @@ export default class Changes extends React.Component {
         return (
             <div className="ChangesPage">
                 <GenericNavigationBar />
-                <div className="Content">
+                <div className="MainContent">
                     <h1>Changes</h1>
                     <div>
                         <FoodItem props={tempItemProp} />

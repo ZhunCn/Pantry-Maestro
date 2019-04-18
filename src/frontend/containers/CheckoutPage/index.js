@@ -17,15 +17,15 @@ export default class CheckoutPage extends React.Component {
     };
   }
 
-  handleSubmit(e){
+  handleSubmit(e) {
     console.log(e);
   }
 
   render() {
     return (
       <div class="CheckoutPage">
-        <GenericNavigationBar/>
-        <div class="Content">
+        <GenericNavigationBar />
+        <div class="MainContent">
           <h1>Check Out</h1>
           <h4>What Items Would You Like To Check Out Today?</h4>
           <Form onSubmit={this.handleSubmit}>

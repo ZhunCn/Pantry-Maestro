@@ -416,7 +416,7 @@ export default class Settings extends React.Component {
     return (
       <div class="settingsPage">
         <GenericNavigationBar />
-        <div class="Content">
+        <div class="MainContent">
           <h2>Settings</h2>
           <div class="Total">
             <div class="col">

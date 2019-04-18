@@ -60,26 +60,26 @@ export default class DisplayVolunteerComponent extends React.Component {
     axios.post(`/api/workspaces/${workID}/transfer`, {
       user_id: `${id}`
     },
-    {
-      headers: {
-        Authorization: `${userLoginToken}`,
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
-    }).then(res => {
-      if (res.data.message == "Successfully updated roles") {
-        toast(res.data.message, { type: "success" });
-      } else {
-        toast(res.data.error, { type: "error" });
-      }
-      this.props.getInfo();
-    });
+      {
+        headers: {
+          Authorization: `${userLoginToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+      }).then(res => {
+        if (res.data.message == "Successfully updated roles") {
+          toast(res.data.message, { type: "success" });
+        } else {
+          toast(res.data.error, { type: "error" });
+        }
+        this.props.getInfo();
+      });
     this.closeAll();
   }
   handleMakeAdmin(id) {
     console.log("Make admin: " + id);
     console.log("This function hasn't been implemented yet");
-    toast("Nothing happened because this wasn't implemented yet", {type: "warning"});
+    toast("Nothing happened because this wasn't implemented yet", { type: "warning" });
     this.closeAll();
   }
   refreshModal(name, id) {
@@ -95,7 +95,6 @@ export default class DisplayVolunteerComponent extends React.Component {
           {name}
           <br />
           <Modal
-            style={{ height: 280 }}
             open={this.state.open1}
             onOpen={this.open1}
             onClose={this.closeAll}
@@ -124,7 +123,6 @@ export default class DisplayVolunteerComponent extends React.Component {
             </div>
           </Modal>
           <Modal
-            style={{ height: 280 }}
             open={this.state.open2}
             onOpen={this.open2}
             onClose={this.closeAll}
@@ -149,7 +147,6 @@ export default class DisplayVolunteerComponent extends React.Component {
             </div>
           </Modal>
           <Modal
-            style={{ height: 280 }}
             open={this.state.open3}
             onOpen={this.open3}
             onClose={this.closeAll}
@@ -184,11 +181,11 @@ export default class DisplayVolunteerComponent extends React.Component {
     return (
       <div>
         <strong>Volunteers in current workspace</strong>
-        {this.props.volunteers[0] != "" ||!this.props.volunteers? (
+        {this.props.volunteers[0] != "" || !this.props.volunteers ? (
           this.makeList(this.props.volunteers)
         ) : (
-          <ul>None</ul>
-        )}
+            <ul>None</ul>
+          )}
       </div>
     );
   }
