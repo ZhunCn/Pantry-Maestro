@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
+const path = require('path');
+const fs = require('fs');
 const Schema = mongoose.Schema;
 const c = require('const');
 
@@ -95,6 +98,79 @@ WorkspaceSchema.methods.isOwner = function(user_id, cb) {
   }
 
   cb(false);
+}
+
+WorkspaceSchema.methods.getAdmins = function(cb) {
+  const workspace = this;
+
+  let users = [];
+  for (let i = 0; i < workspace.users.length; i++) {
+    if (workspace.users[i] && workspace.users[i].roles.includes(c.roles.ADMIN)) {
+      users.push(workspace.users[i].account);
+    }
+  }
+
+  cb(users);
+}
+
+WorkspaceSchema.methods.sendLeaveEmail = function(cb) {
+  const workspace = this;
+
+  let users = [];
+  for (let i = 0; i < workspace.users.length; i++) {
+    if (workspace.users[i] && workspace.users[i].roles.includes(c.roles.ADMIN)) {
+      users.push(workspace.users[i].account);
+    }
+  }
+
+  let promises = [];
+
+  for (let i = 0; i < users.length; i++) {
+    promises.push(new Promise((resolve, reject) => {
+      User.findById(users[i]).exec((err, user) => {
+        if (err) {
+          reject(err);
+        }
+
+        resolve(user.email);
+      });
+    }));
+  }
+
+  Promise.all(promises).then(emails => {
+    let html = fs.readFileSync(path.join(__dirname, '../assets/templates/leaveWorkspaceNotif.html'), 'utf8');
+
+    while (html.indexOf('{{workspace_name}}') != -1) {
+        html = html.replace('{{workspace_name}}', workspace.name);
+    }
+
+    let attachments = [{
+      filename: 'PantryMaestroLogo.png',
+      path: path.join(__dirname, '../assets/templates/PantryMaestroLogo.png'),
+      cid: 'logo'
+    }];
+
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    });
+
+    const subject = "A user has left your workspace";
+    for (i = 0; i < emails.length; i++) {
+      transporter.sendMail({
+        from: process.env.NODEMAILER_EMAIL,
+        to: emails[i],
+        subject: subject,
+        html: html,
+        attachments: attachments
+      });
+    }
+
+    cb(null);
+  });
 }
 
 module.exports = mongoose.model('Workspace', WorkspaceSchema);
