@@ -3,7 +3,7 @@ import "./styles.scss";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { Button, Modal } from "semantic-ui-react";
+import { Button, Modal, List, Grid } from "semantic-ui-react";
 
 export default class DisplayVolunteerComponent extends React.Component {
   constructor(props) {
@@ -23,8 +23,18 @@ export default class DisplayVolunteerComponent extends React.Component {
   refreshModal(value) {
     this.setState({ curVolun: value });
   }
+  // makeList(items) {
+  //   return <List>{items.map((item, i) => this.listItem(item))}</List>;
+  // }
   makeList(items) {
-    return <ul>{items.map((item, i) => this.listItem(item))}</ul>;
+    return <List bulleted verticalAlign='middle' style={{"margin-left": 10}}>{items.sort((a, b) => this.sortFunc(a, b)).map((item, i) => this.listItem(item))}</List>;
+  }
+  sortFunc(a, b){
+    var x = a.account.username.toLowerCase();
+    var y = b.account.username.toLowerCase();
+    if (x < y) {return -1;}
+    if (x > y) {return 1;}
+    return 0;
   }
   open1 = () => this.setState({ open1: true });
   close1 = () => this.setState({ open1: false });
@@ -91,19 +101,45 @@ export default class DisplayVolunteerComponent extends React.Component {
     let isSelf = value.account._id == this.props.userID;
     if (this.props.isOwner && !isSelf) {
       return (
-        <li>
+        <List.Item>
           {name}
           <br />
+          <Grid columns = {1}>
+            <Grid.Row>
+                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open1()}}>
+                  Remove from Workspace
+                </Button>
+                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open2()}}>
+                  Make Admin
+                </Button>
+                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open3()}}>
+                  Transfer Ownership
+                </Button>
+            </Grid.Row>
+          </Grid>
+        </List.Item>
+      );
+    } else {
+      return <List.Item>{name}</List.Item>;
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <div style={{"margin-top": 20}}>
+          <h3>Volunteers in current workspace</h3>
+        </div>
+        {this.props.volunteers[0] != "" || !this.props.volunteers ? (
+          this.makeList(this.props.volunteers)
+        ) : (
+            <List><List.Item><List.Header>No Volunteers</List.Header>Try inviting some volunteers</List.Item></List>
+          )}
           <Modal
             open={this.state.open1}
             onOpen={this.open1}
             onClose={this.closeAll}
             size="small"
-            trigger={
-              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
-                Remove from Workspace
-              </Button>
-            }
           >
             <Modal.Header>
               Remove from workspace?
@@ -127,11 +163,6 @@ export default class DisplayVolunteerComponent extends React.Component {
             onOpen={this.open2}
             onClose={this.closeAll}
             size="small"
-            trigger={
-              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
-                Make Admin
-              </Button>
-            }
           >
             <Modal.Header>Make admin of workspace?</Modal.Header>
             <div class="contain" style={{ margin: 20 }}>
@@ -151,11 +182,6 @@ export default class DisplayVolunteerComponent extends React.Component {
             onOpen={this.open3}
             onClose={this.closeAll}
             size="small"
-            trigger={
-              <Button size="small" onClick={() => this.refreshModal(name, value.account._id)}>
-                Transfer ownership
-              </Button>
-            }
           >
             <Modal.Header>Transfer Ownership of workspace?</Modal.Header>
             <div class="contain" style={{ margin: 20 }}>
@@ -170,22 +196,6 @@ export default class DisplayVolunteerComponent extends React.Component {
               <Button onClick={this.closeAll}>Do not transfer ownership</Button>
             </div>
           </Modal>
-        </li>
-      );
-    } else {
-      return <li>{name}</li>;
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <strong>Volunteers in current workspace</strong>
-        {this.props.volunteers[0] != "" || !this.props.volunteers ? (
-          this.makeList(this.props.volunteers)
-        ) : (
-            <ul>None</ul>
-          )}
       </div>
     );
   }

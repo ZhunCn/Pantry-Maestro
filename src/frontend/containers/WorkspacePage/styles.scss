@@ -4,11 +4,10 @@
   * {
     box-sizing: border-box;
   }
-  display:flex;
   .MainContent {
-    flex: 1;
     margin-left: 108px;
     margin-top: 24px;
+    margin-right: 10px;
   }
   .Total {
     display: grid;

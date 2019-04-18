@@ -180,12 +180,12 @@ export default class DisplayWorkspaceComponent extends React.Component {
             <List.Header style={{"margin-top": 10, "margin-bottom": 10}}>{name}</List.Header>
         <Grid columns = {2}>
             <Grid.Column>
-              <Button size="small" onClick={e => {this.refreshModal(value); this.open1(value[1]);e.stopPropagation()}}>
+              <Button size="small" onClick={e => {this.refreshModal(value); this.open1(); e.stopPropagation()}}>
                 Leave Workspace
               </Button>
             </Grid.Column>
             <Grid.Column>
-              <Button size="small" onClick={e => {this.refreshModal(value); this.open2(value[1]);e.stopPropagation()}}>
+              <Button size="small" onClick={e => {this.refreshModal(value); this.open2(); e.stopPropagation()}}>
                 Delete Workspace
               </Button>
             </Grid.Column>
@@ -197,14 +197,13 @@ export default class DisplayWorkspaceComponent extends React.Component {
   render() {
     return (
       <div>
-        <strong>Workspaces you are enrolled in</strong>
+        <h3>Workspaces you are enrolled in</h3>
         {(this.props.names.length==1 && !this.props.names[0][0]) ? (
-          <ul>None</ul>
+          <List><List.Item><List.Header>No Workspaces</List.Header>Try creating one</List.Item></List>
         ) : (
           this.makeList(this.props.names)
         )}
         <Modal
-          style={{ height: 200 }}
           open={this.state.open1}
           onOpen={() => this.open1()}
           onClose={() => this.closeAll()}
@@ -212,10 +211,12 @@ export default class DisplayWorkspaceComponent extends React.Component {
         >
           <Modal.Header>Leave Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
-            <strong>
+            <div class="text" style={{ "margin-bottom": 20 }}>
+            <strong style={{ "margin-bottom": 20 }}>
               Are you sure you want to leave {this.state.works[0]}?
             </strong>
             <br />
+            </div>
             <Button onClick={() => this.checkAndLeave(this.state.works[1])}>
               Leave Workspace
             </Button>
@@ -225,7 +226,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state.open2}
           onOpen={() => this.open2()}
           onClose={() => this.closeAll()}
@@ -233,10 +233,12 @@ export default class DisplayWorkspaceComponent extends React.Component {
         >
           <Modal.Header>Delete Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
-            <strong>
+            <div class="text" style={{ "margin-bottom": 20 }}>
+            <strong style={{ "margin-bottom": 20 }}>
               Are you sure you want to delete {this.state.works[0]}?
             </strong>
             <br />
+            </div>
             <Button onClick={() => this.checkDelete(this.state.works[1])}>
               Delete Workspace
             </Button>
@@ -246,7 +248,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state.open3}
           onOpen={() => this.open3()}
           onClose={() => this.closeAll()}
@@ -254,6 +255,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         >
           <Modal.Header>Leave Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
+            <div class="text" style={{ "margin-bottom": 20 }}>
             <strong>
               You are the only user in the workspace.
               <br />
@@ -262,6 +264,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
               Are you sure you want to leave {this.state.works[0]}?
             </strong>
             <br />
+            </div>
             <Button onClick={() => this.checkDelete(this.state.works[1])}>
               Delete Workspace
             </Button>
@@ -271,7 +274,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state.open4}
           onOpen={() => this.open4()}
           onClose={() => this.closeAll()}
@@ -279,6 +281,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         >
           <Modal.Header>{this.state.field ? "Leave" : "Delete"} last Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
+            <div class="text" style={{ "margin-bottom": 20 }}>
             <strong>
               This is your only workspace.
               <br />
@@ -291,6 +294,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
               {this.state.works[0]}?
             </strong>
             <br />
+            </div>
             <Button
               onClick={() =>
                 this.state.field

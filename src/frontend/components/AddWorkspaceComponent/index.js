@@ -76,18 +76,19 @@ export default class AddWorkspaceComponent extends React.Component {
   render() {
     return (
       <div>
-        <strong>Create a workspace</strong>
+        <h3>Create a new workspace</h3>
         <Form onSubmit={this.handleSubmit}>
-          <Form.Field>
-            <label>Name:</label>
-            <input
+          <Form.Field fluid>
+            <Input
+              label = "Name"
+              placeholder="Workspace Name"
               type="text"
               class="workspaceTextInput"
               value={this.state.newWorkspaceName}
               onChange={this.handleChange}
+              action={<Button type="submit">Submit</Button>}
             />
           </Form.Field>
-          <Button type="submit">Submit </Button>
         </Form>
       </div>
     );

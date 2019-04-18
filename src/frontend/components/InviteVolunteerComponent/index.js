@@ -3,7 +3,7 @@ import "./styles.scss";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { Form, Button } from "semantic-ui-react";
+import { Form, Button, Input } from "semantic-ui-react";
 
 export default class InviteVolunteerComponent extends React.Component {
   constructor(props) {
@@ -39,12 +39,11 @@ export default class InviteVolunteerComponent extends React.Component {
   //   });
   // }
   handleSubmit(e) {
+    console.log("EMAIL: "+this.state.email);
     e.preventDefault();
     const workspaceID = localStorage.getItem("currWorkspaceID");
     const userLoginToken = localStorage.getItem("loginToken");
-    axios
-      .post(
-        `/api/workspaces/${workspaceID}/invites`,
+    axios.post(`/api/workspaces/${workspaceID}/invites`,
         { email: this.state.email },
         {
           headers: {
@@ -55,33 +54,33 @@ export default class InviteVolunteerComponent extends React.Component {
         }
       )
       .then(res => {
-        toast(this.state.email + " has been sent an invitation", {
-          type: "success"
-        });
+        toast(this.state.email + " has been sent an invitation", {type: "success"});
         console.log(res.data);
-      })
-      .catch(error => {
-        toast(error.data, { type: "error" });
-        console.log(error.data);
+        this.setState({email: ''});
+      }).catch(error => {
+        toast(error.message, { type: "error" });
+        console.log(error.message);
       });
   }
 
   render() {
     return (
-      <div>
-        <strong>Send an invitation to the current workspace</strong>
+      <div style={{"margin-top": 20}}>
+        <div style={{"margin-bottom": 10}}>
+          <h3>Send an invitation to the current workspace</h3>
+        </div>
         <Form onSubmit={this.handleSubmit}>
-          <Form.Field>
-            <label>Email:</label>
-            <input
-              placeholder="email"
+          <Form.Field fluid>
+            <Input
+              label="Email"
+              placeholder="Email"
               type="text"
               class="email"
               value={this.state.email}
               onChange={this.handleChange}
+              action={<Button type="submit">Submit</Button>}
             />
           </Form.Field>
-          <Button type="submit">Submit </Button>
         </Form>
       </div>
     );
