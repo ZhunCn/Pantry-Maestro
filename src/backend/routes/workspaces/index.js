@@ -8,6 +8,7 @@ module.exports = function(router) {
   require('./invites')(router);
   require('./analytics')(router);
   require('./transfer')(router);
+  require('./checkout')(router);
 
   return router;
 }
