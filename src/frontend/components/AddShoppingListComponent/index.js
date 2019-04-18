@@ -17,7 +17,9 @@ export default class AddShoppingListComponent extends React.Component {
 
   render() {
     return (
-
+      <div>
+        <h3>Create a new shoppingList</h3>
+      </div>
     );
   }
 };
