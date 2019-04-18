@@ -250,35 +250,84 @@ export default class Inventory extends React.Component {
   }
 
   handleAddToCartButton(item, updown) {
+    // //NOT WORKING CORRECT RN
+    // let userLoginToken = localStorage.getItem("loginToken");
+    // let updatedQuantity = {
+    //   items: {
+    //     [item.id]: {
+    //       [item.expiration]: updown
+    //     }
+    //   }
+    // };
+    // workspaceID = localStorage.getItem("currWorkspaceID");
+    // let itemID = item.id;
+    // axios
+    //   .post(`/api/workspaces/${workspaceID}/checkout`, updatedQuantity, {
+    //     headers: { Authorization: `${userLoginToken}` }
+    //   })
+    //   .then(res => {
+    //     // HTTP status 200 OK
+    //     if (res.status === 200) {
+    //       console.log("checked out");
+    //     }
+    //     this.fetchData();
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //     toast(`There was error adding to cart. ${error}`, {
+    //       type: "error"
+    //     });
+    //   });
+    //
+    // //NOT WORKING CORRECT RN
+    //remove instead of checkout
     let userLoginToken = localStorage.getItem("loginToken");
+
+    // JSON to send to server with the associated expiration date and +1/-1 quantity
     let updatedQuantity = {
-      items: {
-        [item.id]: {
-          [item.expiration]: updown
-        }
+      quantities: {
+        [item.expiration]: updown
       }
     };
     workspaceID = localStorage.getItem("currWorkspaceID");
     let itemID = item.id;
     axios
-      .post(`/api/workspaces/${workspaceID}/checkout`, updatedQuantity, {
-        headers: { Authorization: `${userLoginToken}` }
-      })
+      .put(
+        `/api/workspaces/${workspaceID}/inventory/${itemID}`,
+        updatedQuantity,
+        { headers: { Authorization: `${userLoginToken}` } }
+      )
       .then(res => {
         // HTTP status 200 OK
         if (res.status === 200) {
-          console.log("checked out");
+          console.log("updated quantity");
         }
+        let valsl = sessionStorage.getItem("shoppingList");
+        let valsid = sessionStorage.getItem("idList");
+        if (valsid == "") {
+          let vals = `${itemID}`;
+          sessionStorage.setItem("idList", vals);
+          let vall = `${item.name}`;
+          sessionStorage.setItem("shoppingList", vall);
+        }else{
+          let idList = valsid.split(",");
+          idList.push(`${itemID}`);
+          let shoppingList = valsl.split(",");
+          shoppingList.push(`${item.name}`);
+          sessionStorage.setItem("shoppingList", shoppingList.toString());
+          sessionStorage.setItem("idList", idList.toString());
+          console.log(sessionStorage.getItem("shoppingList"));
+          console.log(sessionStorage.getItem("idList"));
+        }
+
         this.fetchData();
       })
       .catch(error => {
         console.log(error);
-        toast(`There was error adding to cart. ${error}`, {
+        toast(`There was error updating the quantity. ${error}`, {
           type: "error"
         });
       });
-
-    //NOT WORKING CORRECT RN
   }
 
   // handles +/- button for items
@@ -788,8 +837,8 @@ export default class Inventory extends React.Component {
                 style={{ padding: "6px auto 6px auto", marginRight: "10px" }}
                 onClick={
                   () =>
-                    //this.handleAddToCartButton(row.row._original, -1)
-                    this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
+                    this.handleAddToCartButton(row.row._original, -1)
+                    // this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
                 }
               >
                 Add To Cart
