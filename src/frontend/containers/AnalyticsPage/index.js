@@ -24,18 +24,7 @@ export default class Analytics extends React.Component {
     let userLoginToken = localStorage.getItem("loginToken");
     let workspaceID = localStorage.getItem("currWorkspaceID");
     axios.get(`/api/workspaces/${workspaceID}/analytics/quantities/top`, { headers: { "Authorization": `${userLoginToken}` } }).then(res => {
-      //console.log(workspaceID);
-      //console.log(userLoginToken);
-      //console.log(res.analytics[0].name);
-      //console.log(res.data);
 
-
-      //if(res.data.analytics.length != 3){
-      //  console.log("hi0");
-      //  console.log(res.data.analytics);
-      //}else{
-      //console.log("hi");
-      //console.log(res.data.analytics);
       var labellist = [res.data.analytics[0].name, res.data.analytics[1].name, res.data.analytics[2].name];
       var qval = [res.data.analytics[0].total, res.data.analytics[1].total, res.data.analytics[2].total];
       this.setState({
@@ -65,7 +54,7 @@ export default class Analytics extends React.Component {
   getQuantChartData() {
     let userLoginToken = localStorage.getItem("loginToken");
     let workspaceID = localStorage.getItem("currWorkspaceID");
-    axios.get(`/api/workspaces/${workspaceID}/inventory`, {}).then(res => {
+    axios.get(`/api/workspaces/${workspaceID}/inventory`, { headers: { "Authorization": `${userLoginToken}` } }).then(res => {
       //console.log(workspaceID);
       //console.log(userLoginToken);
       //console.log(res.analytics);
