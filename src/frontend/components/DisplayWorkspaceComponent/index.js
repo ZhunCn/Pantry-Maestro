@@ -3,7 +3,7 @@ import "./styles.scss";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { Button, Modal } from "semantic-ui-react";
+import { Button, Modal, Grid, List } from "semantic-ui-react";
 
 export default class DisplayWorkspaceComponent extends React.Component {
   constructor(props) {
@@ -11,7 +11,11 @@ export default class DisplayWorkspaceComponent extends React.Component {
     this.state = {
       user_id: this.props.user_id,
       works: ["", ""],
-      field: 0
+      field: 0,
+      open1: false,
+      open2: false,
+      open3: false,
+      open4: false,
     };
   }
   checkAndLeave(id) {
@@ -35,10 +39,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
         }).then(res => {
           this.handleLeave(id);
         });
-        this.closeAll(id);
+        this.closeAll();
       } else {
-        this.closeAll(id);
-        this.open3(id);
+        this.closeAll();
+        this.open3();
       }
     });
   }
@@ -73,7 +77,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
         toast(error.message, { type: "error" });
         this.props.getInfo();
       });
-    this.closeAll(id);
+    this.closeAll();
   }
   handleDelete(id) {
     console.log("DELETE ID: " + id);
@@ -101,13 +105,13 @@ export default class DisplayWorkspaceComponent extends React.Component {
         this.props.getInfo();
         console.log(error.message);
       });
-    this.closeAll(id);
+    this.closeAll();
   }
   checkDelete(id) {
     if (this.props.names.length == 1 && this.props.names[0][0] != "") {
       console.log("This is your last workspace.");
-      this.closeAll(id);
-      this.setState({ field: 0, ["open4" + id]: true });
+      this.closeAll();
+      this.setState({ field: 0, open4: true });
     } else {
       this.handleDelete(id);
     }
@@ -115,46 +119,43 @@ export default class DisplayWorkspaceComponent extends React.Component {
   checkLeave(id) {
     if (this.props.names.length == 1 && this.props.names[0][0] != "") {
       console.log("This is your last workspace.");
-      this.closeAll(id);
-      this.setState({ field: 1, ["open4" + id]: true });
+      this.closeAll();
+      this.setState({ field: 1, open4: true });
     } else {
       this.handleLeave(id);
     }
   }
   makeList(items) {
-    return <ul>{items.map((item, i) => this.listItem(item))}</ul>;
+    return <List selection verticalAlign='middle' style={{"margin-right": 10}}>{items.sort((a, b) => this.sortFunc(a, b)).map((item, i) => this.listItem(item))}</List>;
   }
-  closeAll = id => {
-    console.log(this.state);
-    this.close1(id);
-    this.close2(id);
-    this.close3(id);
-    this.close4(id);
+  sortFunc(a, b){
+    var x = a[0].toLowerCase();
+    var y = b[0].toLowerCase();
+    if (x < y) {return -1;}
+    if (x > y) {return 1;}
+    return 0;
+  }
+  closeAll = () => {
+    this.setState({
+      open1: false,
+      open2: false,
+      open3: false,
+      open4: false,
+    });
   };
-  open1 = id => {
-    this.setState({ ["open1" + id]: true });
+  open1 = () => {
+    this.setState({ open1: true });
   };
-  close1 = id => {
-    this.setState({ ["open1" + id]: false });
+  open2 = () => {
+    this.setState({ open2: true });
   };
-  open2 = id => {
-    this.setState({ ["open2" + id]: true });
+  open3 = () => {
+    this.setState({ open3: true });
   };
-  close2 = id => {
-    this.setState({ ["open2" + id]: false });
+  open4 = () => {
+    this.setState({ open4: true });
   };
-  open3 = id => {
-    this.setState({ ["open3" + id]: true });
-  };
-  close3 = id => {
-    this.setState({ ["open3" + id]: false });
-  };
-  open4 = id => {
-    this.setState({ ["open4" + id]: true });
-  };
-  close4 = id => {
-    this.setState({ ["open4" + id]: false });
-  };
+
   setCurrentWorkspace(id) {
     localStorage.setItem("currWorkspaceID", id);
     this.props.getInfo();
@@ -167,34 +168,45 @@ export default class DisplayWorkspaceComponent extends React.Component {
     let workspaceID = localStorage.getItem("currWorkspaceID");
     var isCurr = value[1] == workspaceID;
     if (isCurr) {
-      name = <strong>{value[0]} (current workspace)</strong>;
+      name = value[0]+" (current workspace)";
     }
-    let openState = "open" + value[1];
     return (
-      <li key={value[1]}>
-        {name}
-        {isCurr ? null : (
-          <Button
-            style={{ marginLeft: 5 }}
-            size="small"
-            onClick={() => this.setCurrentWorkspace(value[1])}
-          >
-            Set Workspace
-          </Button>
+      <List.Item
+        active={isCurr}
+        onClick={() => this.setCurrentWorkspace(value[1])}
+        >
+            <List.Header style={{"margin-top": 10, "margin-bottom": 10}}>{name}</List.Header>
+        <Grid columns = {2}>
+            <Grid.Column>
+              <Button size="small" onClick={e => {this.refreshModal(value); this.open1(value[1]);e.stopPropagation()}}>
+                Leave Workspace
+              </Button>
+            </Grid.Column>
+            <Grid.Column>
+              <Button size="small" onClick={e => {this.refreshModal(value); this.open2(value[1]);e.stopPropagation()}}>
+                Delete Workspace
+              </Button>
+            </Grid.Column>
+        </Grid>
+      </List.Item>
+    );
+  }
+
+  render() {
+    return (
+      <div>
+        <strong>Workspaces you are enrolled in</strong>
+        {(this.props.names.length==1 && !this.props.names[0][0]) ? (
+          <ul>None</ul>
+        ) : (
+          this.makeList(this.props.names)
         )}
-        <br />
         <Modal
-          id={value[1]}
           style={{ height: 200 }}
-          open={this.state["open1" + value[1]]}
-          onOpen={() => this.open1(value[1])}
-          onClose={() => this.closeAll(value[1])}
+          open={this.state.open1}
+          onOpen={() => this.open1()}
+          onClose={() => this.closeAll()}
           size="small"
-          trigger={
-            <Button size="small" onClick={() => this.refreshModal(value)}>
-              Leave Workspace
-            </Button>
-          }
         >
           <Modal.Header>Leave Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
@@ -205,22 +217,17 @@ export default class DisplayWorkspaceComponent extends React.Component {
             <Button onClick={() => this.checkAndLeave(this.state.works[1])}>
               Leave Workspace
             </Button>
-            <Button onClick={() => this.closeAll(value[1])}>
+            <Button onClick={() => this.closeAll()}>
               Do not leave Workspace
             </Button>
           </div>
         </Modal>
         <Modal
           style={{ height: 200 }}
-          open={this.state["open2" + value[1]]}
-          onOpen={() => this.open2(value[1])}
-          onClose={() => this.closeAll(value[1])}
+          open={this.state.open2}
+          onOpen={() => this.open2()}
+          onClose={() => this.closeAll()}
           size="small"
-          trigger={
-            <Button size="small" onClick={() => this.refreshModal(value)}>
-              Delete Workspace
-            </Button>
-          }
         >
           <Modal.Header>Delete Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
@@ -231,16 +238,16 @@ export default class DisplayWorkspaceComponent extends React.Component {
             <Button onClick={() => this.checkDelete(this.state.works[1])}>
               Delete Workspace
             </Button>
-            <Button onClick={() => this.closeAll(value[1])}>
+            <Button onClick={() => this.closeAll()}>
               Do not delete Workspace
             </Button>
           </div>
         </Modal>
         <Modal
           style={{ height: 200 }}
-          open={this.state["open3" + value[1]]}
-          onOpen={() => this.open3(value[1])}
-          onClose={() => this.closeAll(value[1])}
+          open={this.state.open3}
+          onOpen={() => this.open3()}
+          onClose={() => this.closeAll()}
           size="tiny"
         >
           <Modal.Header>Leave Workspace?</Modal.Header>
@@ -256,19 +263,19 @@ export default class DisplayWorkspaceComponent extends React.Component {
             <Button onClick={() => this.checkDelete(this.state.works[1])}>
               Delete Workspace
             </Button>
-            <Button onClick={() => this.closeAll(value[1])}>
+            <Button onClick={() => this.closeAll()}>
               Do not delete Workspace
             </Button>
           </div>
         </Modal>
         <Modal
           style={{ height: 200 }}
-          open={this.state["open4" + value[1]]}
-          onOpen={() => this.open4(value[1])}
-          onClose={() => this.closeAll(value[1])}
+          open={this.state.open4}
+          onOpen={() => this.open4()}
+          onClose={() => this.closeAll()}
           size="tiny"
         >
-          <Modal.Header>Leave last Workspace?</Modal.Header>
+          <Modal.Header>{this.state.field ? "Leave" : "Delete"} last Workspace?</Modal.Header>
           <div class="contain" style={{ margin: 20 }}>
             <strong>
               This is your only workspace.
@@ -291,24 +298,11 @@ export default class DisplayWorkspaceComponent extends React.Component {
             >
               {this.state.field ? "Leave" : "Delete"} Workspace
             </Button>
-            <Button onClick={() => this.closeAll(value[1])}>
+            <Button onClick={() => this.closeAll()}>
               Do not {this.state.field ? "leave" : "delete"} Workspace
             </Button>
           </div>
         </Modal>
-      </li>
-    );
-  }
-
-  render() {
-    return (
-      <div>
-        <strong>Workspaces you are enrolled in</strong>
-        {(this.props.names.length==1 && !this.props.names[0][0]) ? (
-          <ul>None</ul>
-        ) : (
-          this.makeList(this.props.names)
-        )}
       </div>
     );
   }
