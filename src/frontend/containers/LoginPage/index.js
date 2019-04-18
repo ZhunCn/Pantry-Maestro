@@ -127,13 +127,16 @@ export default class Login extends React.Component {
                   });
                 } else {
                   localStorage.setItem("loginToken", res.data.token);
-                  //two concurrent lists
-                  //one for item ids
-                  // other for item names
+                  //three concurrent lists
+                  //one for item ids and the other for item names
+                  //last for expiration
+                  //create shopping cart
                   let shoppingList = [];
                   let idList = [];
+                  let expList = [];
                   sessionStorage.setItem("shoppingList", shoppingList.toString());
                   sessionStorage.setItem("idList", idList.toString());
+                  sessionStorage.setItem("expList", expList.toString());
                   // console.log(sessionStorage.getItem("shoppingList"));
                   // console.log(shoppingList.toString());
 

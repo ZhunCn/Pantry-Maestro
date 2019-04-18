@@ -12,7 +12,7 @@ export default class AddShoppingListComponent extends React.Component {
   }
 
   createList(items) {
-    return <ul>{items.map((item, i) => this.listItem(item))}</ul>;
+    return [];//<List selection verticalAlign='middle' style={{"margin-right": 10}}>{items.sort((a, b) => this.sortFunc(a, b)).map((item, i) => this.listItem(item))}</List>;
   }
 
   render() {

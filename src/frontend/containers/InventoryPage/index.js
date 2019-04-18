@@ -304,20 +304,27 @@ export default class Inventory extends React.Component {
         }
         let valsl = sessionStorage.getItem("shoppingList");
         let valsid = sessionStorage.getItem("idList");
+        let valsexp = sessionStorage.getItem("expList");
         if (valsid == "") {
           let vals = `${itemID}`;
           sessionStorage.setItem("idList", vals);
           let vall = `${item.name}`;
           sessionStorage.setItem("shoppingList", vall);
+          let vale = `${item.expiration}`;
+          sessionStorage.setItem("expList", vale);
         }else{
           let idList = valsid.split(",");
           idList.push(`${itemID}`);
           let shoppingList = valsl.split(",");
           shoppingList.push(`${item.name}`);
+          let expList = valsexp.split(",");
+          expList.push(`${item.expiration}`);
           sessionStorage.setItem("shoppingList", shoppingList.toString());
           sessionStorage.setItem("idList", idList.toString());
+          sessionStorage.setItem("expList", expList.toString());
           console.log(sessionStorage.getItem("shoppingList"));
           console.log(sessionStorage.getItem("idList"));
+          console.log(sessionStorage.getItem("expList"));
         }
 
         this.fetchData();

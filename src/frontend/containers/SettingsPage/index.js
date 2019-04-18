@@ -293,8 +293,10 @@ export default class Settings extends React.Component {
   //function to log the user out and redirect to the login page
   logoutProcedure() {
     localStorage.removeItem("loginToken");
+    //remove shopping cart
     sessionStorage.removeItem("shoppingList");
     sessionStorage.removeItem("idList");
+    sessionStorage.removeItem("expList");
     this.props.history.push("/login");
   }
   //function to enable popup when disabled and vice versa

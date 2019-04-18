@@ -47,8 +47,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
     });
   }
   handleLeave(id) {
+    //refresh shopping cart
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
+    sessionStorage.setItem("expList", "");
     console.log("LEAVE ID: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post("/api/account/leave",
@@ -83,8 +85,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
     this.closeAll();
   }
   handleDelete(id) {
+    //refresh shopping cart
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
+    sessionStorage.setItem("expList", "");
     console.log("DELETE ID: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
@@ -163,8 +167,10 @@ export default class DisplayWorkspaceComponent extends React.Component {
   };
 
   setCurrentWorkspace(id) {
+    //refresh shopping cart
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
+    sessionStorage.setItem("expList", "");
     localStorage.setItem("currWorkspaceID", id);
     this.props.getInfo();
   }
