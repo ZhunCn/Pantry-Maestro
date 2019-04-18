@@ -17,11 +17,18 @@ import { Button, Icon, Modal, Form, Confirm, Header, FormButton, TextArea } from
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
-function Item(id, name, expiration, quantity) {
-  this.id = id;
-  this.name = name;
-  this.expiration = expiration;
-  this.quantity = quantity;
+class Item {
+  constructor(id, name, expiration, quantity, note) {
+    this.id = id;
+    this.name = name;
+    this.expiration = expiration;
+    this.quantity = quantity;
+    this.note = note;
+  }
+
+  getNote() {
+    return this.note;
+  }
 }
 
 export default class Inventory extends React.Component {
@@ -35,8 +42,10 @@ export default class Inventory extends React.Component {
       deleteItemShow: false,
       itemToDelete: {},
       listOfFood: [],
-      noDataText: ""
+      noDataText: "",
+      currNote: ""
     };
+    this.noteInput = React.createRef();
     this.editNameInput = React.createRef();
     this.refReactTable = React.createRef();
   }
@@ -92,12 +101,14 @@ export default class Inventory extends React.Component {
         let inventoryDataQuantities = Object.entries(
           inventoryData[i][1].quantities
         );
+        console.log(inventoryData[i]);
         for (let j = 0; j < inventoryDataQuantities.length; j++) {
           let tempItem = new Item(
             inventoryData[i][1]._id,
             inventoryData[i][1].name,
             inventoryDataQuantities[j][0],
-            inventoryDataQuantities[j][1]
+            inventoryDataQuantities[j][1],
+            inventoryData[i][1].note
           );
           parsedData.push(tempItem);
         }
@@ -376,6 +387,35 @@ export default class Inventory extends React.Component {
       });
   }
 
+  handleEditNote(row) {
+    let userLoginToken = localStorage.getItem("loginToken");
+    workspaceID = localStorage.getItem("currWorkspaceID");
+    let itemID = row.subRows[0]._original.id;
+    let newNote = this.noteInput.current.value;
+    let updateJSON = {
+      content: newNote
+    };
+    let data = this.state.data;
+    data.find(x => x.id === row.row._subRows[0]._original.id).note = newNote;
+    this.setState({ data: data })
+    axios
+      .put(`/api/workspaces/${workspaceID}/inventory/${itemID}/note`, updateJSON, {
+        headers: { Authorization: `${userLoginToken}` }
+      })
+      .then(res => {
+        if (res.status === 200) {
+          console.log("Updated note");
+          toast("Updated note successfully", { type: "success" });
+        }
+      })
+      .catch(error => {
+        console.log(error.response);
+        toast(`There was error updating the note of this item. ${error}`, {
+          type: "error"
+        });
+      });
+  }
+
   render() {
     if (!authorize()) {
       return <Redirect to="/login" />;
@@ -446,6 +486,7 @@ export default class Inventory extends React.Component {
                   </Modal.Actions>
                 </Modal>
                 <Modal
+                  scrolling
                   closeIcon
                   centered
                   trigger={
@@ -460,23 +501,14 @@ export default class Inventory extends React.Component {
                   } >
                   <Modal.Header>Note</Modal.Header>
                   <Modal.Content>
-                    <Form>
-                      <TextArea style={{ height: "300px" }} placeholder='Tell us more' />
-                    </Form>
+                    <textarea ref={this.noteInput} style={{ resize: "none", height: "400px", width: "100%" }} placeholder='This item has no note. Add one here and click save.' >
+                      {this.state.data.find(x => x.id === row.row._subRows[0]._original.id).note}
+                    </textarea>
                   </Modal.Content>
                   <Modal.Actions>
                     <Button
-                      onClick={() => {
-
-                      }}
-                    >
-                      Discard
-                  </Button>
-                    <Button
                       positive
-                      onClick={() => {
-
-                      }}
+                      onClick={() => this.handleEditNote(row)}
                     >
                       Save Note
                   </Button>
@@ -846,7 +878,7 @@ export default class Inventory extends React.Component {
               }}
             />
             <Modal
-              className="asdasdasd"
+              centered={false}
               closeIcon
               // style={{ height: "70%", width: "40%" }}
               trigger={
