@@ -210,7 +210,7 @@ export default class Invite extends React.Component {
     if (authorize()) {
       return (
         <div class="invitePage">
-          <div class="Content">
+          <div class="MainContent">
             <Grid
               textAlign="center"
               style={{ height: "100%" }}
@@ -218,7 +218,7 @@ export default class Invite extends React.Component {
               className="middle aligned"
             >
               <Grid.Column style={{ maxWidth: 450 }}>
-                <img textAlign="center" src={logo} class="ui medium centered image"/>
+                <img textAlign="center" src={logo} class="ui medium centered image" />
                 <Header as="h2" color="black" textAlign="center">
                   You have been invited to a Pantry Workplace!
                 </Header>
@@ -246,7 +246,7 @@ export default class Invite extends React.Component {
     } else {
       return (
         <div class="invitePage">
-          <div class="Content">
+          <div class="MainContent">
             <center>
               <Grid
                 textAlign="center"
@@ -255,7 +255,7 @@ export default class Invite extends React.Component {
                 className="middle aligned"
               >
                 <Grid.Column style={{ maxWidth: 450 }}>
-                  <img textAlign="center" src={logo} class="ui medium centered image"/>
+                  <img textAlign="center" src={logo} class="ui medium centered image" />
                   <Header as="h2" color="black" textAlign="center">
                     You have been invited to a Pantry Workplace!
                   </Header>

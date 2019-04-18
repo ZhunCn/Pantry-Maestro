@@ -13,7 +13,7 @@ import { sum, authorize } from "@/utils";
 import AddChangeItemComponent from "@/components/AddChangeItemComponent";
 import { toast, ToastContainer } from "react-toastify";
 
-import { Button, Icon, Modal, Form, Confirm, Header } from "semantic-ui-react";
+import { Button, Icon, Modal, Form, Confirm, Header, FormButton, TextArea } from "semantic-ui-react";
 
 let workspaceID = localStorage.getItem("currWorkspaceID");
 
@@ -409,43 +409,81 @@ export default class Inventory extends React.Component {
         Cell: row => {
           if (!row.original) {
             return (
-              <Modal
-                closeIcon
-                style={{ height: "250px" }}
-                trigger={
-                  <Button
-                    compact
-                    fluid
-                    style={{
-                      padding: "6px 7px 6px 7px"
-                    }}
-                  >
-                    Edit Name
-                  </Button>
-                }
-              >
-                <Modal.Header>Edit Name</Modal.Header>
-                <Modal.Content>
-                  <Form style={{ padding: "10px" }}>
-                    <label>Enter a new name:</label>
-                    <input
-                      type="text"
-                      ref={this.editNameInput}
-                      list="listOfFood"
-                    />
-                    <datalist id="listOfFood" />
-
+              <div style={{ display: "inline-block" }}>
+                <Modal
+                  closeIcon
+                  trigger={
                     <Button
-                      style={{ marginTop: "10px" }}
-                      floated="right"
+                      compact
+                      style={{
+                        padding: "7px 4px 7px 4px",
+                        float: "left"
+                      }}
+                    >
+                      Edit Name
+                  </Button>
+                  }
+                >
+                  <Modal.Header>Edit Name</Modal.Header>
+                  <Modal.Content>
+                    <Form>
+                      <label>Enter a new name:</label>
+                      <input
+                        type="text"
+                        ref={this.editNameInput}
+                        list="listOfFood"
+                      />
+                      <datalist id="listOfFood" />
+                    </Form>
+                  </Modal.Content>
+                  <Modal.Actions>
+                    <Button
                       positive
                       onClick={() => this.handleEditNameButton(row)}
                     >
                       Submit
                     </Button>
-                  </Form>
-                </Modal.Content>
-              </Modal>
+                  </Modal.Actions>
+                </Modal>
+                <Modal
+                  closeIcon
+                  centered
+                  trigger={
+                    <Button
+                      compact
+                      style={{
+                        padding: "7px 6px 7px 6px",
+                        float: "right"
+                      }}
+                      icon="sticky note"
+                    />
+                  } >
+                  <Modal.Header>Note</Modal.Header>
+                  <Modal.Content>
+                    <Form>
+                      <TextArea style={{ height: "300px" }} placeholder='Tell us more' />
+                    </Form>
+                  </Modal.Content>
+                  <Modal.Actions>
+                    <Button
+                      onClick={() => {
+
+                      }}
+                    >
+                      Discard
+                  </Button>
+                    <Button
+                      positive
+                      onClick={() => {
+
+                      }}
+                    >
+                      Save Note
+                  </Button>
+                  </Modal.Actions>
+                </Modal>
+              </div >
+
             );
           } else {
             return (
@@ -456,7 +494,7 @@ export default class Inventory extends React.Component {
         sortable: false,
         filterable: false,
         resizable: false,
-        width: 90
+        width: 120
       },
       {
         Header: "Earliest Expiration Date",
@@ -758,7 +796,6 @@ export default class Inventory extends React.Component {
               <Modal
                 id={row.original.id + row.original.expiration}
                 closeIcon
-                style={{ height: "200px" }}
                 open={this.state[stateVar]}
               >
                 <Header icon="trash" content="Delete Item" />
@@ -796,7 +833,7 @@ export default class Inventory extends React.Component {
     return (
       <div class="inventoryPage">
         <GenericNavigationBar />
-        <div class="Content">
+        <div class="MainContent">
           <div class="InventoryTopBar" style={{ display: "inline-block" }}>
             <h1>Inventory</h1>
             <Button
@@ -809,8 +846,9 @@ export default class Inventory extends React.Component {
               }}
             />
             <Modal
+              className="asdasdasd"
               closeIcon
-              style={{ height: "70%", width: "40%" }}
+              // style={{ height: "70%", width: "40%" }}
               trigger={
                 <Button icon labelPosition="left" size="small">
                   <Icon name="add" />
@@ -819,7 +857,7 @@ export default class Inventory extends React.Component {
               }
             >
               <Modal.Header>Add a new item</Modal.Header>
-              <Modal.Content scrolling>
+              <Modal.Content scrolling className="asdasdasdqw">
                 <AddChangeItemComponent
                   namesOfFood={this.state.listOfFood}
                   fetchData={() => {

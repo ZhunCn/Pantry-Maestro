@@ -55,12 +55,12 @@ export default class DisplayWorkspaceComponent extends React.Component {
           Accept: "application/json",
           "Content-Type": "application/json"
         }
-    }).then(res => {
+      }).then(res => {
         if (res.data.error == "You can't leave the workspace if you're the last member in it") {
-          toast(res.data.error + ". Try deleting the workspace instead.", {type: "warning"});
+          toast(res.data.error + ". Try deleting the workspace instead.", { type: "warning" });
         }
-        else if(res.data.error == "You cannot leave a workspace if you are the owner"){
-          toast(res.data.error +". Transfer the ownership to another person first.", {type:"warning"});
+        else if (res.data.error == "You cannot leave a workspace if you are the owner") {
+          toast(res.data.error + ". Transfer the ownership to another person first.", { type: "warning" });
         }
         else {
           toast("User has left the workspace", { type: "success" });
@@ -69,7 +69,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
           }
           this.props.getInfo();
         }
-    }).catch(error => {
+      }).catch(error => {
         toast(error.message, { type: "error" });
         this.props.getInfo();
       });
@@ -80,27 +80,27 @@ export default class DisplayWorkspaceComponent extends React.Component {
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
     axios.delete(`/api/workspaces/${id}`, {
-        headers: {
-          Authorization: `${userLoginToken}`,
-          Accept: "application/json",
-          "Content-Type": "application/json"
+      headers: {
+        Authorization: `${userLoginToken}`,
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    }).then(res => {
+      if (res.data.error === "There was an error deleting the workspace: Insufficient permissions") {
+        toast("The workspace was not deleted. Only the owner may delete the workspace", { type: "error" });
+      }
+      else {
+        toast("The workspace has been successfully deleted", { type: "success" });
+        if (id == localStorage.getItem("currWorkspaceID")) {
+          localStorage.setItem("currWorkspaceID", "");
         }
-      }).then(res => {
-        if (res.data.error ==="There was an error deleting the workspace: Insufficient permissions") {
-          toast("The workspace was not deleted. Only the owner may delete the workspace",{ type: "error" });
-        }
-        else {
-          toast("The workspace has been successfully deleted", {type: "success"});
-          if (id == localStorage.getItem("currWorkspaceID")) {
-            localStorage.setItem("currWorkspaceID", "");
-          }
-          this.props.getInfo();
-        }
-      }).catch(error => {
-        toast(error.message, { type: "error" });
         this.props.getInfo();
-        console.log(error.message);
-      });
+      }
+    }).catch(error => {
+      toast(error.message, { type: "error" });
+      this.props.getInfo();
+      console.log(error.message);
+    });
     this.closeAll(id);
   }
   checkDelete(id) {
@@ -185,7 +185,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
         <br />
         <Modal
           id={value[1]}
-          style={{ height: 200 }}
           open={this.state["open1" + value[1]]}
           onOpen={() => this.open1(value[1])}
           onClose={() => this.closeAll(value[1])}
@@ -211,7 +210,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state["open2" + value[1]]}
           onOpen={() => this.open2(value[1])}
           onClose={() => this.closeAll(value[1])}
@@ -237,7 +235,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state["open3" + value[1]]}
           onOpen={() => this.open3(value[1])}
           onClose={() => this.closeAll(value[1])}
@@ -262,7 +259,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
           </div>
         </Modal>
         <Modal
-          style={{ height: 200 }}
           open={this.state["open4" + value[1]]}
           onOpen={() => this.open4(value[1])}
           onClose={() => this.closeAll(value[1])}
@@ -304,11 +300,11 @@ export default class DisplayWorkspaceComponent extends React.Component {
     return (
       <div>
         <strong>Workspaces you are enrolled in</strong>
-        {(this.props.names.length==1 && !this.props.names[0][0]) ? (
+        {(this.props.names.length == 1 && !this.props.names[0][0]) ? (
           <ul>None</ul>
         ) : (
-          this.makeList(this.props.names)
-        )}
+            this.makeList(this.props.names)
+          )}
       </div>
     );
   }
