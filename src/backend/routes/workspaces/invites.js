@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const {Workspace, Invite, User} = require('models');
-const {complete} = require('utils');
+const {authorize, complete} = require('utils');
 const c = require('const');
 
 module.exports = function(router) {
@@ -83,7 +83,8 @@ module.exports = function(router) {
         let invite = new Invite({
           'workspace': req.params.workspace_id,
           'workspace_name': workspace.name,
-          'email': req.body.email
+          'email': req.body.email,
+          'sender': decoded.user_id
         });
 
         invite.save((err, invite) => {
@@ -169,7 +170,7 @@ module.exports = function(router) {
   });
 
   /*
-   * Confirm an invitation
+   * Validate an invitation
    */
   router.post('/api/workspaces/:workspace_id/invites/validate', (req, res) => {
     // Authorize
@@ -199,7 +200,7 @@ module.exports = function(router) {
   });
 
   /*
-   * Confirm an invitation
+   * Invalidate an invitation
    */
   router.post('/api/workspaces/:workspace_id/invites/invalidate', (req, res) => {
     // Authorize
@@ -245,7 +246,14 @@ module.exports = function(router) {
             return;
           }
 
-          res.json({'message': 'Successfully invalidated the token'});
+          invite.sendDeclined(err => {
+            if (err) {
+              res.json({'error': 'There was an error invalidating: ' + err});
+              return;
+            }
+
+            res.json({'message': 'Successfully invalidated the token'});  
+          });
         });
       });
     });
@@ -320,7 +328,14 @@ module.exports = function(router) {
                   return;
                 }
 
-                res.json({'message': 'Successfully joined workspace', 'workspace': workspace._id});
+                invite.sendAccepted(err => {
+                  if (err) {
+                    res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error accepting invitation: ' + err});
+                    return;
+                  }
+
+                  res.json({'message': 'Successfully joined workspace', 'workspace': workspace._id});
+                });
               });
             });
           });

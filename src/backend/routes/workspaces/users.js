@@ -142,6 +142,8 @@ module.exports = function(router) {
           return;
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
     });
   });
 
@@ -216,6 +218,8 @@ module.exports = function(router) {
           }
         });
       });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
     });
   });
 }

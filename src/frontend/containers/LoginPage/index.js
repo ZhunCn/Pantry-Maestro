@@ -127,6 +127,15 @@ export default class Login extends React.Component {
                   });
                 } else {
                   localStorage.setItem("loginToken", res.data.token);
+                  //two concurrent lists
+                  //one for item ids
+                  // other for item names
+                  let shoppingList = [];
+                  let idList = [];
+                  sessionStorage.setItem("shoppingList", shoppingList.toString());
+                  sessionStorage.setItem("idList", idList.toString());
+                  // console.log(sessionStorage.getItem("shoppingList"));
+                  // console.log(shoppingList.toString());
 
                   if (this.props.match.params.inviteToken) {
                     this.props.history.push(
@@ -174,7 +183,7 @@ export default class Login extends React.Component {
           verticalAlign="middle"
           className="middle aligned"
         >
-        
+
           <Grid.Column style={{ maxWidth: 450 }}>
           <img textAlign="center" src={logo} class="ui medium centered image"/>
             <Header as="h2" color="black" textAlign="center">

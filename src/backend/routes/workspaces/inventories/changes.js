@@ -4,6 +4,7 @@ const {authorize, getEmptyPromise} = require('utils');
 const {Change, Item} = require('models');
 const c = require('const');
 const joi = require('joi');
+const max = 50;
 
 module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id/inventory/changes', (req, res) => {
@@ -14,6 +15,7 @@ module.exports = function(router) {
       Change
       .find({workspace: req.params.workspace_id})
       .sort({'_id': 'desc'})
+      .limit(max)
       .select('-__v -workspace')
       .exec((err, changes) => {
         if (err) {
@@ -21,7 +23,18 @@ module.exports = function(router) {
           return;
         }
 
-        res.json({'changes': changes});
+        let lastId = changes[changes.length - 1]._id;
+
+        Change
+        .deleteMany({workspace: req.params.workspace_id, _id: {$lt: lastId}})
+        .exec((err, result) => {
+          if (err) {
+            res.json({'error': 'There was an error minimizing the changeset'});
+            return;
+          }
+
+          res.json({'changes': changes});
+        });
       });
     }).catch(err => {
       res.json({'error': 'There was an error getting your account information: ' + err});
