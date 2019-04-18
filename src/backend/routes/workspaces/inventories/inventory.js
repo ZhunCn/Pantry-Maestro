@@ -18,7 +18,7 @@ module.exports = function(router) {
       'workspace_id': req.params.workspace_id,
       'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
     }).then(decoded => {
-      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -deleted').populate({
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).select('-_id -__v -name -users -invites -deleted').populate({
         path: 'inventory',
         select: '-_id  -__v',
         populate: {
