@@ -64,6 +64,9 @@ export default class CheckoutPage extends React.Component {
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
     sessionStorage.setItem("expList", "");
+    console.log('h');
+    this.setState({shoppingCart:[]});
+    console.log('h');
   }
 
   render() {
