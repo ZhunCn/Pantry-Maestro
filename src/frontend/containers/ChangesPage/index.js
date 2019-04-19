@@ -167,7 +167,6 @@ export default class Changes extends React.Component {
                         this.setState({ allowed: true }, resolve)
                     }
                 }).catch(err => {
-                    toast(`An error has occurred. ${err}`, { type: "error" });
                     console.log(err);
                 })
         })
@@ -186,18 +185,22 @@ export default class Changes extends React.Component {
                 <GenericNavigationBar />
                 <div className="MainContent">
                     <h1>Changes</h1>
-                    <Button
-                        icon="refresh"
-                        labelPosition="left"
-                        content="Refresh"
-                        size="small"
-                        onClick={() => {
-                            this.getChanges();
-                        }}
-                        style={{ marginBottom: "10px" }}
-                    />
+
                     {(this.state.allowed) ?
-                        (<ChangesList changes={this.state.changes} getChanges={() => this.getChanges()} />)
+                        (
+                            <div>
+                                <Button
+                                    icon="refresh"
+                                    labelPosition="left"
+                                    content="Refresh"
+                                    size="small"
+                                    onClick={() => {
+                                        this.getChanges();
+                                    }}
+                                    style={{ marginBottom: "10px" }}
+                                />
+                                <ChangesList changes={this.state.changes} getChanges={() => this.getChanges()} />
+                            </div>)
                         :
                         (<Header as='h2'>
                             <Icon name='hand paper outline' />
