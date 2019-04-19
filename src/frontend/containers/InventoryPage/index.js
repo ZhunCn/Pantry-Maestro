@@ -312,7 +312,7 @@ export default class Inventory extends React.Component {
           sessionStorage.setItem("shoppingList", vall);
           let vale = `${item.expiration}`;
           sessionStorage.setItem("expList", vale);
-        }else{
+        } else {
           let idList = valsid.split(",");
           idList.push(`${itemID}`);
           let shoppingList = valsl.split(",");
@@ -429,15 +429,10 @@ export default class Inventory extends React.Component {
         headers: { Authorization: `${userLoginToken}` }
       })
       .then(res => {
-        if (!res.data.error) {
+        if (res.status === 200) {
           console.log("Updated name");
           toast("Updated name successfully", { type: "success" });
           this.fetchData();
-        }
-        else {
-          toast(`There was error updating the name of this item. ${res.data.error}`, {
-            type: "error"
-          });
         }
       })
       .catch(error => {
@@ -850,7 +845,7 @@ export default class Inventory extends React.Component {
                 onClick={
                   () =>
                     this.handleAddToCartButton(row.row._original, -1)
-                    // this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
+                  // this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
                 }
               >
                 <Button.Content visible>Add To Cart</Button.Content>
@@ -962,16 +957,9 @@ export default class Inventory extends React.Component {
                 />
               </Modal.Content>
             </Modal>
-            <Button
-              labelPosition="left"
-              content="DEV - Create 100 fake items"
-              size="small"
-              onClick={() => {
-                this.createFakeData();
-              }}
-            />
           </div>
           <ReactTable
+            className="-striped -highlight"
             ref={r => {
               this.refReactTable = r;
             }}

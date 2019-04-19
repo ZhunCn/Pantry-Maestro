@@ -176,7 +176,13 @@ export default class AddChangeItemComponent extends React.Component {
       <div style={{ margin: "15px", paddingBottom: "50px" }}>
         <Form>
           <Form.Field inline={true} autoComplete="off">
+            <label style={{ marginBottom: "5px", marginLeft: "8px" }}>Name:</label>
             <Search
+              autoFocus
+              ref="nameInput"
+              name="nameInput"
+              id="nameInput"
+              placeholder="Enter a name"
               input={{ icon: "add", iconPosition: "left" }}
               onResultSelect={this.handleNameSelect}
               onSearchChange={this.handleNameChange}
@@ -231,7 +237,7 @@ export default class AddChangeItemComponent extends React.Component {
                       />
                     </Form.Field>
                     <Form.Field>
-                      <label class="quantityLabel" htmlFor={quantityId}>
+                      <label style={{ marginRight: "200px" }} class="quantityLabel" htmlFor={quantityId}>
                         Quantity:{" "}
                       </label>
                       <input
