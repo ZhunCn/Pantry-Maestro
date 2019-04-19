@@ -26,9 +26,9 @@ module.exports = function(router) {
     }
 
     let newUser = new User({
-      'email': req.body.email,
-      'username': req.body.username,
-      'password': req.body.password
+      email: req.body.email,
+      username: req.body.username,
+      password: req.body.password
     });
 
     newUser.save((err, user) => {
@@ -37,17 +37,9 @@ module.exports = function(router) {
         return;
       }
 
-      user.workspaces.push(req.params.workspace_id);
-      user.save((err, user) => {
-        if (err) {
-          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving user: ' + err});
-          return;
-        }
-
-        res.status(c.status.OK).json({
-          'message': 'Successfully registered user',
-          'user_id': user['_id']
-        });
+      res.status(c.status.OK).json({
+        'message': 'Successfully registered user',
+        'user_id': user['_id']
       });
     });
   });
@@ -96,34 +88,4 @@ module.exports = function(router) {
       });
     });
   });
-
-  // router.post('/api/auth/test', (req, res) => {
-  //   if (!req.headers.authorization) {
-  //     res.status(c.status.UNAUTHORIZED).json({'error': 'Missing necessary authorization'});
-  //     return;
-  //   }
-  //
-  //   let token = req.headers.authorization;
-  //
-  //   if (token.startsWith('Bearer ')) {
-  //     token = token.slice(7, token.length);
-  //   }
-  //
-  //   if (!token) {
-  //     res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
-  //     return;
-  //   }
-  //
-  //   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-  //     if (err) {
-  //       res.status(c.status.BAD_REQUEST).json({'error': 'Invalid token'});
-  //       return;
-  //     }
-  //
-  //     res.status(c.status.OK).json({
-  //       'message': 'Successfully decoded token',
-  //       'decoded': decoded
-  //     });
-  //   });
-  // });
 }

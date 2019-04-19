@@ -35,7 +35,7 @@ UserSchema.pre('save', function(next) {
 
   if (user) {
     user.workspaces.filter(workspace => {
-      return workspace !== null;
+      return workspace != null;
     });
   }
 
