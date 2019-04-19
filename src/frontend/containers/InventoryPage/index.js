@@ -429,10 +429,15 @@ export default class Inventory extends React.Component {
         headers: { Authorization: `${userLoginToken}` }
       })
       .then(res => {
-        if (res.status === 200) {
+        if (!res.data.error) {
           console.log("Updated name");
           toast("Updated name successfully", { type: "success" });
           this.fetchData();
+        }
+        else {
+          toast(`There was error updating the name of this item. ${res.data.error}`, {
+            type: "error"
+          });
         }
       })
       .catch(error => {
