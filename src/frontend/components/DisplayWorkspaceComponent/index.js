@@ -23,7 +23,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
     sessionStorage.setItem("expList", "");
-    console.log("LEAVE ID: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post("/api/account/leave",
       {
@@ -52,7 +51,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
       }).catch(error => {
         // toast(error.message, { type: "error" });
         // this.props.getInfo();
-        console.log(error.message);
       });
     this.closeAll();
   }
@@ -61,7 +59,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
     sessionStorage.setItem("expList", "");
-    console.log("DELETE ID: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     let userID = this.props.user_id;
     axios.delete(`/api/workspaces/${id}`, {
@@ -80,18 +77,15 @@ export default class DisplayWorkspaceComponent extends React.Component {
           localStorage.setItem("currWorkspaceID", "");
         }
         this.props.getInfo();
-        console.log(error.message);
       }
     }).catch(error => {
       // toast(error.message, { type: "error" });
       // this.props.getInfo();
-      console.log(error.message);
     });
     this.closeAll();
   }
   checkDelete(id) {
     if (this.props.names.length == 1 && this.props.names[0][0] != "") {
-      console.log("This is your last workspace.");
       this.closeAll();
       this.setState({ field: 0, open4: true });
     } else {
@@ -100,7 +94,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
   }
   checkLeave(id) {
     if (this.props.names.length == 1 && this.props.names[0][0] != "") {
-      console.log("This is your last workspace.");
       this.closeAll();
       this.setState({ field: 1, open4: true });
     } else {
