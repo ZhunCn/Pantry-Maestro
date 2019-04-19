@@ -4,7 +4,7 @@ import GenericNavigationBar from '@/components/GenericNavigationBar';
 import ChangesList from '@/components/ChangesList'
 import axios from 'axios';
 import { toast, ToastContainer } from "react-toastify";
-import { List, Button } from "semantic-ui-react";
+import { List, Button, Header, Icon } from "semantic-ui-react";
 import './styles.scss';
 
 
@@ -71,7 +71,8 @@ export default class Changes extends React.Component {
                     itemName: "Pizza",
                     quantities: { "02/02/2019": 23 }
                 }
-            ]
+            ],
+            allowed: false
         };
     }
 
@@ -147,8 +148,36 @@ export default class Changes extends React.Component {
                 console.log(err);
             });
     }
+
+    verifyOwner() {
+        return new Promise(resolve => {
+            let workspaceID = localStorage.getItem("currWorkspaceID");
+            let userLoginToken = localStorage.getItem("loginToken");
+
+            axios
+                .get(`/api/workspaces/${workspaceID}/own`, {
+                    headers: { Authorization: `${userLoginToken}` }
+                })
+                .then(res => {
+                    console.log("res", res.data.roles.includes("owner"));
+                    console.log("res", res.data.roles.includes("admin"));
+                    if (!(res.data.roles.includes("owner") || res.data.roles.includes("admin"))) {
+                        this.setState({ allowed: false }, resolve)
+                    } else {
+                        this.setState({ allowed: true }, resolve)
+                    }
+                }).catch(err => {
+                    toast(`An error has occurred. ${err}`, { type: "error" });
+                    console.log(err);
+                })
+        })
+    }
+
     componentDidMount() {
-        this.getChanges();
+        this.verifyOwner().then(() => {
+            this.getChanges()
+        }
+        );
     }
 
     render() {
@@ -167,7 +196,15 @@ export default class Changes extends React.Component {
                         }}
                         style={{ marginBottom: "10px" }}
                     />
-                    <ChangesList changes={this.state.changes} getChanges={() => this.getChanges()} />
+                    {(this.state.allowed) ?
+                        (<ChangesList changes={this.state.changes} getChanges={() => this.getChanges()} />)
+                        :
+                        (<Header as='h2'>
+                            <Icon name='hand paper outline' />
+                            <Header.Content>You're not allowed to see changes. Please contact your pantry coordinator.</Header.Content>
+                        </Header>)
+                    }
+                    {/* <ChangesList changes={this.state.changes} getChanges={() => this.getChanges()} /> */}
                 </div>
             </div>
         );
