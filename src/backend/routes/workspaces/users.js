@@ -148,17 +148,133 @@ module.exports = function(router) {
   });
 
   /*
-   * Update a user profile or change the user's role
+   * Promote a user to an admin
    */
-  router.put('/api/workspaces/:workspace_id/users/:user_id', (req, res) => {
+  router.put('/api/workspaces/:workspace_id/users/:user_id/promote', (req, res) => {
     // Authorize
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
+    }).then(decoded => {
+      User.findById(req.params.user_id).exec((err, user) => {
+        if (err) {
+          res.json({'error': 'There was an error finding this user: ' + err});
+          return;
+        }
+        else if (!user) {
+          res.json({'error': 'No user exists with that id'});
+          return;
+        }
 
-    if (!req.body) {
-      res.status(c.status.OK).json({'message': 'No fields to update'});
-      return;
-    }
+        Workspace.findOne({_id: req.params.workspace_id, deleted: false}).exec((err, workspace) => {
+          if (err) {
+            res.json({'error': 'There was an error finding this workspace: ' + err});
+            return;
+          }
+          else if (!workspace) {
+            res.json({'error': 'No workspace exists with this id'});
+            return;
+          }
 
-    res.status(c.status.NOT_IMPLEMENTED).json({'error': 'Functionality not added'});
+          for (let i = 0; i < workspace.users.length; i++) {
+            let user = workspace.users[i];
+
+            if (user && user.account == req.params.user_id) {
+              if (user.roles.includes(c.roles.MEMBER)) {
+                user.roles = user.roles.splice(i, 1);
+
+                if (!user.roles.includes(c.roles.ADMIN)) {
+                  user.roles.push(c.roles.ADMIN);
+                }
+
+                workspace.save(err => {
+                  if (err) {
+                    res.json({'error': 'There was an error saving the changes: ' + err});
+                    return;
+                  }
+
+                  res.json({'message': 'Successfully promoted the user'});
+                });
+                return;
+              }
+              else {
+                res.json({'message': 'User is already an admin'});
+                return;
+              }
+            }
+          }
+
+          res.json({'error': 'User is not a part of that workspace'});
+        });
+      });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
+    });
+  });
+
+  /*
+   * Promote a user to an admin
+   */
+  router.put('/api/workspaces/:workspace_id/users/:user_id/demote', (req, res) => {
+    // Authorize
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
+    }).then(decoded => {
+      User.findById(req.params.user_id).exec((err, user) => {
+        if (err) {
+          res.json({'error': 'There was an error finding this user: ' + err});
+          return;
+        }
+        else if (!user) {
+          res.json({'error': 'No user exists with that id'});
+          return;
+        }
+
+        Workspace.findOne({_id: req.params.workspace_id, deleted: false}).exec((err, workspace) => {
+          if (err) {
+            res.json({'error': 'There was an error finding this workspace: ' + err});
+            return;
+          }
+          else if (!workspace) {
+            res.json({'error': 'No workspace exists with this id'});
+            return;
+          }
+
+          for (let i = 0; i < workspace.users.length; i++) {
+            let user = workspace.users[i];
+
+            if (user && user.account == req.params.user_id) {
+              if (user.roles.includes(c.roles.ADMIN)) {
+                user.roles = user.roles.splice(i, 1);
+
+                if (!user.roles.includes(c.roles.MEMBER)) {
+                  user.roles.push(c.roles.MEMBER);
+                }
+
+                workspace.save(err => {
+                  if (err) {
+                    res.json({'error': 'There was an error saving the changes: ' + err});
+                    return;
+                  }
+
+                  res.json({'message': 'Successfully demoted the user'});
+                });
+                return;
+              }
+              else {
+                res.json({'message': 'User is already demoted'});
+                return;
+              }
+            }
+          }
+
+          res.json({'error': 'User is not a part of that workspace'});
+        });
+      });
+    }).catch(err => {
+      res.json({'error': 'There was an error getting your account information: ' + err});
+    });
   });
 
   /*

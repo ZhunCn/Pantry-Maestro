@@ -13,6 +13,7 @@ export default class DisplayVolunteerComponent extends React.Component {
       open1: false,
       open2: false,
       open3: false,
+      open4: false,
       volunteers: this.props.volunteers,
       curWorkspace: "",
       isOwner: this.props.isOwner,
@@ -42,7 +43,9 @@ export default class DisplayVolunteerComponent extends React.Component {
   close2 = () => this.setState({ open2: false });
   open3 = () => this.setState({ open3: true });
   close3 = () => this.setState({ open3: false });
-  closeAll = () => this.setState({ open1: false, open2: false, open3: false });
+  open4 = () => this.setState({ open4: true });
+  close4 = () => this.setState({ open4: false });
+  closeAll = () => this.setState({ open1: false, open2: false, open3: false, open4: false });
   handleRemove(id) {
     console.log("Remove: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
@@ -86,10 +89,46 @@ export default class DisplayVolunteerComponent extends React.Component {
       });
     this.closeAll();
   }
-  handleMakeAdmin(id) {
-    console.log("Make admin: " + id);
-    console.log("This function hasn't been implemented yet");
-    toast("Nothing happened because this wasn't implemented yet", { type: "warning" });
+  handlePromote(id) {
+    let workID = localStorage.getItem("currWorkspaceID");
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.put(`/api/workspaces/${workID}/users/${id}/promote`, {}, {
+        headers: {
+          Authorization: `${userLoginToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+    }).then(res => {
+      if (!res.data.error) {
+        toast(res.data.message, { type: "success" });
+      } else {
+        toast(res.data.error, { type: "error" });
+      }
+
+      this.props.getInfo();
+    });
+
+    this.closeAll();
+  }
+  handleDemote(id) {
+    let workID = localStorage.getItem("currWorkspaceID");
+    let userLoginToken = localStorage.getItem("loginToken");
+    axios.put(`/api/workspaces/${workID}/users/${id}/demote`, {}, {
+        headers: {
+          Authorization: `${userLoginToken}`,
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+    }).then(res => {
+      if (!res.data.error) {
+        toast(res.data.message, { type: "success" });
+      } else {
+        toast(res.data.error, { type: "error" });
+      }
+
+      this.props.getInfo();
+    });
+
     this.closeAll();
   }
   refreshModal(name, id) {
@@ -99,6 +138,27 @@ export default class DisplayVolunteerComponent extends React.Component {
     var name = value.account.username;
     let workspaceID = localStorage.getItem("currWorkspaceID");
     let isSelf = value.account._id == this.props.userID;
+    let promoteButton;
+
+    // Either show button to promote, to demote, or nothing
+    if (value.roles.includes("member")) {
+      promoteButton = (
+        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open2()}}>
+          Promote to Admin
+        </Button>
+      );
+    }
+    else if (value.roles.includes("admin")) {
+      promoteButton = (
+        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open4()}}>
+          Demote to Member
+        </Button>
+      );
+    }
+    else {
+      promoteButton = "";
+    }
+
     if (this.props.isOwner && !isSelf) {
       return (
         <List.Item>
@@ -109,9 +169,7 @@ export default class DisplayVolunteerComponent extends React.Component {
                 <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open1()}}>
                   Remove from Workspace
                 </Button>
-                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open2()}}>
-                  Make Admin
-                </Button>
+                {promoteButton}
                 <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open3()}}>
                   Transfer Ownership
                 </Button>
@@ -171,7 +229,7 @@ export default class DisplayVolunteerComponent extends React.Component {
                 administrator of <i>{this.props.name}</i>?
               </strong>
               <br />
-              <Button onClick={() => this.handleMakeAdmin(this.state.curID)}>
+              <Button onClick={() => this.handlePromote(this.state.curID)}>
                 Make admin
               </Button>
               <Button onClick={this.closeAll}>Do not make admin</Button>
@@ -194,6 +252,24 @@ export default class DisplayVolunteerComponent extends React.Component {
                 Transfer Ownership
               </Button>
               <Button onClick={this.closeAll}>Do not transfer ownership</Button>
+            </div>
+          </Modal>
+          <Modal
+            open={this.state.open4}
+            onOpen={this.open4}
+            onClose={this.closeAll}
+            size="small"
+          >
+            <Modal.Header>Demote admin to member?</Modal.Header>
+            <div class="contain" style={{ margin: 20 }}>
+              <strong>
+                Are you sure you want to demote <i>{this.state.curVolun}</i> to a member?
+              </strong>
+              <br />
+              <Button onClick={() => this.handleDemote(this.state.curID)}>
+                Demote to Member
+              </Button>
+              <Button onClick={this.closeAll}>Do not demote</Button>
             </div>
           </Modal>
       </div>
