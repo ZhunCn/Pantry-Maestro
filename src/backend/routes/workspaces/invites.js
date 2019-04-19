@@ -202,7 +202,7 @@ module.exports = function(router) {
   /*
    * Invalidate an invitation
    */
-  router.post('/api/workspaces/:workspace_id/invites/invalidate', (req, res) => {
+  router.post('/api/workspaces/invites/invalidate', (req, res) => {
     // Authorize
 
     let fields = [
@@ -252,7 +252,7 @@ module.exports = function(router) {
               return;
             }
 
-            res.json({'message': 'Successfully invalidated the token'});  
+            res.json({'message': 'Successfully invalidated the token'});
           });
         });
       });

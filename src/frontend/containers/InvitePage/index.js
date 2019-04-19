@@ -176,7 +176,19 @@ export default class Invite extends React.Component {
   }
 
   denyProcedure() {
-    this.props.history.push("/inventory");
+    let self = this;
+    axios
+    .post("/api/workspaces/invites/invalidate", {
+      invite: self.state.inviteToken
+    })
+    .then(res => {
+      if (res.data.err) {
+        toast("There was an error joining the workspace", { type: "error" });
+        return;
+      } else {
+        self.props.history.push("/inventory");
+      }
+    });
   }
 
   onInputChange(event) {
