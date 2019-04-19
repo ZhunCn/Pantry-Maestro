@@ -15,9 +15,9 @@ export default class CheckoutPage extends React.Component {
     let valsl = sessionStorage.getItem("shoppingList");
     let valsid = sessionStorage.getItem("idList");
     let valsexp = sessionStorage.getItem("expList");
-    let idList = valsid.split(",");
-    let shoppingList = valsl.split(",");
-    let expList = valsexp.split(",");
+    let idList = valsid ? valsid.split(",") : '';
+    let shoppingList = valsl ? valsl.split(",") : '';
+    let expList = valsexp ? valsexp.split(",") : '';
     console.log("list:");
     console.log([
       shoppingList,

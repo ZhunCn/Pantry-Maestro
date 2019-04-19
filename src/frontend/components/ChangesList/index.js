@@ -3,6 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { Button, Modal, Grid, List } from "semantic-ui-react";
+import "./styles.scss";
 
 export default class ChangesList extends React.Component {
     constructor(props) {
@@ -36,12 +37,14 @@ export default class ChangesList extends React.Component {
         console.log(change);
         if (change.isCreated) {
             return (
-                <List.Item>
+                <List.Item className="changeItem">
                     <List.Content>
-                        <List.Header>Item: {change.itemName}</List.Header>
-                        <List.Description>Change: Created</List.Description>
+                        <div className="changeContent">
+                          <h3>{change.itemName}</h3>
+                          <p>Created</p>
+                        </div>
+                        <p className="changeUser">{change.user}</p>
                         Expiration: {Object.entries(change.quantities)[0][0]}<br />
-                        Deleted by: {change.user}<br />
                         <Button
                             onClick={() => this.revertChange(change.changeID)}
                             content="Restore change"
@@ -54,12 +57,14 @@ export default class ChangesList extends React.Component {
             return (
                 <List.Item>
                     <List.Content>
-                        <List.Header>Item: {change.itemName}</List.Header>
-                        <List.Description>Change: Modified</List.Description>
+                        <div className="changeContent">
+                          <h3>{change.itemName}</h3>
+                          <p>Modified</p>
+                        </div>
+                        <p className="changeUser">{change.user}</p>
                         Expiration: {Object.entries(change.quantities)[0][0]}<br />
                         Original Quantity: {Object.entries(change.quantities)[0][1]}<br />
                         Quantity changed by: {Object.entries(change.changed)[0][1]}<br />
-                        Changed by: {change.user}<br />
                         <Button
                             onClick={() => this.revertChange(change.changeID)}
                             content="Restore change"
@@ -72,10 +77,12 @@ export default class ChangesList extends React.Component {
             return (
                 <List.Item>
                     <List.Content>
-                        <List.Header>Item: {change.itemName}</List.Header>
-                        <List.Description>Change: Renamed</List.Description>
+                        <div className="changeContent">
+                          <h3>{change.itemName}</h3>
+                          <p>Renamed</p>
+                        </div>
+                        <p className="changeUser">{change.user}</p>
                         Original Name: {change.oldName}<br />
-                        Changed by: {change.user}<br />
                         <Button
                             onClick={() => this.revertChange(change.changeID)}
                             content="Restore change"
@@ -93,7 +100,7 @@ export default class ChangesList extends React.Component {
     }
     render() {
         return (
-            <div>
+            <div className="changesList">
                 {this.makeList(this.props.changes)}
             </div>
         )

@@ -1,0 +1,36 @@
+.changesList {
+  .list {
+    width: 95%;
+    .item {
+      background: #f2f2f2;
+      padding: 10px;
+      border: 1px solid #d8d8d8;
+      margin-bottom: 20px;
+
+      .changeContent {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        h3 {
+          margin: 0px;
+        }
+
+        .changeUser {
+          margin: 14px;
+        }
+      }
+
+      button {
+        float: right;
+      }
+    }
+    .item:first-child {
+      padding-top: 10px !important; /* Lord please forgive me for using !important */
+      border-top: 1px solid #d8d8d8 !important; /* And here too (sorry) */
+    }
+    .item:last-child {
+      padding-bottom: 10px;
+    }
+  }
+}
