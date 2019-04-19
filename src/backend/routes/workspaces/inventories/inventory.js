@@ -381,7 +381,7 @@ module.exports = function(router) {
         let quantity = {};
         quantity[req.body.expiration] = item.quantities[req.body.expiration];
         let changed = {};
-        changed[req.body.expiration] = 0;
+        changed[req.body.expiration] = -1 * item.quantities[req.body.expiration];
         delete item.quantities[req.body.expiration];
         item.markModified('quantities');
 
