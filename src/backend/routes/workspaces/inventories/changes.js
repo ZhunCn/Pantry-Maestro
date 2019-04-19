@@ -10,7 +10,7 @@ module.exports = function(router) {
   router.get('/api/workspaces/:workspace_id/inventory/changes', (req, res) => {
     authorize(req, {
       'workspace_id': req.params.workspace_id,
-      'roles': [c.roles.OWNER, c.roles.ADMIN, c.roles.MEMBER]
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
     }).then(decoded => {
       Change
       .find({workspace: req.params.workspace_id})

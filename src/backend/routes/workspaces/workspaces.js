@@ -251,7 +251,7 @@ module.exports = function(router) {
                   return;
                 }
 
-                res.status(c.status.OK).json({'message': 'Successfully deleted database'});                
+                res.status(c.status.OK).json({'message': 'Successfully deleted database'});
               });
             });
           });
@@ -260,6 +260,41 @@ module.exports = function(router) {
     })
     .catch(err => {
       res.json({'error': 'There was an error deleting the workspace: ' + err});
+    });
+  });
+
+  /*
+   * Get own information
+   */
+  router.get('/api/workspaces/:workspace_id/own', (req, res) => {
+    authorize(req, {
+      'workspace_id': req.params.workspace_id,
+      'roles': [c.roles.OWNER, c.roles.ADMIN]
+    }).then(decoded => {
+      Workspace.findOne({'_id': req.params.workspace_id, 'deleted': false}).exec((err, workspace) => {
+        if (err) {
+          res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error querying for workspace: ' + err});
+          return;
+        }
+        else if (!workspace) {
+          res.status(c.status.BAD_REQUEST).json({'error': 'A workspace with that id doesn\'t exist'});
+          return;
+        }
+
+        for (let i = 0; i < workspace.users.length; i++) {
+          let user = workspace.users[i];
+
+          if (user.account == decoded.user_id) {
+            res.json({'roles': user.roles});
+            return;
+          }
+        }
+
+        res.json({'error': 'You are not a part of this workspace'});
+      });
+    }).catch(err => {
+      res.json({'error': 'Authorization error: ' + err});
+      return;
     });
   });
 }
