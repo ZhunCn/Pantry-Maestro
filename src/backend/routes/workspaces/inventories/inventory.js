@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {authorize, complete, sanitize} = require('utils');
+const {authorize, complete, sanitize, getEmptyPromise} = require('utils');
 const {Change, Inventory, Item, Workspace} = require('models');
 const c = require('const');
 const joi = require('joi');
@@ -217,76 +217,101 @@ module.exports = function(router) {
           item.markModified('quantities');
         }
 
+        let namePromise = getEmptyPromise();
+
         if (toUpdate['name']) {
+          namePromise = new Promise((resolve, reject) => {
+            Item.findOne({inventory: item.inventory, name: toUpdate['name']}).exec((err, item) => {
+              if (err) {
+                reject();
+                return;
+              }
+
+              if (item) {
+                resolve(true);
+              }
+              else {
+                resolve(false);
+              }
+            });
+          });
+
           oldName = item.name;
           item.name = toUpdate['name'];
         }
 
-        item.save((err, item) => {
-          if (err) {
-            res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+        namePromise.then(exists => {
+          if (exists) {
+            res.json({'error': 'An item with that name already exists in your inventory'});
             return;
           }
 
-          // Create change for name and quantity
-          if (toUpdate['name']) {
-            let change = new Change({
-              workspace: req.params.workspace_id,
-              item: {
-                _id: req.params.item_id,
-                name: oldName,
-                renamed: true
-              }
-            }).save(err => {
-              if (err) {
-                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
-                return;
-              }
+          item.save((err, item) => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+              return;
+            }
 
-              if (toUpdate['quantities']) {
-                let change = new Change({
-                  workspace: req.params.workspace_id,
-                  item: {
-                    _id: req.params.item_id,
-                    quantities: quantities,
-                    changed: toUpdate['quantities'],
-                    modified: true
-                  }
-                }).save(err => {
-                  if (err) {
-                    res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
-                    return;
-                  }
+            // Create change for name and quantity
+            if (toUpdate['name']) {
+              let change = new Change({
+                workspace: req.params.workspace_id,
+                item: {
+                  _id: req.params.item_id,
+                  name: oldName,
+                  renamed: true
+                }
+              }).save(err => {
+                if (err) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                  return;
+                }
 
+                if (toUpdate['quantities']) {
+                  let change = new Change({
+                    workspace: req.params.workspace_id,
+                    item: {
+                      _id: req.params.item_id,
+                      quantities: quantities,
+                      changed: toUpdate['quantities'],
+                      modified: true
+                    }
+                  }).save(err => {
+                    if (err) {
+                      res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                      return;
+                    }
+
+                    res.status(c.status.OK).json({'message': 'Successfully updated item'});
+                  });
+                }
+                else {
                   res.status(c.status.OK).json({'message': 'Successfully updated item'});
-                });
-              }
-              else {
-                res.status(c.status.OK).json({'message': 'Successfully updated item'});
-              }
-            });
-          }
-          else if (toUpdate['quantities']) {
-            let change = new Change({
-              workspace: req.params.workspace_id,
-              item: {
-                _id: req.params.item_id,
-                quantities: quantities,
-                changed: toUpdate['quantities'],
-                modified: true
-              }
-            }).save(err => {
-              if (err) {
-                res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
-                return;
-              }
+                }
+              });
+            }
+            else if (toUpdate['quantities']) {
+              let change = new Change({
+                workspace: req.params.workspace_id,
+                item: {
+                  _id: req.params.item_id,
+                  quantities: quantities,
+                  changed: toUpdate['quantities'],
+                  modified: true
+                }
+              }).save(err => {
+                if (err) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error saving item(s) to database: ' + err});
+                  return;
+                }
 
+                res.status(c.status.OK).json({'message': 'Successfully updated item'});
+              });
+            }
+            else {
               res.status(c.status.OK).json({'message': 'Successfully updated item'});
-            });
-          }
-          else {
-            res.status(c.status.OK).json({'message': 'Successfully updated item'});
-          }
+            }
+          });
         });
       });
     }).catch(err => {
