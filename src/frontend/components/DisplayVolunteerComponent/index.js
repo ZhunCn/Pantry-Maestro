@@ -136,49 +136,88 @@ export default class DisplayVolunteerComponent extends React.Component {
   }
   listItem(value) {
     var name = value.account.username;
+    var status;
     let workspaceID = localStorage.getItem("currWorkspaceID");
     let isSelf = value.account._id == this.props.userID;
     let promoteButton;
-
+    let removeButton;
+    let transferButton;
+    if(value.roles.includes("owner")){
+      status = " (owner)";
+    }
+    else if(value.roles.includes("admin")){
+      status = " (admin)";
+    }
+    else{
+      status = "";
+    }
     // Either show button to promote, to demote, or nothing
-    if (value.roles.includes("member")) {
-      promoteButton = (
-        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open2()}}>
-          Promote to Admin
+    if(this.props.isOwner){
+      if (value.roles.includes("member")) {
+        promoteButton = (
+          <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open2()}}>
+            Promote to Admin
+          </Button>
+        );
+      }
+      else if (value.roles.includes("admin")) {
+        promoteButton = (
+          <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open4()}}>
+            Demote to Member
+          </Button>
+        );
+      }
+      else {
+        promoteButton = "";
+      }
+      removeButton = (
+        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open1()}}>
+          Remove from Workspace
+        </Button>
+      );
+      transferButton=(
+        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open3()}}>
+          Transfer Ownership
         </Button>
       );
     }
-    else if (value.roles.includes("admin")) {
-      promoteButton = (
-        <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open4()}}>
-          Demote to Member
-        </Button>
-      );
+    else if(this.props.isAdmin){
+      console.log("ADMIN: "+this.props.isAdmin);
+      if (value.roles.includes("admin")||value.roles.includes("owner")) {
+        removeButton = "";
+      }
+      else {
+        removeButton = (
+          <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open1()}}>
+            Remove from Workspace
+          </Button>
+        );
+      }
+      promoteButton="";
+      transferButton="";
     }
-    else {
-      promoteButton = "";
+    else{
+      removeButton="";
+      promoteButton="";
+      transferButton="";
     }
 
-    if (this.props.isOwner && !isSelf) {
+    if (!isSelf) {
       return (
         <List.Item>
-          {name}
+          {name}{status}
           <br />
           <Grid columns = {1}>
             <Grid.Row>
-                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open1()}}>
-                  Remove from Workspace
-                </Button>
+                {removeButton}
                 {promoteButton}
-                <Button size="small" onClick={e => {this.refreshModal(name, value.account._id); this.open3()}}>
-                  Transfer Ownership
-                </Button>
+                {transferButton}
             </Grid.Row>
           </Grid>
         </List.Item>
       );
     } else {
-      return <List.Item>{name}</List.Item>;
+      return <List.Item><strong>{name}{status}</strong></List.Item>;
     }
   }
 

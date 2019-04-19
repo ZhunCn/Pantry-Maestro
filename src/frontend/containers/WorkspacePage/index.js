@@ -24,6 +24,7 @@ export default class Workspace extends React.Component {
       volunteers: [''],
       isOwner: false,
       curName: '',
+      isAdmin: false,
     };
   }
 
@@ -101,7 +102,6 @@ export default class Workspace extends React.Component {
     this.getInfo();
   }
   getVolunteers(id) {
-    console.log("ID" + id);
     let userLoginToken = localStorage.getItem("loginToken");
     if (id == "null") {
       this.setState({
@@ -126,8 +126,6 @@ export default class Workspace extends React.Component {
           volunteers: ['']
         });
       }
-      console.log("Volunteers");
-      console.log(this.state.volunteers);
     }).catch(() => {
       this.setState({
         volunteers: ['']
@@ -182,7 +180,6 @@ export default class Workspace extends React.Component {
         this.setState({
           curName: ''
         });
-        console.log(error);
       });
   }
   checkOwnership(id) {
@@ -195,11 +192,16 @@ export default class Workspace extends React.Component {
       }
     }).then(res => {
       if (res.data.roles.includes("owner")) {
-        console.log("Ownership check complete: true");
         this.setState({ isOwner: true });
       } else {
-        console.log("Ownership check complete: False");
         this.setState({ isOwner: false });
+      }
+      if (res.data.roles.includes("admin")) {
+        console.log("Admin check: true");
+        this.setState({ isAdmin: true });
+      } else {
+        console.log("Admin check: false");
+        this.setState({ isAdmin: false });
       }
     }).catch(res => {
       this.setState({
@@ -226,7 +228,7 @@ export default class Workspace extends React.Component {
             <div class="Right">
               <AddWorkspaceComponent getInfo={() => { this.getInfo() }} />
               <InviteVolunteerComponent />
-              <DisplayVolunteerComponent getInfo={() => { this.getInfo() }} isOwner={this.state.isOwner} volunteers={this.state.volunteers} userID={this.state.userID} name={this.state.curName} />
+              <DisplayVolunteerComponent getInfo={() => { this.getInfo() }} isOwner={this.state.isOwner} isAdmin={this.state.isAdmin} volunteers={this.state.volunteers} userID={this.state.userID} name={this.state.curName} />
             </div>
           </div>
         </div>
