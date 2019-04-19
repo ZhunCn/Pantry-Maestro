@@ -113,7 +113,12 @@ module.exports = function(router) {
                     workspace: workspace._id,
                     item: {
                       _id: item._id,
-                      created: true
+                      created: true,
+                      name: req.body.name
+                    },
+                    modifier: {
+                      username: decoded.username,
+                      user_id: decoded.user_id
                     }
                   }).save((err) => {
                     if (err) {
@@ -258,8 +263,13 @@ module.exports = function(router) {
                 workspace: req.params.workspace_id,
                 item: {
                   _id: req.params.item_id,
-                  name: oldName,
+                  oldName: oldName,
+                  name: item.name,
                   renamed: true
+                },
+                modifier: {
+                  username: decoded.username,
+                  user_id: decoded.user_id
                 }
               }).save(err => {
                 if (err) {
@@ -274,7 +284,12 @@ module.exports = function(router) {
                       _id: req.params.item_id,
                       quantities: quantities,
                       changed: toUpdate['quantities'],
-                      modified: true
+                      modified: true,
+                      name: item.name
+                    },
+                    modifier: {
+                      username: decoded.username,
+                      user_id: decoded.user_id
                     }
                   }).save(err => {
                     if (err) {
@@ -297,7 +312,12 @@ module.exports = function(router) {
                   _id: req.params.item_id,
                   quantities: quantities,
                   changed: toUpdate['quantities'],
-                  modified: true
+                  modified: true,
+                  name: item.name
+                },
+                modifier: {
+                  username: decoded.username,
+                  user_id: decoded.user_id
                 }
               }).save(err => {
                 if (err) {
@@ -377,7 +397,12 @@ module.exports = function(router) {
               _id: req.params.item_id,
               quantities: quantity,
               changed: changed,
-              modified: true
+              modified: true,
+              name: item.name
+            },
+            modifier: {
+              username: decoded.username,
+              user_id: decoded.user_id
             }
           }).save(err => {
             if (err) {

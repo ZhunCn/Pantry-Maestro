@@ -13,8 +13,12 @@ var ChangeSchema = new Schema({
       ref: 'Item',
       required: true
     },
-    name: {
+    oldName: {
       type: String
+    },
+    name: {
+      type: String,
+      required: true
     },
     quantities: {
       type: Object
@@ -36,6 +40,15 @@ var ChangeSchema = new Schema({
       type: Boolean,
       required: true,
       default: false
+    }
+  },
+  modifier: {
+    username: {
+      type: String
+    },
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
     }
   }
 }, {

@@ -83,9 +83,10 @@ module.exports = function(router) {
 
         // Create JWT
         let token = jwt.sign({
-          'user_id': user['_id']
+          user_id: user._id,
+          username: user.username
         }, process.env.JWT_SECRET, {
-          'expiresIn': '12h'
+          expiresIn: '12h'
         });
 
         res.json({

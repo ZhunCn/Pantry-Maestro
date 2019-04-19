@@ -23,18 +23,23 @@ module.exports = function(router) {
           return;
         }
 
-        let lastId = changes[changes.length - 1]._id;
+        if (changes.length > 0) {
+          let lastId = changes[changes.length - 1]._id;
 
-        Change
-        .deleteMany({workspace: req.params.workspace_id, _id: {$lt: lastId}})
-        .exec((err, result) => {
-          if (err) {
-            res.json({'error': 'There was an error minimizing the changeset'});
-            return;
-          }
+          Change
+          .deleteMany({workspace: req.params.workspace_id, _id: {$lt: lastId}})
+          .exec((err, result) => {
+            if (err) {
+              res.json({'error': 'There was an error minimizing the changeset: ' + err});
+              return;
+            }
 
+            res.json({'changes': changes});
+          });
+        }
+        else {
           res.json({'changes': changes});
-        });
+        }
       });
     }).catch(err => {
       res.json({'error': 'There was an error getting your account information: ' + err});
@@ -75,7 +80,7 @@ module.exports = function(router) {
               promise = item.remove();
             }
             else if (change.item.renamed) {
-              item.name = change.item.name;
+              item.name = change.item.oldName;
               promise = item.save();
             }
             else if (change.item.modified) {
@@ -112,7 +117,7 @@ module.exports = function(router) {
                   return;
                 }
 
-                res.json({'message': 'Successfully reverted chage'});
+                res.json({'message': 'Successfully reverted change'});
               });
             }).catch(err => {
               res.json({'error': 'There was an error finalizing the change: ' + err});
