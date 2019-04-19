@@ -18,15 +18,43 @@ export default class CheckoutPage extends React.Component {
     let idList = valsid.split(",");
     let shoppingList = valsl.split(",");
     let expList = valsexp.split(",");
+    console.log("list:");
+    console.log([
+      shoppingList,
+      idList,
+      expList
+    ]);
+    let sc = this.transposeArray([
+      shoppingList,
+      idList,
+      expList
+    ], expList.length);
+    console.log(sc);
     this.state = {
-      shoppingCart: [
-        sessionStorage.getItem("shoppingList").split(","),
-        sessionStorage.getItem("idList").split(","),
-        sessionStorage.getItem("expList").split(",")
-      ],
+      shoppingCart: sc,
+      // [
+      //   sessionStorage.getItem("shoppingList").split(","),
+      //   sessionStorage.getItem("idList").split(","),
+      //   sessionStorage.getItem("expList").split(",")
+      // ],
       userID: '',
       items: ['']
     };
+  }
+
+  transposeArray(array, arrayLength){
+      var newArray = [];
+      for(var i = 0; i < arrayLength; i++){
+          newArray.push([]);
+      };
+
+      for(var i = 0; i < array.length; i++){
+          for(var j = 0; j < arrayLength; j++){
+              newArray[j].push(array[i][j]);
+          };
+      };
+
+      return newArray;
   }
 
   handleCheckout(e) {
@@ -50,7 +78,7 @@ export default class CheckoutPage extends React.Component {
               Check Out
             </Button>
           </div>
-          <AddShoppingListComponent items={this.state.shoppingList}/>
+          <AddShoppingListComponent items={this.state.shoppingCart}/>
         </div>
       </div>
     );
