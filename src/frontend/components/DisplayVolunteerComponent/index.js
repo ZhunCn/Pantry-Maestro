@@ -47,7 +47,6 @@ export default class DisplayVolunteerComponent extends React.Component {
   close4 = () => this.setState({ open4: false });
   closeAll = () => this.setState({ open1: false, open2: false, open3: false, open4: false });
   handleRemove(id) {
-    console.log("Remove: " + id);
     let userLoginToken = localStorage.getItem("loginToken");
     let workID = localStorage.getItem("currWorkspaceID");
     axios.delete(`/api/workspaces/${workID}/users/${id}`, {
@@ -67,7 +66,6 @@ export default class DisplayVolunteerComponent extends React.Component {
     this.closeAll();
   }
   handleTransfer(id) {
-    console.log("Transfer to: " + id);
     let workID = localStorage.getItem("currWorkspaceID");
     let userLoginToken = localStorage.getItem("loginToken");
     axios.post(`/api/workspaces/${workID}/transfer`, {
@@ -182,7 +180,6 @@ export default class DisplayVolunteerComponent extends React.Component {
       );
     }
     else if(this.props.isAdmin){
-      console.log("ADMIN: "+this.props.isAdmin);
       if (value.roles.includes("admin")||value.roles.includes("owner")) {
         removeButton = "";
       }

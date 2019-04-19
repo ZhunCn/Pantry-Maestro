@@ -14,7 +14,6 @@ export default class AddWorkspaceComponent extends React.Component {
         this.setState({
           user_id: res.data._id
         });
-        console.log(res.data);
       });
   }
   constructor(props) {
@@ -53,7 +52,6 @@ export default class AddWorkspaceComponent extends React.Component {
           toast("The workspace has been successfully created!", {
             type: "success"
           });
-          console.log(res.data.workspace_id);
           localStorage.setItem("currWorkspaceID", res.data.workspace_id);
           this.props.getInfo();
           this.setState({newWorkspaceName: ''});

@@ -64,7 +64,7 @@ export default class Workspace extends React.Component {
             }
           }
         }).catch(error => {
-          console.log(error);
+          // console.log(error);
         })
     }
   }
@@ -160,7 +160,6 @@ export default class Workspace extends React.Component {
       this.setState({
         volunteers: [''],
       });
-      console.log(err.message);
     });
   }
   getCurName(id) {
@@ -197,17 +196,15 @@ export default class Workspace extends React.Component {
         this.setState({ isOwner: false });
       }
       if (res.data.roles.includes("admin")) {
-        console.log("Admin check: true");
         this.setState({ isAdmin: true });
       } else {
-        console.log("Admin check: false");
         this.setState({ isAdmin: false });
       }
     }).catch(res => {
       this.setState({
-        isOwner: false
+        isOwner: false,
+        isAdmin: false
       });
-      console.log("Error");
     });
   }
   render() {
