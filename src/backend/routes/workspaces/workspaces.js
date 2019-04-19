@@ -206,14 +206,55 @@ module.exports = function(router) {
           return;
         }
 
-        workspace.set({deleted: true});
-        workspace.save((err) => {
+        Inventory.findById(workspace.inventory).exec((err, inventory) => {
           if (err) {
             res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
             return;
           }
 
-          res.status(c.status.OK).json({'message': 'Successfully deleted database'});
+          inventory.remove(err => {
+            if (err) {
+              res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
+              return;
+            }
+
+            let promises = [];
+            for (let i = 0; i < workspace.users.length; i++) {
+              let user = workspace.users[i];
+
+              promises.push(new Promise((resolve, reject) => {
+                User.findById(user.account).exec((err, user) => {
+                  if (err) {
+                    resolve();
+                    return;
+                  }
+
+                  let index = user.workspaces.indexOf(workspace._id);
+                  if (index != -1) {
+                    user.workspaces.splice(index, 1);
+
+                    user.save(err => {
+                      resolve();
+                    });
+                  }
+                  else {
+                    resolve();
+                  }
+                })
+              }));
+            }
+
+            Promise.all(promises).then(() => {
+              workspace.remove(err => {
+                if (err) {
+                  res.status(c.status.INTERNAL_SERVER_ERROR).json({'error': 'Error deleting workspace: ' + err});
+                  return;
+                }
+
+                res.status(c.status.OK).json({'message': 'Successfully deleted database'});                
+              });
+            });
+          });
         });
       });
     })
