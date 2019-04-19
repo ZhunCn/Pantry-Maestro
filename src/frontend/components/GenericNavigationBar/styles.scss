@@ -6,31 +6,16 @@
   /* Prevent sidebar from showing a scrollbar on page */
   overflow: auto;
 }
-.italic{
-  font-style: italic;
-  text-align: center;
-  font-size: 15pt;
-  margin-top: 0px;
-  margin-bottom: 0px;
-}
 
 /* Individual item */
 .bm-item {
   display: inline-block;
-
+  text-align: center;
   /* Our sidebar item styling */
-  text-decoration: none;
-  margin-bottom: 10px;
-  color: #d1d1d1;
   font-size: 20pt;
   transition: color 0.2s;
   outline: 0 !important;
   border:0 none !important;
-}
-
-/* Change color on hover */
-.bm-item:hover {
-  color: white;
 }
 
 /* The rest copied directly from react-burger-menu docs */
@@ -57,12 +42,12 @@
 
 /* Color/shape of close button cross */
 .bm-cross {
-  background: #bdc3c7;
+  background: #646464;
 }
 
 /* General sidebar styles */
 .bm-menu {
-  background: #636363;
+  background: #E3E3E3;
   padding: 2.5em 1.5em 0;
   font-size: 1.15em;
 }
@@ -72,10 +57,6 @@
   fill: #373a47;
 }
 
-/* Wrapper for item list */
-.bm-item-list {
-  color: #b8b7ad;
-}
 
 /* Styling of overlay */
 .bm-overlay {
