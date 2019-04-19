@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
-const Workspace = require('./Workspace');
 const saltRounds = 10;
 
 var UserSchema = new Schema({
@@ -121,3 +120,4 @@ UserSchema.methods.removeWorkspace = function(workspace_id, cb) {
 }
 
 module.exports = mongoose.model('User', UserSchema);
+const Workspace = require('./Workspace');

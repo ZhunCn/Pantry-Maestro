@@ -18,34 +18,6 @@ export default class DisplayWorkspaceComponent extends React.Component {
       open4: false,
     };
   }
-  checkAndLeave(id) {
-    console.log("ID" + id);
-    let userLoginToken = localStorage.getItem("loginToken");
-    let userID = this.props.user_id;
-    axios.get(`api/workspaces/${id}/users`, {
-      headers: {
-        Authorization: `${userLoginToken}`,
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      }
-    }).then(res => {
-      if (res.data.users.length > 1) {
-        axios.get(`/api/workspaces/${id}/users/${userID}`, {
-          headers: {
-            Authorization: `${userLoginToken}`,
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          }
-        }).then(res => {
-          this.handleLeave(id);
-        });
-        this.closeAll();
-      } else {
-        this.closeAll();
-        this.open3();
-      }
-    });
-  }
   handleLeave(id) {
     //refresh shopping cart
     sessionStorage.setItem("shoppingList", "");
@@ -229,7 +201,7 @@ export default class DisplayWorkspaceComponent extends React.Component {
             </strong>
             <br />
             </div>
-            <Button onClick={() => this.checkAndLeave(this.state.works[1])}>
+            <Button onClick={() => this.handleLeave(this.state.works[1])}>
               Leave Workspace
             </Button>
             <Button onClick={() => this.closeAll()}>

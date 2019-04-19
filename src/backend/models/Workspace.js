@@ -46,7 +46,7 @@ WorkspaceSchema.methods.hasUser = function(user_id, cb) {
 
   for (let i = 0; i < workspace.users.length; i++) {
     if (workspace.users[i].account && workspace.users[i].account._id == user_id) {
-      User.findOne({'_id': user_id}).exec((err, user) => {
+      User.findById(user_id).exec((err, user) => {
         cb(true, user);
       });
       return;

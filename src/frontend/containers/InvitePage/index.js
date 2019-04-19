@@ -204,6 +204,7 @@ export default class Invite extends React.Component {
     axios
       .get("/api/account", { headers: { Authorization: `${userLoginToken}` } })
       .then(res => {
+        console.log(res);
         console.log(res.data.username);
         localStorage.setItem("userId", res.data._id);
         self.setState({ userId: res.data._id, username: res.data.username });
