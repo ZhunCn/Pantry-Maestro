@@ -18,7 +18,6 @@ export default class ChangesList extends React.Component {
     }
 
     revertChange(changeID) {
-        console.log("changeID", changeID)
         let workspaceID = localStorage.getItem("currWorkspaceID");
         let userLoginToken = localStorage.getItem("loginToken");
         axios.delete(`/api/workspaces/${workspaceID}/inventory/changes/${changeID}`, {
@@ -34,17 +33,15 @@ export default class ChangesList extends React.Component {
     }
 
     listItem(change, i) {
-        console.log(change);
         if (change.isCreated) {
             return (
                 <List.Item className="changeItem">
                     <List.Content>
                         <div className="changeContent">
-                          <h3>{change.itemName}</h3>
-                          <p>Created</p>
+                            <h3>{change.itemName}</h3>
+                            <h3>Created</h3>
                         </div>
-                        <p className="changeUser">{change.user}</p>
-                        Expiration: {Object.entries(change.quantities)[0][0]}<br />
+                        <p className="changeUser">By: {change.user}</p>
                         <Button
                             onClick={() => this.revertChange(change.changeID)}
                             content="Restore change"
@@ -58,10 +55,10 @@ export default class ChangesList extends React.Component {
                 <List.Item>
                     <List.Content>
                         <div className="changeContent">
-                          <h3>{change.itemName}</h3>
-                          <p>Modified</p>
+                            <h3>{change.itemName}</h3>
+                            <h3>Modified</h3>
                         </div>
-                        <p className="changeUser">{change.user}</p>
+                        <p className="changeUser">By: {change.user}</p>
                         Expiration: {Object.entries(change.quantities)[0][0]}<br />
                         Original Quantity: {Object.entries(change.quantities)[0][1]}<br />
                         Quantity changed by: {Object.entries(change.changed)[0][1]}<br />
@@ -78,10 +75,10 @@ export default class ChangesList extends React.Component {
                 <List.Item>
                     <List.Content>
                         <div className="changeContent">
-                          <h3>{change.itemName}</h3>
-                          <p>Renamed</p>
+                            <h3>{change.itemName}</h3>
+                            <h3>Renamed</h3>
                         </div>
-                        <p className="changeUser">{change.user}</p>
+                        <p className="changeUser">By: {change.user}</p>
                         Original Name: {change.oldName}<br />
                         <Button
                             onClick={() => this.revertChange(change.changeID)}

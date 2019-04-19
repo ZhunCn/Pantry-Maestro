@@ -101,7 +101,6 @@ export default class Inventory extends React.Component {
         let inventoryDataQuantities = Object.entries(
           inventoryData[i][1].quantities
         );
-        console.log(inventoryData[i]);
         for (let j = 0; j < inventoryDataQuantities.length; j++) {
           let tempItem = new Item(
             inventoryData[i][1]._id,
