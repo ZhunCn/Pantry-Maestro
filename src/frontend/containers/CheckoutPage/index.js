@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import GenericNavigationBar from '@/components/GenericNavigationBar';
 import axios from 'axios';
 import { toast, ToastContainer } from "react-toastify";
-import { Form, Button } from 'semantic-ui-react';
+import { Form, Button, Icon } from 'semantic-ui-react';
 import AddShoppingListComponent from '@/components/AddShoppingListComponent';
 
 import './styles.scss';
@@ -64,9 +64,7 @@ export default class CheckoutPage extends React.Component {
     sessionStorage.setItem("shoppingList", "");
     sessionStorage.setItem("idList", "");
     sessionStorage.setItem("expList", "");
-    console.log('h');
     this.setState({shoppingCart:[]});
-    console.log('h');
   }
 
   render() {
@@ -77,8 +75,11 @@ export default class CheckoutPage extends React.Component {
           <h1>Check Out</h1>
           <h3>Would You Like To Remove Any Items From Your Cart Today?</h3>
           <div class="CheckoutUiButton">
-            <Button class="UiButton" size='big' positive onClick={e => {this.handleCheckout();}}>
-              Check Out
+            <Button class="UiButton" size='big' animated positive onClick={e => {this.handleCheckout();}}>
+              <Button.Content visible>Check Out</Button.Content>
+              <Button.Content hidden>
+                <Icon name='shopping cart' />
+              </Button.Content>
             </Button>
           </div>
           <AddShoppingListComponent items={this.state.shoppingCart}/>

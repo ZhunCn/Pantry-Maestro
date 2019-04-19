@@ -839,7 +839,7 @@ export default class Inventory extends React.Component {
               <Button
                 positive
                 floated="right"
-                icon
+                animated
                 compact
                 style={{ padding: "6px auto 6px auto", marginRight: "10px" }}
                 onClick={
@@ -848,7 +848,10 @@ export default class Inventory extends React.Component {
                     // this.handleEditQuantityButton(row.row._original, -1) //api path doesnt work rn so ill just remove for now
                 }
               >
-                Add To Cart
+                <Button.Content visible>Add To Cart</Button.Content>
+                <Button.Content hidden>
+                  <Icon name='shopping cart' />
+                </Button.Content>
               </Button>
             </div>
           );

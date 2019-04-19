@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, List } from "semantic-ui-react";
+import { Button, Grid, List, Icon } from "semantic-ui-react";
 import axios from "axios";
 import './styles.scss';
 
@@ -33,8 +33,13 @@ export default class AddShoppingListComponent extends React.Component {
     return (
       <List.Item>
         <List.Content floated='right'>
-          <Button negative size="small" onClick={e => {this.remove(warray, i, value, value[1],value[2])}}>
-            Remove
+          <Button animated negative size="small" onClick={e => {this.remove(warray, i, value, value[1],value[2])}}>
+          <Button.Content visible>
+            <Icon style={{ marginLeft: "5px" }} name="trash" />
+          </Button.Content>
+          <Button.Content hidden>
+            <Icon style={{ marginLeft: "5px" }} name="delete" />
+          </Button.Content>
           </Button>
         </List.Content>
         <List.Content>
