@@ -7,6 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GenericNavigationBar from "@/components/GenericNavigationBar";
 import "./styles.scss";
+import { Button, Modal, Icon, Input, Form, FormInput } from 'semantic-ui-react'
+
 
 //add input checking on Settings similar to Login/Register
 function verifyUser(username) {
@@ -63,176 +65,75 @@ function verifyPass(password) {
   return true;
 }
 
-class Popup extends React.Component {
-  constructor(props) {
-    super(props);
+export default class Settings extends React.Component {
+  /*
+   * value: the string to control the popup that shows up
+   * showPopup: boolean to control when the popup shows up
+   */
+  constructor() {
+    super();
     this.state = {
+      value: "",
+      showPopup: false,
       user: "currentUsername",
       name: "Firstname Lastname",
       email: "email@email.com",
-      curVal: this.props.curVal
+      userInput: "",
+      emailInput: "",
+      currPassInput: "",
+      passInput1: "",
+      passInput2: "",
+      open1: false,
+      open2: false,
+      open3: false,
+      open4: false,
+      change: false
     };
   }
+  closeAll = () => {
+    this.setState({
+      open1: false,
+      open2: false,
+      open3: false,
+      open4: false,
+      userInput: "",
+      emailInput: "",
+      currPassInput: "",
+      passInput1: "",
+      passInput2: "",
+    });
+    if (this.state.change) {
+      this.setState({ change: false });
+      this.refreshData();
+    }
+  };
+  open1 = () => {
+    this.setState({ open1: true });
+  };
+  open2 = () => {
+    this.setState({ open2: true });
+  };
+  open3 = () => {
+    this.setState({ open3: true });
+  };
+  open4 = () => {
+    this.setState({ open4: true });
+  };
 
-  refreshData() {
-    let userLoginToken = localStorage.getItem("loginToken");
-    axios
-      .get("/api/account", { headers: { Authorization: `${userLoginToken}` } })
-      .then(res => {
-        this.setState({
-          user: res.data.username,
-          email: res.data.email
-        });
-        console.log(res.data);
-      });
-  }
-  componentDidMount() {
-    this.refreshData();
-  }
-
-  render() {
-    //Popup for username change
-    if (this.props.text == "username") {
-      return (
-        <div className="popup">
-          <div className="popup_inner">
-            <h1>Change your username</h1>
-            <p>Current Username:</p>
-            <p>
-              <i>{this.props.curVal}</i>
-            </p>
-            <form>
-              <p>New Username:</p>
-              <input
-                type="text"
-                id="usernameInput"
-                name="username"
-                placeholder="Username"
-              />
-            </form>
-            <button
-              onClick={() =>
-                this.processUsername(
-                  document.getElementById("usernameInput").value
-                )
-              }
-            >
-              Save
-            </button>
-            <button onClick={() => this.props.closePopup()}>
-              Discard Changes
-            </button>
-          </div>
-        </div>
-      );
-    }
-    //Popup for email change
-    else if (this.props.text == "email") {
-      return (
-        <div className="popup">
-          <div className="popup_inner">
-            <h1>Change your email</h1>
-            <p>Current Email:</p>
-            <p>
-              <i>{this.props.curVal}</i>
-            </p>
-            <form>
-              <p>New Email:</p>
-              <input
-                type="text"
-                id="emailInput"
-                name="email"
-                placeholder="email"
-              />
-            </form>
-            <button
-              onClick={() =>
-                this.processEmail(document.getElementById("emailInput").value)
-              }
-            >
-              Save
-            </button>
-            <button onClick={() => this.props.closePopup()}>
-              Discard Changes
-            </button>
-          </div>
-        </div>
-      );
-    }
-    //Popup for changing password
-    else if (this.props.text == "password") {
-      return (
-        <div className="popup">
-          <div className="popup_inner">
-            <h1>Change your Password</h1>
-            <form>
-              <p>Current password:</p>
-              <input
-                type="password"
-                id="curPasswordInput"
-                name="pass1"
-                placeholder="Current Password"
-              />
-              <p>New Password:</p>
-              <input
-                type="password"
-                id="newPasswordInput"
-                name="pass2"
-                placeholder="New Password"
-              />
-              <p>Confirm Password:</p>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="pass3"
-                placeholder="Confirm Password"
-              />
-            </form>
-            <button
-              onClick={() =>
-                this.processPassword([
-                  document.getElementById("curPasswordInput").value,
-                  document.getElementById("newPasswordInput").value,
-                  document.getElementById("confirmPassword").value
-                ])
-              }
-            >
-              Save
-            </button>
-            <button onClick={() => this.props.closePopup()}>
-              Discard Changes
-            </button>
-          </div>
-        </div>
-      );
-    }
-    //Popup for logging out
-    else if (this.props.text == "logout") {
-      return (
-        <div className="popup">
-          <div className="popup_inner">
-            <h1>Logout</h1>
-            <p>Are you sure you want to log out?</p>
-            <button onClick={() => this.ret("logout", "logout")}>
-              Yes, log out
-            </button>
-            <button onClick={() => this.props.closePopup()}>
-              No, do not log out
-            </button>
-          </div>
-        </div>
-      );
-    }
-  }
-  //function to verify username
-  processUsername = username => {
+  handleTextChange = (e, { name, value }) => this.setState({ [name]: value })
+  
+   //function to verify username
+   processUsername = username => {
     if (username == this.props.curVal) {
       toast("Current and new usernames are the same, username not updated", {
         type: "warning"
       });
       console.log("Username equal");
     } else if (verifyUser(username) === true) {
-      this.ret(username, "username");
+      this.setState({ change: true });
+      this.callbackFunction(username, "username");
+      this.closeAll();
+
     } else {
       toast("Invalid username, failed to update username", { type: "error" });
     }
@@ -245,13 +146,16 @@ class Popup extends React.Component {
       });
       console.log("Email equal");
     } else if (verifyEmail(email) === true) {
-      this.ret(email, "email");
+      this.setState({ change: true });
+      this.callbackFunction(email, "email");
+      this.closeAll();
     } else {
       toast("Invalid email, failed to update email", { type: "error" });
     }
   };
   //function to verify password
   processPassword = password => {
+    console.log(password);
     const pass1 = password[0];
     const pass2 = password[1];
     const pass3 = password[2];
@@ -266,30 +170,13 @@ class Popup extends React.Component {
     } else if (verifyPass(pass2) !== true) {
       toast("Invalid password, failed to update password", { type: "error" });
     } else {
-      this.ret(password, "password");
+      this.setState({ change: true });
+      this.callbackFunction(password, "password");
+      this.closeAll();
     }
+    
   };
-  //return function to return fields back to Settings class
-  ret = (user, pass) => {
-    this.props.closePopup();
-    this.props.callBack(user, pass);
-  };
-}
-export default class Settings extends React.Component {
-  /*
-   * value: the string to control the popup that shows up
-   * showPopup: boolean to control when the popup shows up
-   */
-  constructor() {
-    super();
-    this.state = {
-      value: "",
-      showPopup: false,
-      user: "currentUsername",
-      name: "Firstname Lastname",
-      email: "email@email.com"
-    };
-  }
+
   //function to log the user out and redirect to the login page
   logoutProcedure() {
     localStorage.removeItem("loginToken");
@@ -417,6 +304,9 @@ export default class Settings extends React.Component {
       return <Redirect to="/login" />;
     }
 
+    const { value, showPopup, user, name, email, userInput, emailInput, currPassInput,
+      passInput1, passInput2, open1, open2, open3, open4, change } = this.state
+
     return (
       <div class="settingsPage">
         <GenericNavigationBar />
@@ -428,57 +318,212 @@ export default class Settings extends React.Component {
                 <strong>Username: </strong>
                 <i>{this.state.user}</i>
               </p>
-              <button
-                onClick={() => {
-                  this.togglePopup("username");
-                }}
+              <Button
+                onClick={this.open1}
               >
                 Change Username
-              </button>
+              </Button>
+              <br /><br />
+
               <p>
                 <strong>Email: </strong>
                 <i>{this.state.email}</i>
               </p>
-              <button
-                onClick={() => {
-                  this.togglePopup("email");
-                }}
+              <Button
+                onClick={this.open2}
+
               >
                 Change Email
-              </button>
+              </Button>
             </div>
             <div class="col">
               <p>
                 <strong>Change Password:</strong>
               </p>
-              <button
-                onClick={() => {
-                  this.togglePopup("password");
-                }}
+              <Button
+               onClick={this.open3}
               >
                 Change Password
-              </button>
-              <br />
-              <button
-                onClick={() => {
-                  this.togglePopup("logout");
-                }}
+              </Button>
+              
+
+              <br /><br />
+              <Button
+                onClick={this.open4}
               >
                 Log out
-              </button>
+              </Button>
             </div>
           </div>
         </div>
-        {this.state.showPopup ? (
-          <Popup
-            text={this.state.value}
-            closePopup={this.togglePopup.bind(this)}
-            callBack={this.callbackFunction}
-            curVal={
-              this.state.value == "email" ? this.state.email : this.state.user
-            }
-          />
-        ) : null}
+        <Modal
+          open={this.state.open1}
+          onOpen={this.open1}
+          onClose={this.closeAll}
+          size="small"
+          closeIcon
+        >
+        <Modal.Header>Change your username</Modal.Header>
+        <Modal.Content>
+        <div className="popup">
+          <div className="popup_inner">
+            
+
+            <Form>
+              <Form.Group>
+              <Form.Field>
+                <label>Current Username:</label>
+                <p>
+              <i>{this.state.user}</i>
+            </p>
+              </Form.Field>
+            
+              </Form.Group>
+              <Form.Group>
+                <Form.Input label='New Username:' placeholder='Username' name='userInput' value={userInput} onChange={this.handleTextChange} />
+              
+              </Form.Group>
+            </Form>
+            
+            </div>
+        </div>
+        </Modal.Content>
+        <Modal.Actions>
+            <Button color='green'
+              onClick={() =>
+                this.processUsername(
+                  this.state.userInput
+                )
+              }
+            >
+              <Icon name='checkmark' /> Save
+            </Button>
+            <Button color='red' onClick={this.closeAll}>
+            <Icon name='remove' />   Discard Changes
+            </Button>
+            </Modal.Actions>
+        </Modal>
+        <Modal
+          open={this.state.open2}
+          onOpen={this.open2}
+          onClose={this.closeAll}
+          size="small"
+          closeIcon
+          >
+          <Modal.Header>Change your email</Modal.Header>
+
+          <Modal.Content>
+          <div className="popup">
+          <div className="popup_inner">
+
+
+          <Form>
+              <Form.Group>
+              <Form.Field>
+                <label>Current Email:</label>
+                <p>
+              <i>{this.state.email}</i>
+            </p>
+              </Form.Field>
+            
+              </Form.Group>
+              <Form.Group>
+                <Form.Input label='New Email:' placeholder='example@email.com' name='emailInput' value={emailInput} onChange={this.handleTextChange} />
+              
+              </Form.Group>
+            </Form>
+          
+          </div>
+        </div>
+          </Modal.Content>
+          <Modal.Actions>
+          <Button color='green'
+              onClick={() =>
+                this.processEmail(this.state.emailInput)
+              }
+            >
+             <Icon name='checkmark' /> Save
+            </Button>
+            <Button color='red' onClick={this.closeAll}>
+            <Icon name='remove' />  Discard Changes
+            </Button>
+          </Modal.Actions>
+          </Modal>
+          <Modal
+          open={this.state.open3}
+          onOpen={this.open3}
+          onClose={this.closeAll}
+          size="small"
+          closeIcon
+          >
+          <Modal.Header>Change your password</Modal.Header>
+
+          <Modal.Content>
+          <div className="popup">
+          <div className="popup_inner">
+
+          <Form>
+              
+              <Form.Group>
+                <Form.Input label='Current Password:' type='password' placeholder='Current Password' name='currPassInput' value={currPassInput} onChange={this.handleTextChange} />
+              
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Input label='New Password:' type='password' placeholder='New Password' name='passInput1' value={passInput1} onChange={this.handleTextChange} />
+              
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Input label='Confirm Password:' type='password' placeholder='Confirm Password' name='passInput2' value={passInput2} onChange={this.handleTextChange} />
+              
+              </Form.Group>
+            </Form>
+          </div>
+        </div>
+          </Modal.Content>
+          <Modal.Actions>
+          <Button color='green'
+              onClick={() =>
+                this.processPassword([
+                  this.state.currPassInput,
+                  this.state.passInput1,
+                  this.state.passInput2
+                ])
+              }
+            >
+             <Icon name='checkmark' /> Save
+            </Button>
+            <Button color='red' onClick={this.closeAll}>
+            <Icon name='remove' />  Discard Changes
+            </Button>
+          </Modal.Actions>
+          </Modal>
+          <Modal
+          open={this.state.open4}
+          onOpen={this.open4}
+          onClose={this.closeAll}
+          size="small"
+          closeIcon
+          >
+          <Modal.Header>Log out</Modal.Header>
+
+          <Modal.Content>
+          <div className="popup">
+          <div className="popup_inner">
+            <p>Are you sure you want to log out?</p>
+          </div>
+        </div>
+          </Modal.Content>
+          <Modal.Actions>
+          <Button color='green' onClick={() => this.callbackFunction("logout", "logout")}>
+            <Icon name='checkmark' />  Yes, log out
+            </Button>
+            <Button color='red' onClick={this.closeAll}>
+            <Icon name='remove' /> No, do not log out
+            </Button>
+            </Modal.Actions>
+          </Modal>
       </div>
     );
   }
